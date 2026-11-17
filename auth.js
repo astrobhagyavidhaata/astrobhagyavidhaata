@@ -51,5 +51,10 @@
     catch(error){show(error.message,true);}
   });
   window.AstroAuth=Object.freeze({loadUser,getUser:()=>currentUser});
-  loadUser().then(user=>{if(user&&window.AstroWallet)window.AstroWallet.loadWallet().catch(()=>{});});
+  loadUser().then(user=>{
+    if(user){
+      document.dispatchEvent(new CustomEvent("astro:auth-changed",{detail:user}));
+      if(window.AstroWallet)window.AstroWallet.loadWallet().catch(()=>{});
+    }
+  });
 })();
