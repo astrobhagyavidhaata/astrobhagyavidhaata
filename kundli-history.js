@@ -61,7 +61,17 @@
         details.style.margin="7px 0";
         const button=document.createElement("button");button.type="button";button.className="secondary";button.textContent="कुंडली खोलें";
         button.addEventListener("click",()=>openKundli(item.id));
-        wrapper.append(title,details,button);list.appendChild(wrapper);
+        const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent="इस कुंडली को हटाएँ";
+        remove.addEventListener("click",async()=>{
+          if(!window.confirm("क्या आप यह सुरक्षित कुंडली हटाना चाहते हैं?"))return;
+          try{
+            const response=await fetch("/api/kundlis/"+encodeURIComponent(item.id),{method:"DELETE",credentials:"same-origin",headers:{Accept:"application/json"}});
+            const result=await response.json().catch(()=>({}));
+            if(!response.ok)throw new Error(result.message||"कुंडली हटाई नहीं जा सकी।");
+            wrapper.remove();preview.textContent="कुंडली हटा दी गई।";
+          }catch(error){preview.textContent=error.message;}
+        });
+        wrapper.append(title,details,button,remove);list.appendChild(wrapper);
       });
     }catch(error){list.textContent=error.message;}
   }
