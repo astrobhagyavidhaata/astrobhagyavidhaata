@@ -24,6 +24,52 @@
     box.textContent = message;
   }
 
+  function renderVargaCharts(chart) {
+    const root=$("vargaCharts");
+    if(!root)return;
+    root.replaceChildren();
+    const heading=document.createElement("h3");
+    heading.textContent="षोडशवर्ग — 16 छोटी कुंडलियाँ";
+    root.appendChild(heading);
+    const note=document.createElement("p");
+    note.textContent="हर कुंडली में 12 भाव, राशि और ग्रहों की स्थिति अलग-अलग दिखाई गई है।";
+    root.appendChild(note);
+    const wrap=document.createElement("div");
+    wrap.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px";
+    const charts=chart.vargas||{};
+    for(const [key,varga] of Object.entries(charts)){
+      const card=document.createElement("section");
+      card.style.cssText="border:1px solid rgba(220,190,130,.35);border-radius:12px;padding:12px;min-width:0;background:rgba(20,16,32,.45)";
+      const title=document.createElement("h4");
+      title.textContent=key+" — "+varga.name+" | लग्न "+varga.ascendant.rashi;
+      card.appendChild(title);
+      const grid=document.createElement("div");
+      grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px";
+      const occupants={};
+      for(const [planetName,position] of Object.entries(varga.planets||{})){
+        (occupants[position.house]||(occupants[position.house]=[])).push(planetName+(position.retrograde?" ℞":""));
+      }
+      for(let house=1;house<=12;house++){
+        const signIndex=(varga.ascendant.rashiIndex+house-1)%12;
+        const cell=document.createElement("div");
+        cell.style.cssText="min-height:72px;padding:6px;border-radius:7px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);font-size:12px;overflow-wrap:anywhere";
+        const houseLabel=document.createElement("strong");
+        houseLabel.textContent="भाव "+house;
+        const signLabel=document.createElement("div");
+        signLabel.textContent=window.AstroRashis?.[signIndex]||["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"][signIndex];
+        const planetLabel=document.createElement("div");
+        planetLabel.style.cssText="margin-top:4px;color:#f5d994";
+        planetLabel.textContent=(occupants[house]||[]).join(", ")||"—";
+        if(house===1)cell.style.borderColor="rgba(245,217,148,.75)";
+        cell.append(houseLabel,signLabel,planetLabel);
+        grid.appendChild(cell);
+      }
+      card.append(title,grid);
+      wrap.appendChild(card);
+    }
+    root.appendChild(wrap);
+  }
+
   function validateBirthDetails(data) {
     const details = {
       name: String(data.get("name") || "").trim(),
@@ -179,6 +225,7 @@
 
       const chart = result.chart;
       window.AstroKundli = chart;
+      renderVargaCharts(chart);
 
       const lines = [];
       lines.push("नाम: " + (chart.name || details.name));
