@@ -1,11 +1,17 @@
 "use strict";
-const {getAuthenticatedUser,rpc,activeConsultation}=require("../lib/supabase");
+const {getAuthenticatedUser,rpc,activeConsultation,serviceFetch}=require("../lib/supabase");
 function mapConsultation(c){return c?{id:c.id,status:c.status,ratePaisePerMinute:Number(c.rate_paise_per_minute),billedMinutes:Number(c.billed_minutes),startedAt:c.started_at}:null;}
 module.exports=async function(req,res){
   try{
     const user=await getAuthenticatedUser(req,res);
     if(!user)return res.status(401).json({success:false,message:"परामर्श शुरू करने के लिए पहले लॉगिन करें।"});
     const action=req.params.action,body=req.body||{};
+    if(action==="history"&&req.method==="GET"){
+      const id=String(req.query?.consultationId||"");
+      if(!/^[0-9a-f-]{36}$/i.test(id))return res.status(400).json({success:false,message:"परामर्श पहचान सही नहीं है।"});
+      const rows=await serviceFetch("/chat_messages?select=role,content,created_at&user_id=eq."+encodeURIComponent(user.id)+"&consultation_id=eq."+encodeURIComponent(id)+"&order=created_at.asc&limit=100");
+      return res.json({success:true,messages:rows||[]});
+    }
     if(action==="active"&&req.method==="GET"){
       const active=await activeConsultation(user.id);
       if(!active)return res.json({success:true,consultation:null});
