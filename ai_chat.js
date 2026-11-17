@@ -66,12 +66,12 @@
 
       await window.AstroWallet.ready;
       const started = await window.AstroWallet.startConsultation(
-        astroName || "वैदिक ज्योतिषाचार्य"
+        astroName || "AI वैदिक ज्योतिष सहायक"
       );
 
       if (!started) return false;
 
-      activeAstro = astroName || "वैदिक ज्योतिषाचार्य";
+      activeAstro = astroName || "AI वैदिक ज्योतिष सहायक";
       chatHistory = [];
 
       const modal = $("chatModal");
