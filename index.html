@@ -90,9 +90,11 @@
       <p class="chat-info">तिथि, नक्षत्र, योग, करण, सूर्योदय-सूर्यास्त, राहुकाल, यमगण्ड, गुलिक काल, अभिजित और 24 होरा की गणना।</p>
       <form id="panchangForm">
         <label for="panchangDate">तारीख</label><input id="panchangDate" type="date" required>
-        <label for="panchangPlace">स्थान का नाम (पहचान के लिए)</label><input id="panchangPlace" type="text" placeholder="जैसे: Warud, Maharashtra">
-        <label for="panchangLat">अक्षांश (Latitude)</label><input id="panchangLat" type="number" step="any" placeholder="जैसे: 21.47" required>
-        <label for="panchangLon">देशांतर (Longitude)</label><input id="panchangLon" type="number" step="any" placeholder="जैसे: 78.27" required>
+        <label for="panchangPlace">शहर या गाँव</label><input id="panchangPlace" type="text" placeholder="जैसे: Warud, Maharashtra" required>
+        <button type="button" id="panchangFindPlace" class="secondary">स्थान खोजें</button>
+        <select id="panchangPlaceResults" style="display:none" aria-label="सही स्थान चुनें"></select>
+        <input id="panchangLat" type="hidden" required>
+        <input id="panchangLon" type="hidden" required>
         <button type="submit">आज का पंचांग निकालें</button>
       </form>
       <div id="panchangMessage" role="status" aria-live="polite"></div>
