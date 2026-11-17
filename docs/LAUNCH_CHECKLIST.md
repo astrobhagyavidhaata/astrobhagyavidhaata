@@ -56,7 +56,7 @@ Still required:
 ## F. Legal and privacy readiness
 
 1. Support contact details supplied and added to the app and policy drafts: vipank01509@gmail.com and +91 82080 91073 (phone/WhatsApp).
-2. Still required: actual operator/legal name, business or correspondence address, and the appointed Grievance Officer's name/details. Do not invent these.
+2. Operator details added to Terms and Privacy drafts: Vipin Kumar (individual operator) and the postal/correspondence address supplied by him. Still required: appoint and identify the Grievance Officer; confirm whether any additional registered/business address disclosure applies.
 3. Confirm provider disclosures, retention periods, refund process and data-deletion workflow.
 4. Obtain Indian legal review of Terms and Privacy Policy.
 4. Obtain an independent security review before accepting real customer money.
