@@ -121,14 +121,14 @@
 
     <section class="panel">
       <h2>💬 AI ज्योतिष परामर्श</h2>
-      <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न AI ज्योतिष सहायक से पूछें। शुल्क ₹5 प्रति मिनट है। परामर्श शुरू करने से पहले वॉलेट में पर्याप्त बैलेंस रखें।</p>
+      <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न AI ज्योतिष सहायक से पूछें। पहला ₹5 सत्र शुरू होते ही कटेगा; उसके बाद हर पूरा अतिरिक्त मिनट ₹5 है। परामर्श शुरू करने से पहले वॉलेट में पर्याप्त बैलेंस रखें।</p>
       <button type="button" onclick="openChatBox('वैदिक ज्योतिषाचार्य',5)">चैट शुरू करें</button>
       <div id="walletMessage" role="status" aria-live="polite"></div>
     </section>
   </main>
   <div id="chatModal" class="modal"><div class="modal-box">
     <div class="modal-head"><h2 id="chatTitle">AI वैदिक ज्योतिष परामर्श</h2><button type="button" class="close-button" onclick="closeChatBox()">बंद करें</button></div>
-    <p id="consultationBillingStatus" class="chat-info">परामर्श शुरू नहीं हुआ है। शुल्क ₹5 प्रति मिनट है।</p>
+    <p id="consultationBillingStatus" class="chat-info">परामर्श शुरू नहीं हुआ है। पहला मिनट शुरू होते ही ₹5 और हर पूरा अतिरिक्त मिनट ₹5 है।</p>
     <div id="chatMessages" aria-live="polite"></div>
     <label for="userMsgInput">अपना प्रश्न लिखें</label><textarea id="userMsgInput" placeholder="अपना ज्योतिष संबंधी प्रश्न लिखें..." maxlength="4000" rows="3"></textarea>
     <div class="chat-actions"><button type="button" onclick="sendUserMsg()">संदेश भेजें</button></div>
