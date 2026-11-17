@@ -25,7 +25,7 @@ app.all("/api/payments/:action",require("./api/payments"));
 app.all("/api/consultations/:action",require("./api/consultations"));
 app.all("/api/wallet",require("./api/wallet"));
 app.get("/api/kundlis",require("./api/kundlis"));
-app.get("/api/kundlis/:id",require("./api/kundlis"));
+app.all("/api/kundlis/:id",require("./api/kundlis"));
 
 app.all("/api/:name",async(req,res)=>{
   const handler=apiHandlers[req.params.name];
