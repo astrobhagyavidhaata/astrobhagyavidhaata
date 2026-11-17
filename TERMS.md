@@ -4,7 +4,7 @@
 **Effective date:** To be filled before launch.  
 **Platform operator:** Vipin Kumar (individual operator; not a registered firm).  
 **Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.  
-**Customer support email:** vipank01509@gmail.com  
+**Customer support email:** amitdiksha975695@gmail.com  
 **Customer support phone / WhatsApp:** +91 82080 91073. These are also the Grievance Officer contact details.
 
 These Terms govern access to the Astro Bhagya Vidhata website, application, kundli tools, AI-assisted astrology features, wallet and paid consultations (collectively, the “Services”). By creating an account, ticking the acceptance box, adding money or using a paid feature, you agree to the version of these Terms shown to you. If you do not agree, do not use the paid Services.
@@ -73,12 +73,12 @@ Our Privacy Policy explains the personal information we collect, why we use it, 
 OTP delivery, hosting, AI processing and payments may depend on third-party providers. Their services may occasionally be delayed or unavailable. We remain responsible for our own obligations under applicable law and will provide a support route for payment and service issues. Third-party terms may also apply to your use of their services.
 
 ## 11. Complaints and grievance contact
-Customers may contact support by email at vipank01509@gmail.com or by phone/WhatsApp at +91 82080 91073. A complaint should include the registered mobile number (masked where possible), date/time, and transaction or consultation reference. Do not email OTPs, passwords, full card details or UPI PINs.
+Customers may contact support by email at amitdiksha975695@gmail.com or by phone/WhatsApp at +91 82080 91073. A complaint should include the registered mobile number (masked where possible), date/time, and transaction or consultation reference. Do not email OTPs, passwords, full card details or UPI PINs.
 
-**Support email:** vipank01509@gmail.com  
+**Support email:** amitdiksha975695@gmail.com  
 **Support phone / WhatsApp:** +91 82080 91073  
 **Grievance Officer:** Vipin Kumar (owner/operator).  
-**Grievance email:** vipank01509@gmail.com  
+**Grievance email:** amitdiksha975695@gmail.com  
 **Grievance phone / WhatsApp:** +91 82080 91073  
 **Operator name and postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (S U D H A R N), Post Office Barmaad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
 
