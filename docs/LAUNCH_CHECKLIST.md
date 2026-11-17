@@ -55,7 +55,7 @@ Still required:
 
 ## F. Legal and privacy readiness
 
-1. Support contact details supplied and added to the app and policy drafts: vipank01509@gmail.com and +91 82080 91073 (phone/WhatsApp).
+1. Support contact details supplied and added to the app and policy drafts: amitdiksha975695@gmail.com and +91 82080 91073 (phone/WhatsApp).
 2. Operator and Grievance Officer details added to Terms and Privacy drafts: Vipin Kumar (individual operator), the postal/correspondence address supplied by him, and the same support email/phone for grievance contact. Confirm whether any additional registered/business address disclosure applies and ensure complaints are monitored and handled within applicable timelines.
 3. Confirm provider disclosures, retention periods, refund process and data-deletion workflow.
 4. Obtain Indian legal review of Terms and Privacy Policy.
