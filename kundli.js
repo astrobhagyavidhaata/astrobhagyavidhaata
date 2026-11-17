@@ -215,10 +215,39 @@
         lines.push(conjunction.planets.join(" + ") + " (" + conjunction.orb + "°)");
       }
       lines.push("");
-      lines.push("विंशोत्तरी दशा");
+      lines.push("विंशोत्तरी महादशा क्रम");
+      const formatDashaDate = value => value ? new Date(value).toLocaleDateString("hi-IN",{day:"2-digit",month:"short",year:"numeric"}) : "उपलब्ध नहीं";
+      for (const md of chart.dasha.mahadashas || []) {
+        lines.push(md.planet + ": " + formatDashaDate(md.start) + " से " + formatDashaDate(md.end));
+      }
+      lines.push("");
       lines.push("वर्तमान महादशा: " + (chart.dasha.current.mahadasha || "उपलब्ध नहीं"));
       lines.push("वर्तमान अंतर्दशा: " + (chart.dasha.current.antardasha || "उपलब्ध नहीं"));
       lines.push("वर्तमान प्रत्यंतर: " + (chart.dasha.current.pratyantardasha || "उपलब्ध नहीं"));
+      const activeMD = (chart.dasha.mahadashas || []).find(md => md.planet === chart.dasha.current.mahadasha);
+      const activeAD = activeMD?.antardashas?.find(ad => ad.planet === chart.dasha.current.antardasha);
+      if (activeMD) {
+        lines.push("");
+        lines.push("वर्तमान महादशा की सभी अंतर्दशाएँ");
+        for (const ad of activeMD.antardashas || []) {
+          lines.push(ad.planet + ": " + formatDashaDate(ad.start) + " से " + formatDashaDate(ad.end));
+        }
+      }
+      if (activeAD) {
+        lines.push("");
+        lines.push("वर्तमान अंतर्दशा के सभी प्रत्यंतर");
+        for (const pd of activeAD.pratyantardashas || []) {
+          lines.push(pd.planet + ": " + formatDashaDate(pd.start) + " से " + formatDashaDate(pd.end));
+        }
+      }
+      lines.push("");
+      lines.push("जन्म नक्षत्र: " + chart.dasha.birthMoon.nakshatra + " · चरण " + chart.dasha.birthMoon.pada);
+      lines.push("जन्म पर महादशा शेष: " + Number(chart.dasha.balanceAtBirthYears).toFixed(3) + " वर्ष");
+      lines.push("");
+      lines.push("नव तारा चक्र");
+      for (const tara of chart.taraChart || []) {
+        lines.push(tara.nakshatra + ": " + tara.name + " (" + tara.nature + ")");
+      }
       lines.push("");
       lines.push("गणना नोट: " + chart.calculation.accuracyNote);
 
