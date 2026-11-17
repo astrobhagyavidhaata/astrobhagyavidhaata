@@ -50,7 +50,7 @@
       throw new Error("पहले जन्म विवरण भरकर कुंडली तैयार करें।");
     }
 
-    return element.textContent.trim();
+    return window.AstroKundli || element.textContent.trim();
   }
 
   async function openChatBox(astroName, rate) {
