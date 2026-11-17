@@ -32,10 +32,10 @@ We use information only for specified and legitimate service purposes, including
 We will seek separate consent where required for optional marketing messages or any new purpose that is not reasonably connected to the service you requested. Refusing marketing consent must not block essential account or transaction messages.
 
 ## 3. AI processing and service providers
-If you use an AI-assisted consultation, the relevant question, chart details and limited conversation context may be sent to the AI provider (currently planned: Google Gemini) to generate the response. Hosting/database services (currently planned: Supabase), OTP/SMS delivery providers and payment processors (currently planned: Razorpay) may process information needed to provide their functions.
+If you use an AI-assisted consultation, the relevant question, chart details and limited conversation context may be processed by technology service providers to generate and deliver the response. Hosting/database services, OTP/SMS delivery providers and payment processors may also process the information needed to provide their respective functions.
 
 Before launch, the operator must:
-- identify the actual providers and link to their current privacy terms where appropriate;
+- maintain an internal record of the actual providers and provide any provider disclosures or links required by applicable law;
 - configure contracts, access controls and data-processing settings;
 - review provider retention, model-training and international-transfer settings;
 - send only the minimum information required for each request;
@@ -45,7 +45,7 @@ Do not promise that an AI provider never retains data unless the selected accoun
 
 ## 4. Sharing and disclosure
 We do not sell personal information. We may disclose the minimum necessary information:
-- to hosting, database, OTP, AI, payment and customer-support providers acting to provide the service;
+- to technology, hosting, database, OTP, payment and customer-support providers acting to provide the service;
 - to professional advisers, auditors or insurers where reasonably necessary;
 - to law-enforcement, regulators or courts when legally required or to address an immediate serious safety threat;
 - in connection with a business reorganisation, subject to appropriate safeguards and applicable law.
@@ -84,4 +84,4 @@ We may revise this Policy when services, providers or legal requirements change.
 
 ---
 
-**Launch checklist — not ready for publication until completed:** insert the real operator identity and contacts; confirm the actual SMS/OTP, Gemini, hosting and payment providers; set real retention periods; document consent and account-deletion workflows; verify provider contracts and data locations; and obtain Indian legal review. The published Policy must describe what the deployed product really does, not merely planned features.
+**Launch checklist — not ready for publication until completed:** insert the real operator identity and contacts; confirm the actual SMS/OTP, technology, hosting and payment providers; set real retention periods; document consent and account-deletion workflows; verify provider contracts and data locations; and obtain Indian legal review. The published Policy must describe what the deployed product really does, not merely planned features.
