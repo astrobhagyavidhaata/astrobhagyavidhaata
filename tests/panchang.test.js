@@ -12,6 +12,9 @@ test("Panchang API returns local daily elements and time periods",async()=>{
  assert.ok(res.body.panchang.yoga);assert.ok(res.body.panchang.karana);
  assert.equal(res.body.hora.length,24);assert.equal(res.body.choghadiya.day.length,8);
  assert.equal(res.body.choghadiya.night.length,8);assert.ok(Array.isArray(res.body.kaal.bhadraIntervals));
+ assert.equal(res.body.weekday,"बुधवार");assert.equal(res.body.choghadiya.day[0].name,"लाभ");
+ assert.equal(res.body.choghadiya.night[0].name,"उद्वेग");assert.equal(res.body.hora[0].lord,"बुध");
+ assert.ok(res.body.panchang.tithiEnds);assert.ok(res.body.panchang.nakshatraEnds);
 });
 test("Panchang API rejects invalid coordinates",async()=>{
  const res=response();await handler({method:"GET",query:{date:"2026-11-18",lat:"200",lon:"78"}},res);
