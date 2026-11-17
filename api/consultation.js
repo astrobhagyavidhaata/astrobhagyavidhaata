@@ -1,6 +1,7 @@
 "use strict";
 
 const {askGemini}=require("../lib/gemini");
+const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const {getAuthenticatedUser,activeConsultation,rpc,serviceFetch}=require("../lib/supabase");
 const recentRequests=new Map();
 
@@ -54,7 +55,8 @@ module.exports=async function(req,res){
     const billing=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
     if(billing.consultation?.status!=="active")return res.status(402).json({success:false,message:"वॉलेट बैलेंस पूरा हो गया है। परामर्श रोक दिया गया।"});
     recentRequests.set(user.id,now);
-    const chartContext=compactChartContext(body.chartContext);
+    const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
+    const chartContext=compactChartContext(liveChartContext);
     const history=Array.isArray(body.conversationHistory)?body.conversationHistory.slice(-10):[];
     try{
       await serviceFetch("/chat_messages",{
