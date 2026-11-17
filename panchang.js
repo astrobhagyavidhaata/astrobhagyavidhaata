@@ -64,8 +64,9 @@
   }
   form.addEventListener("submit",async e=>{
     e.preventDefault();
-    const lat=Number($("panchangLat").value),lon=Number($("panchangLon").value);
-    if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat > 90||lon < -180||lon > 180){
+    const latText=$("panchangLat").value,lonText=$("panchangLon").value;
+    const lat=Number(latText),lon=Number(lonText);
+    if(!latText||!lonText||!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat > 90||lon < -180||lon > 180){
       status.textContent="कृपया सही अक्षांश और देशांतर भरें।";status.style.display="block";return;
     }
     status.textContent="पंचांग की गणना हो रही है…";status.style.display="block";out.style.display="none";
