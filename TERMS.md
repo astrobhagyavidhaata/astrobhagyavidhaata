@@ -3,7 +3,8 @@
 **Draft for product implementation; requires review by an Indian lawyer before public launch.**  
 **Effective date:** To be filled before launch.  
 **Platform operator:** The owner/operator of Astro Bhagya Vidhata (legal name and registered address to be published before launch).  
-**Support:** A working customer-support email and grievance contact must be published before accepting customers or payments.
+**Customer support email:** vipank01509@gmail.com  
+**Customer support phone / WhatsApp:** +91 82080 91073. This is a support contact only; the appointed Grievance Officer's name and any legally required postal/business address must be added before public launch.
 
 These Terms govern access to the Astro Bhagya Vidhata website, application, kundli tools, AI-assisted astrology features, wallet and paid consultations (collectively, the “Services”). By creating an account, ticking the acceptance box, adding money or using a paid feature, you agree to the version of these Terms shown to you. If you do not agree, do not use the paid Services.
 
@@ -71,10 +72,12 @@ Our Privacy Policy explains the personal information we collect, why we use it, 
 OTP delivery, hosting, AI processing and payments may depend on third-party providers. Their services may occasionally be delayed or unavailable. We remain responsible for our own obligations under applicable law and will provide a support route for payment and service issues. Third-party terms may also apply to your use of their services.
 
 ## 11. Complaints and grievance contact
-Before launch, the operator must publish a monitored support email, postal address and grievance contact, and provide a complaint process consistent with applicable Indian law. A complaint should include the registered mobile number (masked where possible), date/time, and transaction or consultation reference. Do not email OTPs, passwords, full card details or UPI PINs.
+Customers may contact support by email at vipank01509@gmail.com or by phone/WhatsApp at +91 82080 91073. A complaint should include the registered mobile number (masked where possible), date/time, and transaction or consultation reference. Do not email OTPs, passwords, full card details or UPI PINs.
 
-**Support / Grievance Officer:** To be filled with the appointed person's name and contact details before launch.  
-**Registered business name and address:** To be filled before launch.
+**Support email:** vipank01509@gmail.com  
+**Support phone / WhatsApp:** +91 82080 91073  
+**Grievance Officer:** The operator must appoint the appropriate person and publish their name and required contact details before public launch.  
+**Registered business name and address:** To be supplied and published by the operator before public launch.
 
 ## 12. Changes to these Terms
 We may update these Terms to reflect changes in law, features or business operations. We will publish the revised version and effective date. If a change materially affects a paid feature or customer rights, we will provide notice where required. Continued use after the effective date constitutes acceptance only to the extent permitted by law; where fresh consent is legally required, we will request it.
@@ -87,4 +90,4 @@ If any provision is held invalid or unenforceable, it will be limited or severed
 
 ---
 
-**Launch checklist — do not publish this draft as final until completed:** fill legal operator name, registered address, support/grievance contacts, effective date, applicable tax display, final recharge/refund process and legal review. Confirm actual OTP, AI, payment and data practices match the live app before asking users to accept these Terms.
+**Launch checklist — do not publish this draft as final until completed:** fill legal operator name, registered address, appointed Grievance Officer's details, effective date and applicable tax display; verify the support email and phone/WhatsApp are monitored; confirm the final recharge/refund process; and obtain Indian legal review. Confirm actual OTP, AI, payment and data practices match the live app before asking users to accept these Terms.
