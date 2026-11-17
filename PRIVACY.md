@@ -5,7 +5,7 @@
 **Data Fiduciary / operator:** Vipin Kumar (individual operator; not a registered firm).  
 **Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (S U D H A R N), Post Office Barmaad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
 **Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.  
-**Privacy contact:** vipank01509@gmail.com (must be monitored by the operator).  
+**Privacy contact:** amitdiksha975695@gmail.com (must be monitored by the operator).  
 **Customer support phone / WhatsApp:** +91 82080 91073.
 
 This Policy describes how Astro Bhagya Vidhata proposes to handle information when you use the website, mobile application, kundli tools, wallet, AI-assisted astrology and consultations. We will update this document if the actual product or applicable law changes. Do not launch features that collect or share data in a way not described here.
@@ -66,7 +66,7 @@ We retain information only for as long as reasonably necessary for the purposes 
 ## 7. Your choices and rights
 Subject to applicable law, you may request access to, correction of, or deletion of personal information; withdraw consent where processing relies on consent; raise a grievance; and nominate or exercise other rights available under applicable data-protection law. Some records may need to be retained where law requires or permits it, including transaction and fraud records. Deleting an account may make saved charts or chat history unavailable.
 
-To make a privacy request, email vipank01509@gmail.com or contact support by phone/WhatsApp at +91 82080 91073. We may need to verify that the request comes from the account holder. Do not send OTPs, passwords, card details or UPI PINs in a privacy request.
+To make a privacy request, email amitdiksha975695@gmail.com or contact support by phone/WhatsApp at +91 82080 91073. We may need to verify that the request comes from the account holder. Do not send OTPs, passwords, card details or UPI PINs in a privacy request.
 
 ## 8. Children
 Paid account registration is intended for adults aged 18 or older. Do not create an account on behalf of a child or submit a child's personal information unless the platform has specifically introduced a legally compliant feature and obtained the required authority/consent. Any child-related feature must receive a separate legal and privacy review before launch.
@@ -81,10 +81,10 @@ Some service providers may process data in locations outside India. Before enabl
 We may revise this Policy when services, providers or legal requirements change. We will publish the revised version with an updated effective date and obtain fresh consent where required by law.
 
 ## 12. Privacy and grievance contact
-**Privacy contact:** vipank01509@gmail.com  
+**Privacy contact:** amitdiksha975695@gmail.com  
 **Customer support phone / WhatsApp:** +91 82080 91073  
 **Grievance Officer:** Vipin Kumar (owner/operator).  
-**Grievance email:** vipank01509@gmail.com  
+**Grievance email:** amitdiksha975695@gmail.com  
 **Grievance phone / WhatsApp:** +91 82080 91073  
 **Legal operator name and postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (S U D H A R N), Post Office Barmaad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
 
