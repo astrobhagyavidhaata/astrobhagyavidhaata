@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -6,433 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#17112b">
   <title>Astro Bhagya Vidhata | वैदिक ज्योतिष</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #100d1c;
-      color: #fff;
-    }
-
-    header {
-      background: #211638;
-      border-bottom: 1px solid #493568;
-      padding: 18px 14px;
-      text-align: center;
-    }
-
-    header h1 {
-      color: #f5c66b;
-      margin: 0;
-      font-size: 24px;
-    }
-
-    header p {
-      color: #d4c9e5;
-      margin: 8px 0 0;
-      font-size: 14px;
-    }
-
-    .wallet-bar {
-      max-width: 650px;
-      margin: 14px auto 0;
-      padding: 0 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .wallet {
-      background: #2c2140;
-      border: 1px solid #70558e;
-      border-radius: 10px;
-      padding: 11px 14px;
-      color: #f5c66b;
-      font-weight: bold;
-    }
-
-    .wallet button {
-      width: auto;
-      margin: 0 0 0 8px;
-      padding: 7px 12px;
-      font-size: 13px;
-    }
-
-    main {
-      max-width: 650px;
-      margin: 18px auto;
-      padding: 14px;
-    }
-
-    .panel {
-      background: #211a32;
-      border: 1px solid #493568;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-
-    h2 {
-      color: #f5c66b;
-      font-size: 19px;
-      margin-top: 0;
-    }
-
-    label {
-      display: block;
-      margin: 16px 0 7px;
-      color: #e6d9f5;
-      font-size: 14px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 13px;
-      border-radius: 8px;
-      border: 1px solid #66547f;
-      background: #151020;
-      color: #fff;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 9px;
-      background: #e8b957;
-      color: #211638;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 18px;
-    }
-
-    button:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-
-    .secondary {
-      background: #493568;
-      color: white;
-    }
-
-    #message, #walletMessage {
-      display: none;
-      padding: 12px;
-      margin-top: 14px;
-      border-radius: 8px;
-      background: #151020;
-      color: #f5d994;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    #kBox {
-      display: none;
-      margin-top: 18px;
-    }
-
-    #kTxt {
-      background: #151020;
-      border: 1px solid #66547f;
-      border-radius: 9px;
-      padding: 13px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      color: #eee;
-    }
-
-    .chat-info {
-      color: #d4c9e5;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      background: rgba(0,0,0,.82);
-      padding: 12px;
-      overflow-y: auto;
-    }
-
-    .modal-box {
-      max-width: 520px;
-      margin: 25px auto;
-      padding: 17px;
-      border-radius: 14px;
-      background: #211a32;
-      border: 1px solid #70558e;
-    }
-
-    .modal-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .modal-head h2 {
-      font-size: 17px;
-      margin: 0;
-    }
-
-    .close-button {
-      width: auto;
-      margin: 0;
-      padding: 8px 13px;
-      background: #493568;
-      color: white;
-    }
-
-    #chatMessages {
-      height: 330px;
-      overflow-y: auto;
-      background: #151020;
-      border: 1px solid #66547f;
-      border-radius: 10px;
-      padding: 12px;
-      margin-top: 15px;
-    }
-
-    .msg-bot {
-      background: #302342;
-      padding: 11px;
-      border-radius: 9px;
-      margin-bottom: 10px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    .msg-user {
-      background: #17483f;
-      padding: 11px;
-      border-radius: 9px;
-      margin-bottom: 10px;
-      text-align: right;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    #userMsgInput {
-      margin-top: 12px;
-      min-height: 48px;
-    }
-
-    .chat-actions {
-      display: flex;
-      gap: 9px;
-    }
-
-    .chat-actions button {
-      flex: 1;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px 14px;
-      color: #a99bbd;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    @media (max-width: 420px) {
-      header h1 {
-        font-size: 21px;
-      }
-
-      .panel {
-        padding: 15px;
-      }
-
-      #chatMessages {
-        height: 300px;
-      }
-    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:#100d1c;color:#fff}
+    header{background:#211638;border-bottom:1px solid #493568;padding:18px 14px;text-align:center}
+    header h1{color:#f5c66b;margin:0;font-size:24px}
+    header p{color:#d4c9e5;margin:8px 0 0;font-size:14px}
+    .wallet-bar{max-width:650px;margin:14px auto 0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .wallet{background:#2c2140;border:1px solid #70558e;border-radius:10px;padding:11px 14px;color:#f5c66b;font-weight:bold}
+    .wallet button{width:auto;margin:0 0 0 8px;padding:7px 12px;font-size:13px}
+    main{max-width:650px;margin:18px auto;padding:14px}
+    .panel{background:#211a32;border:1px solid #493568;border-radius:15px;padding:20px;margin-bottom:16px}
+    h2{color:#f5c66b;font-size:19px;margin-top:0}
+    h3{color:#f5c66b;font-size:16px;margin:18px 0 8px}
+    label{display:block;margin:16px 0 7px;color:#e6d9f5;font-size:14px}
+    input,select,textarea{width:100%;padding:13px;border-radius:8px;border:1px solid #66547f;background:#151020;color:#fff;font-size:16px}
+    button{width:100%;padding:14px;border:0;border-radius:9px;background:#e8b957;color:#211638;font-size:16px;font-weight:bold;cursor:pointer;margin-top:18px}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .secondary{background:#493568;color:white}
+    #message,#walletMessage,#panchangMessage{display:none;padding:12px;margin-top:14px;border-radius:8px;background:#151020;color:#f5d994;line-height:1.6;overflow-wrap:anywhere}
+    #kBox{display:none;margin-top:18px}
+    #kTxt{background:#151020;border:1px solid #66547f;border-radius:9px;padding:13px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;color:#eee}
+    .chat-info{color:#d4c9e5;font-size:14px;line-height:1.6}
+    .modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.82);padding:12px;overflow-y:auto}
+    .modal-box{max-width:520px;margin:25px auto;padding:17px;border-radius:14px;background:#211a32;border:1px solid #70558e}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .modal-head h2{font-size:17px;margin:0}
+    .close-button{width:auto;margin:0;padding:8px 13px;background:#493568;color:white}
+    #chatMessages{height:330px;overflow-y:auto;background:#151020;border:1px solid #66547f;border-radius:10px;padding:12px;margin-top:15px}
+    .msg-bot{background:#302342;padding:11px;border-radius:9px;margin-bottom:10px;line-height:1.6;overflow-wrap:anywhere}
+    .msg-user{background:#17483f;padding:11px;border-radius:9px;margin-bottom:10px;text-align:right;line-height:1.6;overflow-wrap:anywhere}
+    #userMsgInput{margin-top:12px;min-height:48px}
+    .chat-actions{display:flex;gap:9px}
+    .chat-actions button{flex:1}
+    #panchangOutput{display:none;margin-top:18px;line-height:1.6}
+    #panchangOutput p{margin:8px 0}
+    #panchangOutput table{color:#eee}
+    #panchangOutput th{text-align:left;padding:7px;color:#f5c66b}
+    #panchangOutput td{padding:7px;border-top:1px solid #493568}
+    footer{text-align:center;padding:20px 14px;color:#a99bbd;font-size:12px;line-height:1.7}
+    @media(max-width:420px){header h1{font-size:21px}.panel{padding:15px}#chatMessages{height:300px}}
   </style>
 </head>
-
 <body>
-
-  <header>
-    <h1>🔱 Astro Bhagya Vidhata</h1>
-    <p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p>
-  </header>
-
-  <div class="wallet-bar">
-    <div class="wallet">
-      वॉलेट: ₹<span id="bal">0.00</span>
-    </div>
-    <button type="button" onclick="addMoney(100)">
-      ₹100 रिचार्ज
-    </button>
-  </div>
-
+  <header><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></header>
+  <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
   <main>
-
     <section class="panel">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
-
       <form id="kundliForm">
-
-        <label for="name">पूरा नाम</label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          placeholder="अपना पूरा नाम लिखें"
-          maxlength="100"
-          required
-        >
-
-        <label for="dob">जन्म तारीख</label>
-        <input
-          id="dob"
-          name="dob"
-          type="date"
-          required
-        >
-
-        <label for="birthTime">जन्म समय</label>
-        <input
-          id="birthTime"
-          name="birthTime"
-          type="time"
-          required
-        >
-
-        <label for="birthPlace">जन्म स्थान</label>
-        <input
-          id="birthPlace"
-          name="birthPlace"
-          type="text"
-          placeholder="शहर या गाँव का नाम"
-          maxlength="150"
-          required
-        >
-
-        <button type="submit">
-          मेरी कुंडली बनाएं
-        </button>
-
+        <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
+        <label for="dob">जन्म तारीख</label><input id="dob" name="dob" type="date" required>
+        <label for="birthTime">जन्म समय</label><input id="birthTime" name="birthTime" type="time" required>
+        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव का नाम" maxlength="150" required>
+        <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
-
       <div id="message" role="status" aria-live="polite"></div>
+      <div id="kBox"><h2>📜 आपकी जन्म कुंडली</h2><div id="kTxt"></div><button type="button" onclick="openChatBox('वैदिक ज्योतिषाचार्य',5)">ज्योतिषाचार्य से बात करें</button></div>
+    </section>
 
-      <div id="kBox">
-        <h2>📜 आपकी जन्म कुंडली</h2>
-
-        <div id="kTxt"></div>
-
-        <button
-          type="button"
-          onclick="openChatBox('वैदिक ज्योतिषाचार्य', 5)"
-        >
-          ज्योतिषाचार्य से बात करें
-        </button>
-      </div>
+    <section class="panel">
+      <h2>📅 दैनिक पंचांग और शुभ-अशुभ काल</h2>
+      <p class="chat-info">तिथि, नक्षत्र, योग, करण, सूर्योदय-सूर्यास्त, राहुकाल, यमगण्ड, गुलिक काल, अभिजित और 24 होरा की गणना।</p>
+      <form id="panchangForm">
+        <label for="panchangDate">तारीख</label><input id="panchangDate" type="date" required>
+        <label for="panchangPlace">स्थान का नाम (पहचान के लिए)</label><input id="panchangPlace" type="text" placeholder="जैसे: Warud, Maharashtra">
+        <label for="panchangLat">अक्षांश (Latitude)</label><input id="panchangLat" type="number" step="any" placeholder="जैसे: 21.47" required>
+        <label for="panchangLon">देशांतर (Longitude)</label><input id="panchangLon" type="number" step="any" placeholder="जैसे: 78.27" required>
+        <button type="submit">आज का पंचांग निकालें</button>
+      </form>
+      <div id="panchangMessage" role="status" aria-live="polite"></div>
+      <div id="panchangOutput" aria-live="polite"></div>
     </section>
 
     <section class="panel">
       <h2>🪐 आज का ग्रह गोचर</h2>
       <label for="rashiSelect">अपनी चंद्र राशि चुनें</label>
       <select id="rashiSelect">
-        <option value="मेष">मेष</option><option value="वृषभ">वृषभ</option>
-        <option value="मिथुन">मिथुन</option><option value="कर्क">कर्क</option>
-        <option value="सिंह">सिंह</option><option value="कन्या">कन्या</option>
-        <option value="तुला">तुला</option><option value="वृश्चिक">वृश्चिक</option>
-        <option value="धनु">धनु</option><option value="मकर">मकर</option>
-        <option value="कुंभ">कुंभ</option><option value="मीन">मीन</option>
+        <option value="मेष">मेष</option><option value="वृषभ">वृषभ</option><option value="मिथुन">मिथुन</option><option value="कर्क">कर्क</option><option value="सिंह">सिंह</option><option value="कन्या">कन्या</option><option value="तुला">तुला</option><option value="वृश्चिक">वृश्चिक</option><option value="धनु">धनु</option><option value="मकर">मकर</option><option value="कुंभ">कुंभ</option><option value="मीन">मीन</option>
       </select>
       <div id="rashiGocharOut" class="chat-info" aria-live="polite"></div>
     </section>
 
     <section class="panel">
       <h2>💬 लाइव ज्योतिष परामर्श</h2>
-
-      <p class="chat-info">
-        अपनी कुंडली से जुड़े प्रश्न पूछें।
-        परामर्श शुल्क ₹5 प्रति मिनट है।
-        परामर्श शुरू करने से पहले वॉलेट में पर्याप्त बैलेंस रखें।
-      </p>
-
-      <button
-        type="button"
-        onclick="openChatBox('वैदिक ज्योतिषाचार्य', 5)"
-      >
-        चैट शुरू करें
-      </button>
-
+      <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न पूछें। परामर्श शुल्क ₹5 प्रति मिनट है। परामर्श शुरू करने से पहले वॉलेट में पर्याप्त बैलेंस रखें।</p>
+      <button type="button" onclick="openChatBox('वैदिक ज्योतिषाचार्य',5)">चैट शुरू करें</button>
       <div id="walletMessage" role="status" aria-live="polite"></div>
     </section>
-
   </main>
-
-  <div id="chatModal" class="modal">
-    <div class="modal-box">
-
-      <div class="modal-head">
-        <h2 id="chatTitle">वैदिक ज्योतिष परामर्श</h2>
-
-        <button
-          type="button"
-          class="close-button"
-          onclick="closeChatBox()"
-        >
-          बंद करें
-        </button>
-      </div>
-
-      <div id="chatMessages" aria-live="polite"></div>
-
-      <label for="userMsgInput">अपना प्रश्न लिखें</label>
-
-      <textarea
-        id="userMsgInput"
-        placeholder="अपना ज्योतिष संबंधी प्रश्न लिखें..."
-        maxlength="4000"
-        rows="3"
-      ></textarea>
-
-      <div class="chat-actions">
-        <button
-          type="button"
-          onclick="sendUserMsg()"
-        >
-          संदेश भेजें
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <footer>
-    © 2026 Astro Bhagya Vidhata
-    <br>
-    वैदिक ज्योतिष परामर्श
-    <br>
-    ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।
-    <br>
-    <a href="/TERMS.md" style="color:#f5c66b;">नियम और शर्तें</a>
-    &nbsp;|&nbsp;
-    <a href="/PRIVACY.md" style="color:#f5c66b;">प्राइवेसी पॉलिसी</a>
-  </footer>
-
-  <script src="kundli.js"></script>
-  <script src="wallet.js"></script>
-  <script src="ai_chat.js"></script>
-  <script src="gochar.js"></script>
-
+  <div id="chatModal" class="modal"><div class="modal-box">
+    <div class="modal-head"><h2 id="chatTitle">वैदिक ज्योतिष परामर्श</h2><button type="button" class="close-button" onclick="closeChatBox()">बंद करें</button></div>
+    <div id="chatMessages" aria-live="polite"></div>
+    <label for="userMsgInput">अपना प्रश्न लिखें</label><textarea id="userMsgInput" placeholder="अपना ज्योतिष संबंधी प्रश्न लिखें..." maxlength="4000" rows="3"></textarea>
+    <div class="chat-actions"><button type="button" onclick="sendUserMsg()">संदेश भेजें</button></div>
+  </div></div>
+  <footer>© 2026 Astro Bhagya Vidhata<br>वैदिक ज्योतिष परामर्श<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।<br><a href="/TERMS.md" style="color:#f5c66b;">नियम और शर्तें</a> &nbsp;|&nbsp; <a href="/PRIVACY.md" style="color:#f5c66b;">प्राइवेसी पॉलिसी</a></footer>
+  <script src="kundli.js"></script><script src="wallet.js"></script><script src="ai_chat.js"></script><script src="panchang.js"></script><script src="gochar.js"></script>
 </body>
 </html>
