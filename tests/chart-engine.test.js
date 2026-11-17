@@ -24,6 +24,20 @@ test("D2, D7 and D10 follow the odd/even sign starts",()=>{
  assert.equal(getVargaPosition(30.5,60).rashi,"मिथुन");
 });
 
+test("Common Parashari starts are applied for the remaining equal-part vargas",()=>{
+ assert.equal(getVargaPosition(10,3).rashi,"सिंह");
+ assert.equal(getVargaPosition(7.5,4).rashi,"कर्क");
+ assert.equal(getVargaPosition(30,9).rashi,"मकर");
+ assert.equal(getVargaPosition(30,16).rashi,"सिंह");
+ assert.equal(getVargaPosition(30,20).rashi,"धनु");
+ assert.equal(getVargaPosition(0,24).rashi,"सिंह");
+ assert.equal(getVargaPosition(30,24).rashi,"कर्क");
+ assert.equal(getVargaPosition(30,27).rashi,"कर्क");
+ assert.equal(getVargaPosition(30,40).rashi,"तुला");
+ assert.equal(getVargaPosition(60,45).rashi,"धनु");
+ assert.equal(getVargaPosition(30,60).rashi,"वृषभ");
+});
+
 test("D30 switches at its unequal classical segment boundaries",()=>{
  assert.equal(getVargaPosition(4.999,30).rashi,"मेष");
  assert.equal(getVargaPosition(5,30).rashi,"कुंभ");
