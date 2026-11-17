@@ -2,7 +2,8 @@
 
 **Draft for product implementation; requires review by an Indian privacy lawyer before public launch.**  
 **Effective date:** To be filled before launch.  
-**Data Fiduciary / operator:** The legal name and registered address of the platform operator must be published before launch.  
+**Data Fiduciary / operator:** Vipin Kumar (individual operator; not a registered firm).  
+**Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.  
 **Privacy contact:** vipank01509@gmail.com (must be monitored by the operator).  
 **Customer support phone / WhatsApp:** +91 82080 91073.
 
@@ -86,4 +87,4 @@ We may revise this Policy when services, providers or legal requirements change.
 
 ---
 
-**Launch checklist — not ready for publication until completed:** insert the real operator identity and registered address, appoint and identify the Grievance Officer, verify that the listed email and phone/WhatsApp are monitored, confirm the actual SMS/OTP, technology, hosting and payment providers; set real retention periods; document consent and account-deletion workflows; verify provider contracts and data locations; and obtain Indian legal review. The published Policy must describe what the deployed product really does, not merely planned features.
+**Launch checklist — not ready for publication until completed:** confirm the operator identity and postal address, appoint and identify the Grievance Officer, verify that the listed email and phone/WhatsApp are monitored, confirm the actual SMS/OTP, technology, hosting and payment providers; set real retention periods; document consent and account-deletion workflows; verify provider contracts and data locations; and obtain Indian legal review. The published Policy must describe what the deployed product really does, not merely planned features.
