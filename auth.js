@@ -40,7 +40,7 @@
     if(!otpSent){show("पहले OTP भेजें।",true);return;}
     $("verifyOtpButton").disabled=true;
     try{
-      const data=await call("verify-otp",{phone:phoneInput.value.trim(),token:$("loginOtp").value.trim()});
+      const data=await call("verify-otp",{phone:phoneInput.value.trim(),token:$("loginOtp").value.trim(),termsAccepted:true});
       currentUser=data.user;otpSent=false;$("loginOtp").value="";render();
       show("लॉगिन सफल। आपका वॉलेट लोड किया जा रहा है।");
       if(window.AstroWallet)await window.AstroWallet.loadWallet();
