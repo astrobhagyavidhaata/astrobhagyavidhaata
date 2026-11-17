@@ -199,3 +199,31 @@ create policy "chat read own" on public.chat_messages for select to authenticate
 create policy "chat insert own" on public.chat_messages for insert to authenticated with check (user_id=auth.uid() and role='user');
 
 -- No client-side insert/update/delete policies for wallets, payments, transactions or consultations.
+
+
+-- Idempotent wallet credit: a verified captured Razorpay payment is credited once.
+create or replace function public.credit_payment(p_order_id text, p_payment_id text)
+returns jsonb language plpgsql security definer set search_path = ''
+as $$
+declare p public.payments%rowtype; w public.wallets%rowtype;
+begin
+  select * into p from public.payments where order_id=p_order_id for update;
+  if not found then raise exception 'PAYMENT_ORDER_NOT_FOUND'; end if;
+  if p.status='paid' then
+    select * into w from public.wallets where user_id=p.user_id;
+    return jsonb_build_object('credited',false,'wallet',to_jsonb(w));
+  end if;
+  if p.status<>'created' then raise exception 'PAYMENT_NOT_PAYABLE'; end if;
+  update public.payments set status='paid',payment_id=p_payment_id,paid_at=now()
+    where id=p.id returning * into p;
+  update public.wallets set balance_paise=balance_paise+p.amount_paise,updated_at=now()
+    where user_id=p.user_id returning * into w;
+  if not found then raise exception 'WALLET_NOT_FOUND'; end if;
+  insert into public.wallet_transactions(user_id,kind,amount_paise,reference_id,description)
+    values(p.user_id,'recharge',p.amount_paise,p.order_id,'Razorpay wallet recharge');
+  return jsonb_build_object('credited',true,'wallet',to_jsonb(w));
+end;
+$$;
+
+revoke all on function public.credit_payment(text,text) from public, anon, authenticated;
+grant execute on function public.credit_payment(text,text) to service_role;
