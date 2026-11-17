@@ -77,8 +77,10 @@ Customers may contact support by email at vipank01509@gmail.com or by phone/What
 
 **Support email:** vipank01509@gmail.com  
 **Support phone / WhatsApp:** +91 82080 91073  
-**Grievance Officer:** The operator must appoint the appropriate person and publish their name and required contact details before public launch.  
-**Operator name and postal / correspondence address:** Vipin Kumar, Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
+**Grievance Officer:** Vipin Kumar (owner/operator).  
+**Grievance email:** vipank01509@gmail.com  
+**Grievance phone / WhatsApp:** +91 82080 91073  
+**Operator name and postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (S U D H A R N), Post Office Barmaad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
 
 ## 12. Changes to these Terms
 We may update these Terms to reflect changes in law, features or business operations. We will publish the revised version and effective date. If a change materially affects a paid feature or customer rights, we will provide notice where required. Continued use after the effective date constitutes acceptance only to the extent permitted by law; where fresh consent is legally required, we will request it.
