@@ -195,6 +195,16 @@
         lines.push(name + ": " + p.rashi + " | भाव " + p.house);
       }
       lines.push("");
+      lines.push("ग्रह दृष्टि");
+      for (const a of chart.relationships?.aspects || []) {
+        lines.push(a.from + " की " + a.type + " " + a.to + " पर");
+      }
+      lines.push("");
+      lines.push("युति");
+      for (const conjunction of chart.relationships?.conjunctions || []) {
+        lines.push(conjunction.planets.join(" + ") + " (" + conjunction.orb + "°)");
+      }
+      lines.push("");
       lines.push("विंशोत्तरी दशा");
       lines.push("वर्तमान महादशा: " + (chart.dasha.current.mahadasha || "उपलब्ध नहीं"));
       lines.push("वर्तमान अंतर्दशा: " + (chart.dasha.current.antardasha || "उपलब्ध नहीं"));
