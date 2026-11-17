@@ -24,6 +24,7 @@
   }
   $("sendOtpButton").addEventListener("click",async()=>{
     const phone=phoneInput.value.trim();
+    if(!$("termsConsent").checked){show("आगे बढ़ने के लिए नियम और प्राइवेसी पॉलिसी से सहमत हों।",true);return;}
     if(!phone){show("मोबाइल नंबर भरें।",true);return;}
     $("sendOtpButton").disabled=true;
     try{
@@ -35,6 +36,7 @@
   });
   form.addEventListener("submit",async e=>{
     e.preventDefault();
+    if(!$("termsConsent").checked){show("आगे बढ़ने के लिए नियम और प्राइवेसी पॉलिसी से सहमत हों।",true);return;}
     if(!otpSent){show("पहले OTP भेजें।",true);return;}
     $("verifyOtpButton").disabled=true;
     try{
