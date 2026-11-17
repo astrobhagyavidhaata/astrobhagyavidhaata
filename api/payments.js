@@ -50,13 +50,14 @@ module.exports=async function(req,res){
         return res.status(400).json({success:false,message:"भुगतान सत्यापन विवरण अधूरे हैं।"});
       const rows=await serviceFetch("/payments?select=order_id,amount_paise,user_id,status&order_id=eq."+encodeURIComponent(orderId)+"&user_id=eq."+encodeURIComponent(user.id)+"&limit=1");
       if(!rows?.length)return res.status(404).json({success:false,message:"भुगतान ऑर्डर नहीं मिला।"});
+      const trustedOrderId=rows[0].order_id;
       const {secret}=razorpayConfig();
-      const expected=crypto.createHmac("sha256",secret).update(orderId+"|"+paymentId).digest("hex");
+      const expected=crypto.createHmac("sha256",secret).update(trustedOrderId+"|"+paymentId).digest("hex");
       if(!safeEqual(expected,signature))return res.status(400).json({success:false,message:"भुगतान हस्ताक्षर सही नहीं है।"});
       const payment=await razorpayRequest("/payments/"+encodeURIComponent(paymentId));
-      if(payment.order_id!==orderId||Number(payment.amount)!==Number(rows[0].amount_paise)||payment.currency!=="INR"||payment.status!=="captured")
+      if(payment.order_id!==trustedOrderId||Number(payment.amount)!==Number(rows[0].amount_paise)||payment.currency!=="INR"||payment.status!=="captured")
         return res.status(409).json({success:false,message:"भुगतान अभी कैप्चर नहीं हुआ है। कुछ समय बाद वॉलेट जाँचें।"});
-      const result=await rpc("credit_payment",{p_order_id:orderId,p_payment_id:paymentId,p_amount_paise:Number(payment.amount)});
+      const result=await rpc("credit_payment",{p_order_id:trustedOrderId,p_payment_id:paymentId,p_amount_paise:Number(payment.amount)});
       const wallet=await walletFor(user.id);
       return res.json({success:true,credited:Boolean(result?.credited),wallet});
     }
