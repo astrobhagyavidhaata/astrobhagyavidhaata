@@ -5,6 +5,7 @@ const tzLookup = require("tz-lookup");
 const { calculateSiderealPositions } = require("../lib/ephemeris");
 const { buildChart } = require("../lib/chart-engine");
 const { getVimshottariDasha, getCompleteTaraChart } = require("../lib/astrology-engine");
+const { getAuthenticatedUser, serviceFetch } = require("../lib/supabase");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
@@ -52,9 +53,31 @@ module.exports = async function handler(req, res) {
       dasha,
       taraChart
     };
+    let savedKundliId=null;
+    if(body.saveToAccount===true){
+      try{
+        const user=await getAuthenticatedUser(req,res);
+        if(user){
+          const rows=await serviceFetch("/kundlis",{
+            method:"POST",
+            headers:{Prefer:"return=representation"},
+            body:JSON.stringify({
+              user_id:user.id,
+              title:(result.name||"जन्म कुंडली")+" - "+result.birth.localDate,
+              birth_details:{name:result.name,...result.birth},
+              chart_data:result
+            })
+          });
+          savedKundliId=rows?.[0]?.id||null;
+        }
+      }catch(saveError){
+        console.warn("Kundli save skipped:",saveError.message);
+      }
+    }
     return res.status(200).json({
       success:true,
       message:"जन्म विवरण के आधार पर प्रारंभिक कुंडली गणना पूरी हुई।",
+      savedKundliId,
       chart:result
     });
   } catch (error) {
