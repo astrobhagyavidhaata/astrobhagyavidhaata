@@ -70,6 +70,10 @@ Note: Shodashvarga means the 16 classical divisional charts. A 64-varga set is a
 - [ ] Vimshottari Mahadasha, Antardasha and Pratyantardasha with exact start/end
 - [ ] Dasha balance at birth and timezone-safe date calculations
 - [ ] Planetary dignity, house lordship, aspects, conjunctions and yogas
+- [x] Jaimini Argala/Virodha Argala for all 12 houses and each graha.
+- [x] Indu Lagna (Dhana Lagna) using seven-graha Kala values.
+- [x] 64th Navamsa / Khara Navamsa reference points from Lagna, Moon and Sun.
+- [x] Fractional Parashari Drishti on planets and houses, including special aspects.
 - [ ] Optional Shadbala / other strength systems only after validated implementation
 - [ ] Combined dasha + transit interpretation, with source/rule transparency
 
