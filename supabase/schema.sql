@@ -37,6 +37,7 @@ create table if not exists public.consultations (
   billed_minutes integer not null default 1 check (billed_minutes >= 1),
   started_at timestamptz not null default now(),
   last_billed_at timestamptz not null default now(),
+  last_activity_at timestamptz not null default now(),
   ended_at timestamptz
 );
 create index if not exists consultations_user_status_idx
@@ -93,6 +94,9 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users
 for each row execute procedure public.handle_new_user();
 
+-- Keep older deployments compatible with the heartbeat lease column.
+alter table public.consultations add column if not exists last_activity_at timestamptz not null default now();
+
 -- Atomic start: ₹5 is charged immediately for the first minute.
 create or replace function public.start_consultation(p_user_id uuid, p_astrologer_id text default 'vedic-astrologer')
 returns jsonb language plpgsql security definer set search_path = ''
@@ -101,6 +105,8 @@ declare w public.wallets%rowtype; c public.consultations%rowtype;
 begin
   select * into w from public.wallets where user_id = p_user_id for update;
   if not found then raise exception 'WALLET_NOT_FOUND'; end if;
+  update public.consultations set status='stopped', ended_at=last_activity_at + interval '45 seconds'
+    where user_id=p_user_id and status='active' and last_activity_at < now()-interval '45 seconds';
   if exists(select 1 from public.consultations where user_id=p_user_id and status='active') then
     raise exception 'ACTIVE_CONSULTATION_EXISTS';
   end if;
@@ -128,6 +134,11 @@ begin
     where id=p_consultation_id and user_id=p_user_id for update;
   if not found or c.status <> 'active' then raise exception 'CONSULTATION_NOT_ACTIVE'; end if;
   select * into w from public.wallets where user_id=p_user_id for update;
+  if c.last_activity_at < now()-interval '45 seconds' then
+    update public.consultations set status='stopped', ended_at=last_activity_at + interval '45 seconds'
+      where id=p_consultation_id returning * into c;
+    return jsonb_build_object('consultation',to_jsonb(c),'wallet',to_jsonb(w));
+  end if;
   due_minutes := greatest(0, floor(extract(epoch from (now()-c.last_billed_at))/60)::integer);
   if due_minutes > 0 then
     affordable := least(due_minutes, (w.balance_paise / 500)::integer);
@@ -139,13 +150,17 @@ begin
         values(p_user_id,'consultation_debit',debit,p_consultation_id::text,
           'परामर्श शुल्क: '||affordable||' अतिरिक्त मिनट');
       update public.consultations set billed_minutes=billed_minutes+affordable,
-        last_billed_at=last_billed_at + make_interval(mins=>affordable)
+        last_billed_at=last_billed_at + make_interval(mins=>affordable),
+        last_activity_at=now()
         where id=p_consultation_id returning * into c;
     end if;
     if affordable < due_minutes then
       update public.consultations set status='stopped', ended_at=now()
         where id=p_consultation_id returning * into c;
     end if;
+  else
+    update public.consultations set last_activity_at=now()
+      where id=p_consultation_id returning * into c;
   end if;
   return jsonb_build_object('consultation',to_jsonb(c),'wallet',to_jsonb(w));
 end;
