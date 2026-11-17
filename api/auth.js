@@ -34,10 +34,8 @@ module.exports=async function(req,res) {
     }
     if(action==="logout"&&req.method==="POST") {
       const user=await getAuthenticatedUser(req,res);
-      if(user) {
-        const jar=(req.headers.cookie||"").split(";").map(x=>x.trim());
-        const token=jar.find(x=>x.startsWith("astro_access="))?.slice("astro_access=".length);
-        if(token) await authFetch("/logout",{method:"POST",headers:{Authorization:"Bearer "+decodeURIComponent(token)}}).catch(()=>{});
+      if(user?._accessToken) {
+        await authFetch("/logout",{method:"POST",headers:{Authorization:"Bearer "+user._accessToken}}).catch(()=>{});
       }
       clearAuthCookies(req,res);
       return res.json({success:true});
