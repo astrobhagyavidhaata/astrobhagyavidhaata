@@ -1,7 +1,7 @@
 "use strict";
 
 const {askGemini}=require("../lib/gemini");
-const {getAuthenticatedUser,activeConsultation,rpc}=require("../lib/supabase");
+const {getAuthenticatedUser,activeConsultation,rpc,serviceFetch}=require("../lib/supabase");
 const recentRequests=new Map();
 
 module.exports=async function(req,res){
@@ -23,6 +23,16 @@ module.exports=async function(req,res){
     const chartContext=body.chartContext&&typeof body.chartContext==="object"?body.chartContext:{};
     const history=Array.isArray(body.conversationHistory)?body.conversationHistory.slice(-10):[];
     const answer=await askGemini({question:question.trim(),chartContext,conversationHistory:history});
+    try{
+      await serviceFetch("/chat_messages",{
+        method:"POST",
+        headers:{Prefer:"return=minimal"},
+        body:JSON.stringify([
+          {user_id:user.id,consultation_id:active.id,role:"user",content:question.trim()},
+          {user_id:user.id,consultation_id:active.id,role:"assistant",content:answer}
+        ])
+      });
+    }catch(saveError){console.warn("Consultation transcript save skipped:",saveError.message);}
     return res.status(200).json({success:true,answer});
   }catch(error){
     console.error("Consultation API error:",error.message);
