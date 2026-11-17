@@ -1,54 +1,31 @@
+"use strict";
 
-const { askGemini } = require("../lib/gemini");
+const {askGemini}=require("../lib/gemini");
+const {getAuthenticatedUser,activeConsultation,rpc}=require("../lib/supabase");
+const recentRequests=new Map();
 
-module.exports = async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      success: false,
-      message: "केवल POST अनुरोध स्वीकार है।"
-    });
-  }
-
-  try {
-    const body = req.body || {};
-
-    const question = body.question || body.content;
-    const chartContext = body.chartContext || {};
-    const conversationHistory = Array.isArray(body.conversationHistory)
-      ? body.conversationHistory
-      : [];
-
-    if (!question || typeof question !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "कृपया अपना प्रश्न लिखें।"
-      });
-    }
-
-    if (question.length > 5000) {
-      return res.status(400).json({
-        success: false,
-        message: "प्रश्न बहुत लंबा है।"
-      });
-    }
-
-    const answer = await askGemini({
-      question,
-      chartContext,
-      conversationHistory
-    });
-
-    return res.status(200).json({
-      success: true,
-      answer
-    });
-
-  } catch (error) {
-    console.error("Consultation API error:", error.message);
-
-    return res.status(500).json({
-      success: false,
-      message: "अभी उत्तर प्राप्त नहीं हो पाया। कृपया दोबारा प्रयास करें।"
-    });
+module.exports=async function(req,res){
+  if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
+  try{
+    const user=await getAuthenticatedUser(req,res);
+    if(!user)return res.status(401).json({success:false,message:"परामर्श के लिए पहले मोबाइल OTP से लॉगिन करें।"});
+    const body=req.body||{};
+    const question=body.question||body.content;
+    if(typeof question!=="string"||!question.trim())return res.status(400).json({success:false,message:"कृपया अपना प्रश्न लिखें।"});
+    if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
+    const now=Date.now(),last=recentRequests.get(user.id)||0;
+    if(now-last<3000)return res.status(429).json({success:false,message:"अगला प्रश्न भेजने से पहले कुछ सेकंड रुकें।"});
+    const active=await activeConsultation(user.id);
+    if(!active)return res.status(402).json({success:false,message:"पहले वॉलेट से ₹5 प्रति मिनट का परामर्श शुरू करें।"});
+    const billing=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
+    if(billing.consultation?.status!=="active")return res.status(402).json({success:false,message:"वॉलेट बैलेंस पूरा हो गया है। परामर्श रोक दिया गया।"});
+    recentRequests.set(user.id,now);
+    const chartContext=body.chartContext&&typeof body.chartContext==="object"?body.chartContext:{};
+    const history=Array.isArray(body.conversationHistory)?body.conversationHistory.slice(-10):[];
+    const answer=await askGemini({question:question.trim(),chartContext,conversationHistory:history});
+    return res.status(200).json({success:true,answer});
+  }catch(error){
+    console.error("Consultation API error:",error.message);
+    return res.status(503).json({success:false,message:"परामर्श सेवा अभी कॉन्फ़िगर नहीं है। कृपया बाद में प्रयास करें।"});
   }
 };
