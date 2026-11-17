@@ -195,6 +195,16 @@
         lines.push(name + ": " + p.rashi + " | भाव " + p.house);
       }
       lines.push("");
+      lines.push("अन्य 14 विभाजित कुंडलियाँ (षोडशवर्ग)");
+      for (const [vargaKey, varga] of Object.entries(chart.vargas || {})) {
+        if (vargaKey === "D1" || vargaKey === "D9") continue;
+        lines.push("");
+        lines.push(vargaKey + " " + varga.name + " | लग्न: " + varga.ascendant.rashi);
+        for (const [planetName, p] of Object.entries(varga.planets || {})) {
+          lines.push(planetName + ": " + p.rashi + " " + Number(p.degreeInRashi).toFixed(2) + "° | भाव " + p.house + (p.retrograde ? " (वक्री)" : ""));
+        }
+      }
+      lines.push("");
       lines.push("ग्रह दृष्टि");
       for (const a of chart.relationships?.aspects || []) {
         lines.push(a.from + " की " + a.type + " " + a.to + " पर");
