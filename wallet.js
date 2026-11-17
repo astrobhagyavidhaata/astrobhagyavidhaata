@@ -65,7 +65,7 @@
     const el=$("consultationBillingStatus");
     if(!el)return;
     if(!consultation){
-      el.textContent="परामर्श शुरू नहीं हुआ है। शुल्क ₹5 प्रति मिनट है।";
+      el.textContent="पहला मिनट शुरू होते ही ₹5 और हर पूरा अतिरिक्त मिनट ₹5 है।";
       return;
     }
     const minutes=Number(consultation.billedMinutes||0);
