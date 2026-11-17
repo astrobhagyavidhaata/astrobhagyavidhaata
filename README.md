@@ -1,30 +1,41 @@
 # Astro Bhagya Vidhata
 
-Hindi-first Vedic astrology web application.
+Hindi-first Vedic astrology consultation web application.
 
-## Current implementation
-- Birth details and place selection using Open-Meteo geocoding.
-- Server-side birth chart endpoint: D1, D9, whole-sign houses, nakshatra/pada, retrograde flags, basic graha drishti, conjunctions, combustion estimates, Vimshottari dasha and Nav Tara list.
-- Gemini consultation endpoint (server-side API key only).
-- Local Express server for development.
+## Implemented in the repository
+- Birth chart calculation endpoint with D1/D9, whole-sign houses, nakshatra/pada, retrograde flags, basic drishti/conjunctions, Vimshottari dasha and Nav Tara.
+- Daily nine-planet Gochar display with sign, degrees, nakshatra/pada, navamsa and house from the selected Moon sign.
+- Daily local Panchang endpoint and UI: tithi, paksha, nakshatra/pada, yoga, karana, sunrise/sunset, moonrise/moonset, Rahu Kaal, Yamaganda, Gulika, Abhijit, Bhadra intervals, day/night Choghadiya and 24 horas.
+- Supabase phone OTP authentication using HttpOnly cookies.
+- Database-backed wallet and server-side ₹5/minute consultation billing RPCs.
+- Razorpay order creation, Checkout UI, signature verification and raw-body webhook credit.
+- AI consultation endpoint requires an authenticated user and active paid consultation.
+- GitHub Actions syntax checks and Panchang API tests.
 
-## Important calculation note
-The current ephemeris adapter uses Astronomy Engine tropical geocentric positions, a linear Lahiri ayanamsa approximation and a mean lunar node. It is **not Swiss Ephemeris** and must be validated against a trusted Panchang/ephemeris for the supported historical date range before being sold as an exact professional kundli. Ascendant and combustion calculations also need independent test fixtures. Do not advertise guaranteed precision yet.
+## Astronomy accuracy warning
+The current ephemeris adapter uses Astronomy Engine tropical geocentric positions, a linear Lahiri ayanamsa approximation and a mean lunar node. It is **not Swiss Ephemeris**. Validate against the official Rashtriya Panchang and a trusted professional ephemeris across dates and locations before presenting results as exact. Ascendant, combustion, divisional charts and muhurta rules still need independent regression fixtures and review.
 
-## Run locally
+## Local development
 1. Install Node.js 20 or later.
-2. Run `npm install`.
-3. Set `GEMINI_API_KEY` in the server environment for AI consultations.
-4. Run `npm start` and open the local address printed by the server.
+2. Run \`npm install\`.
+3. Copy \`.env.example\` to \`.env\` and fill server-only credentials.
+4. Run \`npm run check\` and \`npm test\`.
+5. Run \`npm start\` and open the local address printed by the server.
 
-Never put Gemini, payment-provider, or database service-role secrets in browser JavaScript or commit them to GitHub.
+## Supabase setup
+1. Create a Supabase project.
+2. Run \`supabase/schema.sql\` in the SQL Editor.
+3. Enable Phone Auth and configure an SMS provider, OTP expiry and rate limits.
+4. Copy the project URL, anon key and service-role key into the server environment. Never expose the service-role key in the browser.
 
-## Not production-ready yet
-- Secure customer login and persistent account identity.
-- Database-backed wallet ledger and payment verification/webhooks.
-- Server-authoritative ₹5/minute billing and consultation session lifecycle.
-- Admin authentication and persistent Gochar content management.
-- Automated astronomical regression tests and independent ephemeris validation.
-- Production hosting configuration and environment variables.
+## Razorpay setup
+1. Start with Razorpay test mode.
+2. Set the key ID and secret only in server environment variables.
+3. Register \`https://YOUR-DOMAIN/api/payments/webhook\` as the webhook URL.
+4. Subscribe to \`payment.captured\` and \`order.paid\`, and set the webhook secret.
+5. Test duplicate webhook delivery, failed payments and wallet crediting before switching to live mode.
 
-The wallet UI intentionally depends on server endpoints; do not accept real customer payments until authentication, database transactions, and payment webhooks are implemented and tested.
+## Production status
+Source code being committed does not mean the app is deployed or ready to accept money. A Supabase project, SMS provider, Razorpay account/webhook, Gemini API key, hosting environment, environment variables, SQL migration, end-to-end tests and independent security/astrology review are still required. Do not accept real customer payments until these checks pass.
+
+See [SECURITY.md](SECURITY.md), [TERMS.md](TERMS.md), [PRIVACY.md](PRIVACY.md) and [the astrology feature roadmap](docs/ASTROLOGY_FEATURE_ROADMAP.md).
