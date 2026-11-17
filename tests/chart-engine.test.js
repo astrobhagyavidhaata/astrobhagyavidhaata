@@ -1,7 +1,7 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
-const {getVargaPosition,buildDivisionalCharts,buildChart,VARGA_DIVISIONS}=require("../lib/chart-engine");
+const {getVargaPosition,buildDivisionalCharts,buildChart,VARGA_DIVISIONS,getInduLagna,get64thNavamsa,getArgalaRelations,analyzeDrishti}=require("../lib/chart-engine");
 
 test("Shodashvarga engine returns all 16 classical charts",()=>{
  const charts=buildDivisionalCharts(12.5,{सूर्य:{longitude:0},चंद्र:{longitude:30}});
@@ -50,4 +50,55 @@ test("Full chart retains D1 and D9 and includes divisional chart catalogue",()=>
  assert.equal(chart.d1.ascendant.rashi,"मेष");
  assert.ok(chart.d9.ascendant.rashi);
  assert.ok(chart.vargas.D60);
+});
+
+test("Indu Lagna follows the seven-graha kala method",()=>{
+ const result=getInduLagna(2,4); // Gemini Lagna, Leo Moon
+ assert.equal(result.ninthLordFromLagna,"शनि");
+ assert.equal(result.ninthLordFromMoon,"मंगल");
+ assert.equal(result.totalKalas,7);
+ assert.equal(result.countFromMoon,7);
+ assert.equal(result.rashi,"कुंभ");
+});
+
+test("64th Navamsa is the same longitude in the eighth sign",()=>{
+ const result=get64thNavamsa(8.5); // Aries 8°30'
+ assert.equal(result.kharaRashi,"वृश्चिक");
+ assert.equal(result.kharaNavamsa,"कन्या");
+});
+
+
+test("Argala reports primary and secondary positions with their obstruction houses",()=>{
+ const result=getArgalaRelations(0,{
+  गुरु:{longitude:40,rashiIndex:1},
+  शनि:{longitude:330,rashiIndex:11}
+ });
+ assert.deepEqual(result.relations[0].planets,["गुरु"]);
+ assert.deepEqual(result.relations[0].obstructingPlanets,["शनि"]);
+ assert.equal(result.relations[0].status,"संख्या बराबर — बल जाँच आवश्यक");
+ assert.equal(result.relations[3].house,5);
+});
+
+test("Drishti includes full Mars special aspects and partial Parashari aspects",()=>{
+ const result=analyzeDrishti({
+  मंगल:{longitude:0,rashiIndex:0},
+  गुरु:{longitude:120,rashiIndex:4}
+ },0);
+ assert.ok(result.houseAspects.some(x=>x.from==="मंगल"&&x.houseDistance===4&&x.aspectStrength===100));
+ assert.ok(result.houseAspects.some(x=>x.from==="मंगल"&&x.houseDistance===3&&x.aspectStrength===25));
+ assert.ok(result.planetAspects.some(x=>x.from==="मंगल"&&x.to==="गुरु"&&x.houseDistance===5&&x.aspectStrength===50));
+});
+
+test("Full chart returns special Lagnas, Khara points, Argala and Drishti",()=>{
+ const planets={
+  सूर्य:{longitude:10,retrograde:false},
+  चंद्र:{longitude:40,retrograde:false},
+  मंगल:{longitude:80,retrograde:false}
+ };
+ const chart=buildChart(12,planets);
+ assert.ok(chart.specialLagnas.indu.rashi);
+ assert.ok(chart.kharaPoints.lagna.kharaRashi);
+ assert.ok(chart.argala.houses.length===12);
+ assert.ok(chart.argala.grahas.length===3);
+ assert.ok(chart.drishti.houseAspects.length>0);
 });
