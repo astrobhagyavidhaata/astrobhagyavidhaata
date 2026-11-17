@@ -79,7 +79,7 @@
 
       const title = $("chatTitle");
       if (title) {
-        title.textContent = activeAstro + " (वैदिक ज्योतिष परामर्श)";
+        title.textContent = activeAstro + " (AI वैदिक ज्योतिष परामर्श)";
       }
 
       const box = $("chatMessages");
