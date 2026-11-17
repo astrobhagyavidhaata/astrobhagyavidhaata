@@ -90,10 +90,10 @@
     try {
       const data=await request("/api/consultations/active");
       const active=data.consultation;
+      if(data.wallet)updateWallet(data.wallet);
       if(active&&active.id&&active.status==="active"){
         consultationId=active.id;
         if(timer===null)timer=window.setInterval(heartbeat,15000);
-        if(data.wallet)updateWallet(data.wallet);
       }else{
         consultationId=null;
         clearTimer();
