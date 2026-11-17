@@ -44,4 +44,4 @@ A Render Blueprint is included in render.yaml, and a Dockerfile is included for 
 ## Production status
 Source code being committed does not mean the app is deployed or ready to accept money. A Supabase project, SMS provider, Razorpay account/webhook, Gemini API key, hosting environment, environment variables, SQL migration, end-to-end tests and independent security/astrology review are still required. Do not accept real customer payments until these checks pass.
 
-See [SECURITY.md](SECURITY.md), [TERMS.md](TERMS.md), [PRIVACY.md](PRIVACY.md), [the astrology feature roadmap](docs/ASTROLOGY_FEATURE_ROADMAP.md) and [the Shodashvarga calculation rules](docs/VARGA_RULES.md).
+See [SECURITY.md](SECURITY.md), [TERMS.md](TERMS.md), [PRIVACY.md](PRIVACY.md), [the astrology feature roadmap](docs/ASTROLOGY_FEATURE_ROADMAP.md) and [the Shodashvarga calculation rules](docs/VARGA_RULES.md) and [the launch checklist](docs/LAUNCH_CHECKLIST.md).
