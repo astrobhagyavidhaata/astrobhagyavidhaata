@@ -61,6 +61,19 @@
     return data;
   }
 
+  function renderBillingStatus(consultation) {
+    const el=$("consultationBillingStatus");
+    if(!el)return;
+    if(!consultation){
+      el.textContent="परामर्श शुरू नहीं हुआ है। शुल्क ₹5 प्रति मिनट है।";
+      return;
+    }
+    const minutes=Number(consultation.billedMinutes||0);
+    const amount=(minutes*RATE).toFixed(2);
+    el.textContent=(consultation.status==="active"?"परामर्श सक्रिय":"परामर्श समाप्त")+
+      " · बिल किए गए मिनट: "+minutes+" · कुल शुल्क: ₹"+amount;
+  }
+
   function updateWallet(wallet) {
     if (!wallet || typeof wallet.balancePaise !== "number") {
       return;
@@ -91,6 +104,7 @@
       const data=await request("/api/consultations/active");
       const active=data.consultation;
       if(data.wallet)updateWallet(data.wallet);
+      renderBillingStatus(active);
       if(active&&active.id&&active.status==="active"){
         consultationId=active.id;
         if(timer===null)timer=window.setInterval(heartbeat,15000);
@@ -209,6 +223,7 @@
       }
 
       consultationId = data.consultation.id;
+      renderBillingStatus(data.consultation);
       if(data.wallet)updateWallet(data.wallet);
 
       timer = window.setInterval(heartbeat, 15000);
@@ -249,6 +264,7 @@
         updateWallet(data.wallet);
       }
 
+      if (data.consultation) renderBillingStatus(data.consultation);
       if (data.consultation?.status === "stopped") {
         clearTimer();
         consultationId = null;
@@ -290,6 +306,7 @@
       });
 
       if (data.wallet) updateWallet(data.wallet);
+      if (data.consultation) renderBillingStatus(data.consultation);
 
       message("परामर्श समाप्त हो गया।");
 
