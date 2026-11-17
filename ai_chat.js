@@ -1,39 +1,213 @@
-const defaultRashis = ["मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"];
 
-let monthlyGocharData = JSON.parse(localStorage.getItem("adi_gochar")) || {
-    "मेष": "शनि बारहवें भाव में वक्री है—खर्चों पर नियंत्रण रखें और धैर्य से काम लें।",
-    "वृषभ": "लाभ भाव का शनि और पंचम के ग्रह करियर में नए अवसर और ज्ञान देंगे।",
-    "मिथुन": "कर्म भाव का शनि मेहनत बढ़ाएगा, वाणी में संयम रखना बेहद ज़रूरी है।",
-    "कर्क": "भाग्य स्थान का शनि धर्म-अध्यात्म में रुचि बढ़ाएगा और रुके काम बनाएगा।",
-    "सिंह": "अष्टम भाव का वक्री शनि गहरी परीक्षा और आत्म-मंथन का समय दे रहा है।",
-    "कन्या": "सप्तम भाव का शनि रिश्तों में गंभीरता और स्पष्ट संवाद की मांग कर रहा है।",
-    "तुला": "छठे भाव का शनि विरोधियों पर विजय दिलाएगा, पर मानसिक तनाव से बचें।",
-    "वृश्चिक": "पंचम भाव का शनि संतान, शिक्षा और पूर्वपुण्य के कर्मों का फल देगा।",
-    "धनु": "चौथे भाव का शनि पारिवारिक जिम्मेदारियां बढ़ाएगा, धैर्य बनाए रखें।",
-    "मकर": "तीसरे भाव का शनि पराक्रम और साहस बढ़ाएगा, यात्रा के योग बनेंगे।",
-    "कुंभ": "दूसरे भाव का शनि धन संचय और परिवार के साथ वाणी में मधुरता मांगता है।",
-    "मीन": "लग्न में वक्री शनि आत्म-सुधार, अनुशासन और जीवन में बड़े बदलाव लाएगा।"
-};
+/*
+ * ASTRO BHAGYA VIDHATA
+ * Secure AI Astrology Chat
+ * API keys are stored on the server, never in the browser.
+ */
 
-function loadRashiGochar() {
-    let sel = document.getElementById("rashiSelect");
-    let out = document.getElementById("rashiGocharOut");
-    if (!sel || !out) return;
-    let r = sel.value;
-    out.innerHTML = `<b>${r} राशि/लग्न का मासिक गोचर फल:</b><br>${monthlyGocharData[r]}`;
-}
+(() => {
+  "use strict";
 
-function saveAdminGochar() {
-    let pin = prompt("एस्ट्रोलॉजर एडमिन पिन डालें (डिफ़ॉल्ट पिन: 1234):");
-    if (pin !== "1234") {
-        alert("गलत पिन! केवल एडमिन ही गोचर बदल सकते हैं।");
-        return;
+  const CHAT_API = "/api/chat";
+
+  let activeAstro = "";
+  let chatBusy = false;
+  let chatHistory = [];
+
+  const $ = id => document.getElementById(id);
+
+  function showMessage(text) {
+    const box = $("message") || $("walletMessage");
+    if (box) {
+      box.textContent = text;
+      box.style.display = "block";
     }
-    let r = document.getElementById("adminRashiSelect").value;
-    let txt = document.getElementById("adminGocharInput").value.trim();
-    if (!txt) { alert("कृपया गोचर फल लिखें!"); return; }
-    monthlyGocharData[r] = txt;
-    localStorage.setItem("adi_gochar", JSON.stringify(monthlyGocharData));
-    loadRashiGochar();
-    alert(r + " राशि का नया गोचर सेव हो गया है!");
-}
+  }
+
+  function addMessage(sender, text, type) {
+    const box = $("chatMessages");
+    if (!box) return;
+
+    const item = document.createElement("div");
+    item.className = type === "user" ? "msg-user" : "msg-bot";
+
+    const heading = document.createElement("b");
+    heading.textContent = sender + ": ";
+
+    const content = document.createElement("span");
+    content.textContent = text;
+
+    item.appendChild(heading);
+    item.appendChild(content);
+    box.appendChild(item);
+
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function getKundliDetails() {
+    const element = $("kTxt");
+
+    if (!element || !element.textContent.trim()) {
+      throw new Error(
+        "पहले जन्म विवरण भरकर वास्तविक कुंडली तैयार करें।"
+      );
+    }
+
+    return element.textContent.trim();
+  }
+
+  async function openChatBox(astroName, rate) {
+    try {
+      const kundli = getKundliDetails();
+
+      if (!window.AstroWallet) {
+        throw new Error("वॉलेट सेवा उपलब्ध नहीं है।");
+      }
+
+      if (Number(rate) !== 5) {
+        throw new Error("परामर्श शुल्क ₹5 प्रति मिनट निर्धारित है।");
+      }
+
+      const started =
+        await window.AstroWallet.startConsultation(
+          astroName || "वैदिक ज्योतिषाचार्य"
+        );
+
+      if (!started) return false;
+
+      activeAstro = astroName || "वैदिक ज्योतिषाचार्य";
+      chatHistory = [];
+
+      const modal = $("chatModal");
+      if (modal) modal.style.display = "block";
+
+      const title = $("chatTitle");
+      if (title) {
+        title.textContent =
+          activeAstro + " (वैदिक ज्योतिष परामर्श)";
+      }
+
+      const box = $("chatMessages");
+      if (box) box.replaceChildren();
+
+      const userName = $("un")?.value || "नमस्कार";
+
+      addMessage(
+        activeAstro,
+        userName +
+          " जी, आपका परामर्श शुरू हो गया है। कृपया अपना प्रश्न पूछें।",
+        "bot"
+      );
+
+      return true;
+
+    } catch (error) {
+      showMessage(error.message);
+      return false;
+    }
+  }
+
+  async function sendUserMsg() {
+    if (chatBusy) return;
+
+    const input = $("userMsgInput");
+    if (!input) return;
+
+    const question = input.value.trim();
+
+    if (!question) return;
+
+    if (question.length > 4000) {
+      showMessage("प्रश्न 4000 अक्षरों से छोटा रखें।");
+      return;
+    }
+
+    let kundli;
+
+    try {
+      kundli = getKundliDetails();
+    } catch (error) {
+      showMessage(error.message);
+      return;
+    }
+
+    chatBusy = true;
+    input.value = "";
+
+    addMessage("आप", question, "user");
+
+    const loading = document.createElement("div");
+    loading.className = "msg-bot";
+    loading.textContent = "ज्योतिषाचार्य उत्तर तैयार कर रहे हैं...";
+    $("chatMessages")?.appendChild(loading);
+
+    try {
+      const response = await fetch(CHAT_API, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          astrologer: activeAstro,
+          question,
+          kundli,
+          history: chatHistory.slice(-12)
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "AI सेवा अभी उपलब्ध नहीं है।"
+        );
+      }
+
+      if (
+        typeof data.reply !== "string" ||
+        !data.reply.trim()
+      ) {
+        throw new Error("AI से सही उत्तर प्राप्त नहीं हुआ।");
+      }
+
+      loading.textContent = activeAstro + ": " + data.reply;
+
+      chatHistory.push(
+        { role: "user", content: question },
+        { role: "assistant", content: data.reply }
+      );
+
+      chatHistory = chatHistory.slice(-12);
+
+    } catch (error) {
+      loading.textContent =
+        "उत्तर प्राप्त नहीं हुआ: " + error.message;
+
+    } finally {
+      chatBusy = false;
+      $("chatMessages")?.scrollTo({
+        top: $("chatMessages").scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  }
+
+  async function closeChatBox() {
+    if (window.AstroWallet) {
+      await window.AstroWallet.stopConsultation();
+    }
+
+    const modal = $("chatModal");
+    if (modal) modal.style.display = "none";
+
+    chatHistory = [];
+    activeAstro = "";
+  }
+
+  window.openChatBox = openChatBox;
+  window.sendUserMsg = sendUserMsg;
+  window.closeChatBox = closeChatBox;
+
+})();
