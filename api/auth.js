@@ -29,10 +29,11 @@ module.exports=async function(req,res) {
       const response=await authFetch("/verify",{method:"POST",body:JSON.stringify({phone,token,type:"sms"})});
       const data=await response.json();
       if(!response.ok||!data.access_token||!data.refresh_token) return res.status(401).json({success:false,message:data.msg||data.message||"OTP सही नहीं है।"});
-      await serviceFetch("/profiles?id=eq."+encodeURIComponent(data.user.id),{
-        method:"PATCH",headers:{Prefer:"return=minimal"},
+      const profiles=await serviceFetch("/profiles?id=eq."+encodeURIComponent(data.user.id),{
+        method:"PATCH",headers:{Prefer:"return=representation"},
         body:JSON.stringify({terms_accepted_at:new Date().toISOString(),terms_version:"2026-11-18",privacy_version:"2026-11-18"})
       });
+      if(!profiles?.length)throw new Error("Consent record could not be saved.");
       setAuthCookies(req,res,data.access_token,data.refresh_token);
       return res.json({success:true,user:{id:data.user?.id,phone:data.user?.phone||phone}});
     }
