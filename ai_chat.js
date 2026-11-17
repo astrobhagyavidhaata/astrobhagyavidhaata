@@ -64,6 +64,7 @@
         throw new Error("परामर्श शुल्क ₹5 प्रति मिनट है।");
       }
 
+      await window.AstroWallet.ready;
       const started = await window.AstroWallet.startConsultation(
         astroName || "वैदिक ज्योतिषाचार्य"
       );
@@ -84,14 +85,27 @@
       const box = $("chatMessages");
       if (box) box.replaceChildren();
 
-      const userName = $("un")?.value || "नमस्कार";
-
-      addMessage(
-        activeAstro,
-        userName + " जी, आपका परामर्श शुरू हो गया है। कृपया अपना प्रश्न पूछें।",
-        "bot"
-      );
-
+      const consultationId=window.AstroWallet.getConsultationId();
+      let restored=false;
+      if(consultationId){
+        try{
+          const response=await fetch("/api/consultations/history?consultationId="+encodeURIComponent(consultationId),{
+            credentials:"same-origin",headers:{Accept:"application/json"}
+          });
+          const data=await response.json();
+          if(response.ok&&Array.isArray(data.messages)&&data.messages.length){
+            chatHistory=data.messages.map(m=>({role:m.role,content:m.content})).slice(-12);
+            for(const m of data.messages){
+              addMessage(m.role==="user"?"आप":activeAstro,m.content,m.role==="user"?"user":"bot");
+            }
+            restored=true;
+          }
+        }catch(_){}
+      }
+      if(!restored){
+        const userName = $("un")?.value || "नमस्कार";
+        addMessage(activeAstro,userName+" जी, आपका परामर्श शुरू हो गया है। कृपया अपना प्रश्न पूछें।","bot");
+      }
       return true;
 
     } catch (error) {
