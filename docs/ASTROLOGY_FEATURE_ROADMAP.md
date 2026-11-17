@@ -91,4 +91,6 @@ Note: Shodashvarga means the 16 classical divisional charts. A 64-varga set is a
 - GitHub Actions runs JavaScript syntax checks, automated ephemeris/chart/dasha/Panchang tests, HTTP smoke tests and an npm audit (latest successful run: zero dependency vulnerabilities).
 - Mobile OTP, wallet, Razorpay and paid consultation server routes have been added, but they require Supabase/Razorpay configuration, SQL migration execution and staging end-to-end tests before use.
 - Astronomy Engine positions now use apparent geocentric ecliptic coordinates. Lahiri ayanamsa remains a linear approximation; the system is not Swiss Ephemeris and has not passed independent professional validation.
-- The 64-varga extended catalogue, event timelines, festival rules, personalized muhurta, Shadbala and independent ephemeris validation remain future work.
+- The 64-varga extended catalogue is intentionally excluded; the app focuses on the 16 classical Shodashvarga charts.
+- Argala/Virodha Argala, Indu Lagna, 64th Navamsa from Lagna/Moon/Sun and fractional Drishti are implemented with documented tradition notes; independent reference validation remains pending.
+- Event timelines, festival rules, personalized muhurta, Shadbala and independent ephemeris validation remain future work.
