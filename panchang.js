@@ -37,6 +37,9 @@
     finally{placeButton.disabled=false;}
   });
   placeSelect.addEventListener("change",applyPlace);
+  $("panchangPlace").addEventListener("input",()=>{
+    $("panchangLat").value="";$("panchangLon").value="";placeSelect.style.display="none";
+  });
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function render(d){
     const p=d.panchang,k=d.kaal;
