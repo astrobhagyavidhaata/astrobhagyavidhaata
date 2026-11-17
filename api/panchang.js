@@ -26,6 +26,9 @@ function karanaName(index) {
 function fmt(date, zone) {
   return DateTime.fromJSDate(date, { zone:"utc" }).setZone(zone).toFormat("hh:mm a");
 }
+function fmtBoundary(date, zone) {
+  return DateTime.fromJSDate(date, { zone:"utc" }).setZone(zone).toFormat("dd LLL yyyy, hh:mm a");
+}
 function plusMinutes(date, minutes) { return new Date(date.getTime() + minutes * 60000); }
 function periodLabel(a,b,zone) { return fmt(a,zone) + " – " + fmt(b,zone); }
 
@@ -52,7 +55,7 @@ function findBoundary(start, metric, width, zone) {
     const mid = new Date((left.getTime()+right.getTime())/2);
     if (norm(metric(mid)-base) >= needed) right=mid; else left=mid;
   }
-  return fmt(right, zone);
+  return fmtBoundary(right, zone);
 }
 
 function isVishti(date) {
