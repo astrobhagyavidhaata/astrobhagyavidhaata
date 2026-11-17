@@ -28,7 +28,7 @@
     if(!phone){show("मोबाइल नंबर भरें।",true);return;}
     $("sendOtpButton").disabled=true;
     try{
-      const data=await call("send-otp",{phone});
+      const data=await call("send-otp",{phone,termsAccepted:true});
       otpSent=true;otpRow.style.display="block";show(data.message||"OTP भेज दिया गया है।");
       $("loginOtp").focus();
     }catch(error){show(error.message,true);}
