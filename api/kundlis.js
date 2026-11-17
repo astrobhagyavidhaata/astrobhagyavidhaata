@@ -1,11 +1,17 @@
 "use strict";
 const {getAuthenticatedUser,serviceFetch}=require("../lib/supabase");
 module.exports=async function(req,res){
-  if(req.method!=="GET"){res.setHeader("Allow","GET");return res.status(405).json({success:false,message:"केवल GET अनुरोध स्वीकार है।"});}
   try{
     const user=await getAuthenticatedUser(req,res);
     if(!user)return res.status(401).json({success:false,message:"अपनी कुंडलियाँ देखने के लिए पहले लॉगिन करें।"});
     const id=String(req.params.id||"");
+    if(req.method==="DELETE"&&id){
+      if(!/^[0-9a-f-]{36}$/i.test(id))return res.status(400).json({success:false,message:"कुंडली पहचान सही नहीं है।"});
+      const removed=await serviceFetch("/kundlis?id=eq."+encodeURIComponent(id)+"&user_id=eq."+encodeURIComponent(user.id)+"&select=id",{method:"DELETE",headers:{Prefer:"return=representation"}});
+      if(!removed?.length)return res.status(404).json({success:false,message:"कुंडली नहीं मिली।"});
+      return res.json({success:true,message:"कुंडली हटा दी गई।"});
+    }
+    if(req.method!=="GET"){res.setHeader("Allow","GET, DELETE");return res.status(405).json({success:false,message:"यह अनुरोध उपलब्ध नहीं है।"});}
     if(id){
       if(!/^[0-9a-f-]{36}$/i.test(id))return res.status(400).json({success:false,message:"कुंडली पहचान सही नहीं है।"});
       const rows=await serviceFetch("/kundlis?select=id,title,birth_details,chart_data,created_at&user_id=eq."+encodeURIComponent(user.id)+"&id=eq."+encodeURIComponent(id)+"&limit=1");
