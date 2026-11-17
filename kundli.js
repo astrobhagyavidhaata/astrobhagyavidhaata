@@ -213,6 +213,48 @@
         lines.push(a.from + " की " + a.type + " " + a.to + " पर");
       }
       lines.push("");
+      lines.push("विस्तृत ग्रह दृष्टि — दृष्टि बल");
+      for(const a of chart.drishti?.planetAspects||[]){
+        lines.push(a.from+" की "+a.to+" पर "+a.aspectStrength+"% दृष्टि ("+a.houseDistance+"वाँ स्थान)");
+      }
+      lines.push("");
+      lines.push("भावों पर ग्रह दृष्टि");
+      for(const a of chart.drishti?.houseAspects||[]){
+        lines.push(a.from+" की "+a.targetHouse+"वें भाव पर "+a.aspectStrength+"% दृष्टि ("+a.targetSign+")");
+      }
+      lines.push("");
+      lines.push("जैमिनी अर्गला — सभी भाव");
+      for(const item of chart.argala?.houses||[]){
+        lines.push(item.target+" ("+item.referenceSign+")");
+        for(const relation of item.relations){
+          lines.push("  "+relation.position+"वें से "+relation.label+": "+(relation.planets.join(", ")||"कोई ग्रह नहीं")+" | "+relation.obstructionHouse+"वें से विरोध: "+(relation.obstructingPlanets.join(", ")||"कोई ग्रह नहीं")+" | "+relation.status);
+        }
+      }
+      lines.push("");
+      lines.push("ग्रहों पर अर्गला");
+      for(const item of chart.argala?.grahas||[]){
+        lines.push(item.target+" ("+item.referenceSign+")");
+        for(const relation of item.relations){
+          lines.push("  "+relation.position+"वें से: "+(relation.planets.join(", ")||"कोई ग्रह नहीं")+" | विरोध "+relation.obstructionHouse+"वें से: "+(relation.obstructingPlanets.join(", ")||"कोई ग्रह नहीं")+" | "+relation.status);
+        }
+      }
+      lines.push("");
+      lines.push("विशेष लग्न — इंदु लग्न");
+      const indu=chart.specialLagnas?.indu;
+      if(indu){
+        lines.push("इंदु लग्न राशि: "+indu.rashi+" | जन्म लग्न से भाव: "+indu.houseFromLagna);
+        lines.push("लग्न से नवमेश: "+indu.ninthLordFromLagna+" ("+indu.kalas[indu.ninthLordFromLagna]+" कला)");
+        lines.push("चंद्र से नवमेश: "+indu.ninthLordFromMoon+" ("+indu.kalas[indu.ninthLordFromMoon]+" कला)");
+        lines.push("कुल कला: "+indu.totalKalas+" | 12 से शेष: "+indu.remainder+" | चंद्र राशि से गणना: "+indu.countFromMoon);
+      }
+      lines.push("");
+      lines.push("चौंसठवाँ नवांश / खर नवांश");
+      for(const [key,label] of [["lagna","लग्न"],["moon","चंद्र"],["sun","सूर्य"]]){
+        const point=chart.kharaPoints?.[key];
+        if(point)lines.push(label+": मूल राशि "+point.sourceRashi+" "+Number(point.sourceDegree).toFixed(2)+"° | 64वाँ नवांश राशि "+point.kharaRashi+" | नवांश "+point.kharaNavamsa+" | खर नवमांश स्वामी "+point.kharaNavamsaLord);
+      }
+      lines.push("नोट: 64वें नवांश की गणना अलग-अलग ग्रंथ-परंपराओं में लग्न, चंद्र और सूर्य से की जाती है; यहाँ तीनों संदर्भ अलग दिखाए गए हैं। इसे अकेले अशुभ घटना का निश्चित संकेत न मानें।");
+      lines.push("");
       lines.push("युति");
       for (const conjunction of chart.relationships?.conjunctions || []) {
         lines.push(conjunction.planets.join(" + ") + " (" + conjunction.orb + "°)");
