@@ -18,6 +18,11 @@ function compactChartContext(source){
     d9:source.d9||null,
     vargas:source.vargas||{},
     relationships:source.relationships||{},
+    specialLagnas:source.specialLagnas||{},
+    kharaPoints:source.kharaPoints||{},
+    argala:source.argala||null,
+    drishti:source.drishti||null,
+    gochar:source.gochar||source.transits||null,
     dasha:{
       birthMoon:d.birthMoon||{},
       startingMahadasha:d.startingMahadasha||null,
