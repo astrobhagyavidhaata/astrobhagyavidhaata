@@ -203,8 +203,17 @@
 
   async function startConsultation(astrologerId) {
     if (consultationId) {
-      message("आपका परामर्श पहले से सक्रिय है।");
-      return true;
+      try {
+        const current=await request("/api/consultations/active");
+        if(current.consultation?.status==="active"){
+          if(current.wallet)updateWallet(current.wallet);
+          renderBillingStatus(current.consultation);
+          message("आपका परामर्श पहले से सक्रिय है।");
+          return true;
+        }
+      } catch (_) {}
+      clearTimer();
+      consultationId=null;
     }
     if (busy) {
       message("पिछली बिलिंग प्रक्रिया पूरी होने दें।", true);
