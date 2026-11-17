@@ -4,14 +4,12 @@ This checklist separates completed repository/database work from external accoun
 
 ## A. Database and login
 
-<completed>
 - [x] Live Supabase project connected: Astro Bhagya Vidhata.
 - [x] Seven public tables exist: profiles, wallets, wallet_transactions, consultations, payments, kundlis and chat_messages.
 - [x] Row Level Security is enabled on all seven tables.
 - [x] Server-only access to money-changing RPC functions is restricted to service_role.
 - [x] Supporting indexes and optimized own-row RLS checks are applied.
 - [x] Latest Supabase security advisor check returned no security lints.
-</completed>
 
 Still required:
 1. Enable Supabase Phone Auth and configure an SMS provider, OTP expiry and rate limits.
