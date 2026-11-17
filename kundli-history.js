@@ -34,7 +34,7 @@
     preview.textContent=lines.join("\n");
     const consult=document.createElement("button");
     consult.type="button";consult.textContent="इस कुंडली से परामर्श शुरू करें";
-    consult.addEventListener("click",()=>{if(typeof window.openChatBox==="function")window.openChatBox("वैदिक ज्योतिषाचार्य",5);});
+    consult.addEventListener("click",()=>{if(typeof window.openChatBox==="function")window.openChatBox("AI वैदिक ज्योतिष सहायक",5);});
     preview.appendChild(document.createElement("br"));
     preview.appendChild(consult);
   }
