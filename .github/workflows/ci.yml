@@ -15,3 +15,7 @@ jobs:
       - run: npm install
       - run: npm run check
       - run: npm test
+      - name: Report dependency advisories
+        run: |
+          npm audit --json > npm-audit.json || true
+          node -e "const a=require('./npm-audit.json'); for (const [n,v] of Object.entries(a.vulnerabilities || {})) console.log(n + ': ' + v.severity + ' | range=' + v.range + ' | fix=' + JSON.stringify(v.fixAvailable))"
