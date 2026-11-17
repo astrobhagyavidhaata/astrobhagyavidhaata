@@ -1,89 +1,113 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>एस्ट्रो भाग्य विधाता - वैदिक ज्योतिष</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
-  body{background:#f0f2f5;padding-bottom:45px;color:#1a1a2e}
-  .top{background:#1a1a2e;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
-  .logo{color:#f5b041;font-weight:bold;font-size:18px}
-  .wal{background:#f5b041;color:#000;padding:7px 14px;border-radius:20px;font-weight:bold;font-size:14px;cursor:pointer}
-  .box{background:#fff;margin:12px;padding:16px;border-radius:14px;box-shadow:0 3px 10px rgba(0,0,0,0.08)}
-  h3{color:#1a1a2e;border-left:4px solid #e67e22;padding-left:10px;margin-bottom:14px;font-size:17px}
-  label{display:block;font-size:14px;font-weight:bold;margin:14px 0 6px;color:#333}
-  input,select,textarea,button{width:100%;padding:14px;border-radius:10px;border:1.5px solid #bbb;font-size:16px;background:#fff;color:#111}
-  select{cursor:pointer;font-weight:bold;background:#f9fafb;border-color:#999}
-  .row3{display:flex;gap:8px}
-  .row3 select{flex:1;padding:14px 4px;text-align:center;font-size:15px}
-  .btn{background:#1a1a2e;color:#f5b041;font-weight:bold;border:none;margin-top:18px;cursor:pointer;font-size:17px;padding:15px;border-radius:10px}
-  .res{margin-top:14px;background:#fef9e7;border:1.5px solid #e67e22;padding:12px;border-radius:10px;font-size:14px;line-height:1.6}
-  .clist{border:2px solid #d35400;background:#fff;border-radius:10px;max-height:220px;overflow-y:auto;display:none;margin-top:6px;box-shadow:0 6px 16px rgba(0,0,0,0.18)}
-  .citem{padding:13px;border-bottom:1px solid #eee;font-size:15px;font-weight:bold;color:#1a1a2e;cursor:pointer}
-  .citem small{display:block;font-weight:normal;color:#117864;font-size:12px;margin-top:2px}
-  .chart-tabs{display:flex;gap:6px;margin:14px 0}
-  .ctab{flex:1;padding:11px;background:#eee;border:none;border-radius:8px;font-weight:bold;font-size:14px}
-  .ctab.active{background:#d35400;color:#fff}
-  svg{width:100%;max-width:310px;background:#fffdf5;border:2px solid #d35400;margin:0 auto;display:block}
-  .hn{font-size:11px;fill:#d35400;font-weight:bold}
-  .pt{font-size:10px;fill:#1a1a2e;font-weight:bold}
-  .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);z-index:200;padding:15px}
-  .modal-box{background:#fff;border-radius:14px;padding:16px;max-width:420px;margin:25px auto}
-  .chat-area{height:230px;overflow-y:auto;border:1px solid #ddd;padding:10px;border-radius:10px;background:#f9f9f9;margin:10px 0;font-size:14px}
-  .msg-bot{background:#fef9e7;padding:10px;border-radius:10px;margin-bottom:8px;border-left:3px solid #e67e22}
-  .msg-user{background:#e8f8f5;padding:10px;border-radius:10px;margin-bottom:8px;text-align:right}
-  .disclaimer{font-size:11px;color:#666;text-align:center;margin:16px;line-height:1.4}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17112b">
+  <title>Astro Bhagya Vidhata</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #100d1c;
+      color: #fff;
+    }
+    header {
+      padding: 22px 16px;
+      text-align: center;
+      background: #211638;
+      border-bottom: 1px solid #493568;
+    }
+    header h1 { margin: 0; color: #f5c66b; font-size: 25px; }
+    header p { margin: 8px 0 0; color: #d4c9e5; }
+    main { max-width: 600px; margin: 25px auto; padding: 16px; }
+    .panel {
+      background: #211a32;
+      border: 1px solid #493568;
+      border-radius: 15px;
+      padding: 20px;
+    }
+    h2 { color: #f5c66b; margin-top: 0; }
+    label { display: block; margin: 15px 0 7px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      border: 1px solid #66547f;
+      background: #151020;
+      color: white;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      border: 0;
+      border-radius: 9px;
+      background: #e8b957;
+      color: #211638;
+      font-size: 17px;
+      font-weight: bold;
+    }
+    #message {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #151020;
+      color: #f5d994;
+      line-height: 1.6;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #a99bbd;
+      font-size: 13px;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>🔱 Astro Bhagya Vidhata</h1>
+    <p>वैदिक ज्योतिष एवं कुंडली परामर्श</p>
+  </header>
 
-<div class="top">
-  <div class="logo">🔮 एस्ट्रो भाग्य विधाता</div>
-  <div id="google_translate_element"></div>
-  <div class="wal" onclick="addMoney(100)">₹ <span id="bal">100</span> + Add</div>
-</div>
+  <main>
+    <section class="panel">
+      <h2>अपनी जन्म जानकारी भरें</h2>
 
-<div class="box">
-  <h3>जन्म कुंडली (D1, D9 नवांश, D10 दशमांश)</h3>
-  <label>पूरा नाम:</label>
-  <input type="text" id="un" placeholder="यहाँ अपना नाम लिखें">
-  
-  <label>जन्म तारीख (तारीख / महीना / साल चुनें):</label>
-  <div class="row3">
-    <select id="dob_d"></select>
-    <select id="dob_m">
-      <option value="01">जनवरी</option><option value="02">फ़रवरी</option><option value="03">मार्च</option>
-      <option value="04">अप्रैल</option><option value="05">मई</option><option value="06">जून</option>
-      <option value="07" selected>जुलाई</option><option value="08">अगस्त</option><option value="09">सितंबर</option>
-      <option value="10">अक्टूबर</option><option value="11">नवंबर</option><option value="12">दिसंबर</option>
-    </select>
-    <select id="dob_y"></select>
-  </div>
-  <input type="hidden" id="dt" value="1990-07-24">
+      <form id="kundliForm">
+        <label for="name">नाम</label>
+        <input id="name" name="name" type="text"
+          placeholder="अपना नाम लिखें" required>
 
-  <label>जन्म समय (घंटा / मिनट / सुबह-शाम चुनें):</label>
-  <div class="row3">
-    <select id="tob_h"></select>
-    <select id="tob_m"></select>
-    <select id="tob_ap"><option value="AM" selected>AM (सुबह)</option><option value="PM">PM (शाम/रात)</option></select>
-  </div>
-  <input type="hidden" id="tm" value="08:30">
+        <label for="dob">जन्म तारीख</label>
+        <input id="dob" name="dob" type="date" required>
 
-  <label>जन्म स्थान (दुनिया के किसी भी शहर का नाम लिखें):</label>
-  <input type="text" id="pl" placeholder="जैसे: Ludhiana, Delhi, London, New York..." oninput="searchCityAPI()" onfocus="searchCityAPI()">
-  <div class="clist" id="cList"></div>
-  <div id="cInfo" style="font-size:13px;color:#117864;font-weight:bold;margin-top:8px;background:#e8f8f5;padding:8px;border-radius:8px">📍 स्थान: Ludhiana, Punjab, India (Lat: 30.90°N, Lon: 75.85°E)</div>
-  
-  <button class="btn" onclick="syncDateTimeAndBuild()">सभी कुंडली चार्ट बनाएं</button>
+        <label for="birthTime">जन्म समय</label>
+        <input id="birthTime" name="birthTime" type="time" required>
 
-  <div id="kBox" style="display:none">
-    <div class="res" id="kTxt"></div>
-    <div class="chart-tabs">
-      <button class="ctab active" onclick="showChart('d1', this)">D1 लग्न</button>
-      <button class="ctab" onclick="showChart('d9', this)">D9 नवांश</button>
-      <button class="ctab" onclick="showChart('d10', this)">D10 दशमांश</button>
-    </div>
-    <div id="chart_d1"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d1_r1" x="145" y="130" class="hn"></text><text id="d1_r2" x="72" y="65" class="hn"></text><text id="d1_r3" x="52" y="82" class="hn"></text><text id="d1_r4" x="125" y="154" class="hn"></text><text id="d1_r5" x="52" y="225" class="hn"></text><text id="d1_r6" x="72" y="245" class="hn"></text><text id="d1_r7" x="145" y="178" class="hn"></text><text id="d1_r8" x="218" y="245" class="hn"></text><text id="d1_r9" x="238" y="225" class="hn"></text><text id="d1_r10" x="165" y="154" class="hn"></text><text id="d1_r11" x="238" y="82" class="hn"></text><text id="d1_r12" x="218" y="65" class="hn"></text><text id="d1_p1" x="130" y="85" class="pt"></text><text id="d1_p2" x="60" y="35" class="pt"></text><text id="d1_p3" x="12" y="82" class="pt"></text><text id="d1_p4" x="60" y="154" class="pt"></text><text id="d1_p5" x="12" y="225" class="pt"></text><text id="d1_p6" x="60" y="275" class="pt"></text><text id="d1_p7" x="130" y="220" class="pt"></text><text id="d1_p8" x="200" y="275" class="pt"></text><text id="d1_p9" x="245" y="225" class="pt"></text><text id="d1_p10" x="200" y="154" class="pt"></text><text id="d1_p11" x="245" y="82" class="pt"></text><text id="d1_p12" x="190" y="35" class="pt"></text></svg></div>
-    <div id="chart_d9" style="display:none"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d9_r1" x="145" y="130" class="hn"></text><text id="d9_r2" x="72" y="65" class="hn"></text><text id="d9_r3" x="52" y="82" class="hn"></text><text id="d9_r4" x="125" y="154" class="hn"></text><text id="d9_r5" x="52" y="225" class="hn"></text><text id="d9_r6" x="72" y="245" class="hn"></text><text id="d9_r7" x="145" y="178" class="hn"></text><text id="d9_r8" x="218" y="245" class="hn"></text><text id="d9_r9" x="238" y="225" class="hn"></text><text id="d9_r10" x="165" y="154" class="hn"></text><text id="d9_r11" x="238" y="82" class="hn"></text><text id="d9_r12" x="218" y="65" class="hn"></text><text id="d9_p1" x="130" y="85" class="pt"></text><text id="d9_p2" x="60" y="35" class="pt"></text><text id="d9_p3" x="12" y="82" class="pt"></text><text id="d9_p4" x="60" y="154" class="pt"></text><text id="d9_p5" x="12" y="225" class="pt"></text><text id="d9_p6" x="60" y="275" class="pt"></text><text id="d9_p7" x="130" y="220" class="pt"></text><text id="d9_p8" x="200" y="275" class="pt"></text><text id="d9_p9" x="245" y="225" class="pt"></text><text id="d9_p10" x="200" y="154" class="pt"></text><text id="d9_p11" x="245" y="82" class="pt"></text><text id="d9_p12" x="190" y="35" class="pt"></text></svg></div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+        <label for="birthPlace">जन्म स्थान</label>
+        <input id="birthPlace" name="birthPlace" type="text"
+          placeholder="शहर या गाँव का नाम" required>
+
+        <button type="submit">मेरी कुंडली बनाएं</button>
+      </form>
+
+      <div id="message" role="status"></div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Astro Bhagya Vidhata
+    <br>परामर्श शुल्क प्रस्तावित: ₹5 प्रति मिनट
+  </footer>
+
+  <script src="kundli.js"></script>
+  <script src="wallet.js"></script>
+  <script src="ai_chat.js"></script>
+  <script src="gochar.js"></script>
+</body>
+</html>                                                                                                                                                                                                                                                                                                                                                              
