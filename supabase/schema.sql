@@ -155,7 +155,7 @@ begin
         where id=p_consultation_id returning * into c;
     end if;
     if affordable < due_minutes then
-      update public.consultations set status='stopped', ended_at=last_billed_at
+      update public.consultations set status='stopped', ended_at=last_billed_at + interval '1 minute'
         where id=p_consultation_id returning * into c;
     end if;
   else
@@ -192,7 +192,7 @@ begin
             last_billed_at=last_billed_at+make_interval(mins=>affordable)
             where id=p_consultation_id returning * into c;
         end if;
-        if affordable<due_minutes then v_ended_at:=c.last_billed_at;
+        if affordable<due_minutes then v_ended_at:=c.last_billed_at+interval '1 minute';
         else v_ended_at:=now(); end if;
       else
         v_ended_at:=now();
