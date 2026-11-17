@@ -39,7 +39,7 @@ The current ephemeris adapter uses Astronomy Engine tropical geocentric position
 5. Test duplicate webhook delivery, failed payments and wallet crediting before switching to live mode.
 
 ## Deployment option
-A Render Blueprint is included in render.yaml, and a Dockerfile is included for container hosting. These files do not deploy the app automatically; create the service from the repository and enter the environment secrets in the hosting dashboard.
+A Render Blueprint is included in render.yaml on the free staging tier, and a Dockerfile is included for container hosting. The free service may sleep and is for testing only; upgrade to an always-on paid service before accepting real paid consultations. These files do not deploy the app automatically; create the service from the repository and enter the environment secrets in the hosting dashboard.
 
 ## Production status
 Source code being committed does not mean the app is deployed or ready to accept money. A Supabase project, SMS provider, Razorpay account/webhook, Gemini API key, hosting environment, environment variables, SQL migration, end-to-end tests and independent security/astrology review are still required. Do not accept real customer payments until these checks pass.
