@@ -86,6 +86,9 @@ Note: Shodashvarga means the 16 classical divisional charts. A 64-varga set is a
 - D1 and D9 are calculated; the current chart engine now also returns all 16 classical Shodashvarga charts (D1, D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30, D40, D45 and D60) using documented common Parashari division rules. These rules still require independent reference-chart validation.
 - Daily Gochar displays nine grahas with sidereal sign, degree-minute-second, nakshatra/pada, navamsa, house from selected Moon sign and retrograde/direct status.
 - Daily Panchang currently shows sunrise-based five limbs, end-time estimates, local sunrise/sunset/moonrise/moonset, Rahu Kaal, Yamaganda, Gulika, Abhijit, Bhadra, day/night Choghadiya and 24 horas.
+- Vimshottari output includes the full nine-Mahadasha timeline, current Mahadasha/Antardasha/Pratyantardasha breakdowns and the 27-nakshatra Nav Tara chart.
+- Users can opt in to save a generated Kundli to their account, view/delete their own saved charts, and restore the transcript of an active paid consultation.
+- GitHub Actions runs JavaScript syntax checks, automated ephemeris/chart/dasha/Panchang tests, HTTP smoke tests and an npm audit (latest successful run: zero dependency vulnerabilities).
 - Mobile OTP, wallet, Razorpay and paid consultation server routes have been added, but they require Supabase/Razorpay configuration, SQL migration execution and staging end-to-end tests before use.
 - Astronomy Engine positions now use apparent geocentric ecliptic coordinates. Lahiri ayanamsa remains a linear approximation; the system is not Swiss Ephemeris and has not passed independent professional validation.
 - The 64-varga extended catalogue, event timelines, festival rules, personalized muhurta, Shadbala and independent ephemeris validation remain future work.
