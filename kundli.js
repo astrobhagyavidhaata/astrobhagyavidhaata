@@ -300,7 +300,10 @@
         const point=chart.kharaPoints?.[key];
         if(point)lines.push(label+": मूल राशि "+point.sourceRashi+" "+Number(point.sourceDegree).toFixed(2)+"° | 64वाँ नवांश राशि "+point.kharaRashi+" | नवांश "+point.kharaNavamsa+" | खर नवमांश स्वामी "+point.kharaNavamsaLord);
       }
-      lines.push("नोट: 64वें नवांश की गणना अलग-अलग ग्रंथ-परंपराओं में लग्न, चंद्र और सूर्य से की जाती है; यहाँ तीनों संदर्भ अलग दिखाए गए हैं। इसे अकेले अशुभ घटना का निश्चित संकेत न मानें।");
+      for(const [planetName,point] of Object.entries(chart.kharaPoints?.planets||{})){
+        lines.push(planetName+": 64वाँ नवांश "+point.kharaRashi+" / D9 "+point.kharaNavamsa+" | स्वामी "+point.kharaNavamsaLord);
+      }
+      lines.push("नोट: 64वें नवांश की गणना अलग-अलग ग्रंथ-परंपराओं में लग्न, चंद्र और सूर्य से की जाती है; यहाँ तीनों संदर्भ और प्रत्येक ग्रह का अलग बिंदु दिखाया गया है। इसे अकेले अशुभ घटना का निश्चित संकेत न मानें।");
       lines.push("");
       lines.push("युति");
       for (const conjunction of chart.relationships?.conjunctions || []) {
