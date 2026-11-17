@@ -1,0 +1,16 @@
+
+{
+  "name": "astro-bhagya-vidhaata",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vedic Astrology Consultation Platform",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@vercel/node": "^5.3.0"
+  }
+}
