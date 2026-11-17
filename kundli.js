@@ -198,6 +198,7 @@
       }
       lines.push("");
       lines.push("अन्य 14 विभाजित कुंडलियाँ (षोडशवर्ग)");
+      lines.push("महत्वपूर्ण: D60 और सूक्ष्म वर्गों का लग्न जन्म समय में थोड़े अंतर से बदल सकता है; जन्म समय की पुष्टि करें।");
       for (const [vargaKey, varga] of Object.entries(chart.vargas || {})) {
         if (vargaKey === "D1" || vargaKey === "D9") continue;
         lines.push("");
