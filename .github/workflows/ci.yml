@@ -15,6 +15,18 @@ jobs:
       - run: npm install
       - run: npm run check
       - run: npm test
+      - name: Smoke test HTTP server and Panchang API
+        run: |
+          npm start > server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:3000/healthz; then break; fi
+            sleep 1
+          done
+          curl -fsS 'http://127.0.0.1:3000/api/panchang?date=2026-11-18&lat=21.47&lon=78.27' | grep '"success":true'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/lib/ephemeris.js)" = "404"
+          curl -fsS http://127.0.0.1:3000/TERMS.md > /dev/null
       - name: Report dependency advisories
         run: |
           npm audit --json > npm-audit.json || true
