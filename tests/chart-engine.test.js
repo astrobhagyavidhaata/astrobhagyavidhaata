@@ -20,6 +20,8 @@ test("D2, D7 and D10 follow the odd/even sign starts",()=>{
  assert.equal(getVargaPosition(15,2).rashi,"कर्क");
  assert.equal(getVargaPosition(30,7).rashi,"वृश्चिक");
  assert.equal(getVargaPosition(30,10).rashi,"मकर");
+ assert.equal(getVargaPosition(30,60).rashi,"वृषभ");
+ assert.equal(getVargaPosition(30.5,60).rashi,"मिथुन");
 });
 
 test("D30 switches at its unequal classical segment boundaries",()=>{
