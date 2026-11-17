@@ -1,14 +1,13 @@
 
 /*
  * ASTRO BHAGYA VIDHATA
- * Secure AI Astrology Chat
- * API keys are stored on the server, never in the browser.
+ * Gemini Consultation Chat
  */
 
 (() => {
   "use strict";
 
-  const CHAT_API = "/api/chat";
+  const CHAT_API = "/api/consultation";
 
   let activeAstro = "";
   let chatBusy = false;
@@ -48,9 +47,7 @@
     const element = $("kTxt");
 
     if (!element || !element.textContent.trim()) {
-      throw new Error(
-        "पहले जन्म विवरण भरकर वास्तविक कुंडली तैयार करें।"
-      );
+      throw new Error("पहले जन्म विवरण भरकर कुंडली तैयार करें।");
     }
 
     return element.textContent.trim();
@@ -58,20 +55,19 @@
 
   async function openChatBox(astroName, rate) {
     try {
-      const kundli = getKundliDetails();
+      getKundliDetails();
 
       if (!window.AstroWallet) {
         throw new Error("वॉलेट सेवा उपलब्ध नहीं है।");
       }
 
       if (Number(rate) !== 5) {
-        throw new Error("परामर्श शुल्क ₹5 प्रति मिनट निर्धारित है।");
+        throw new Error("परामर्श शुल्क ₹5 प्रति मिनट है।");
       }
 
-      const started =
-        await window.AstroWallet.startConsultation(
-          astroName || "वैदिक ज्योतिषाचार्य"
-        );
+      const started = await window.AstroWallet.startConsultation(
+        astroName || "वैदिक ज्योतिषाचार्य"
+      );
 
       if (!started) return false;
 
@@ -83,8 +79,7 @@
 
       const title = $("chatTitle");
       if (title) {
-        title.textContent =
-          activeAstro + " (वैदिक ज्योतिष परामर्श)";
+        title.textContent = activeAstro + " (वैदिक ज्योतिष परामर्श)";
       }
 
       const box = $("chatMessages");
@@ -94,8 +89,7 @@
 
       addMessage(
         activeAstro,
-        userName +
-          " जी, आपका परामर्श शुरू हो गया है। कृपया अपना प्रश्न पूछें।",
+        userName + " जी, आपका परामर्श शुरू हो गया है। कृपया अपना प्रश्न पूछें।",
         "bot"
       );
 
@@ -114,7 +108,6 @@
     if (!input) return;
 
     const question = input.value.trim();
-
     if (!question) return;
 
     if (question.length > 4000) {
@@ -122,10 +115,10 @@
       return;
     }
 
-    let kundli;
+    let chartContext;
 
     try {
-      kundli = getKundliDetails();
+      chartContext = getKundliDetails();
     } catch (error) {
       showMessage(error.message);
       return;
@@ -150,47 +143,44 @@
           "Accept": "application/json"
         },
         body: JSON.stringify({
-          astrologer: activeAstro,
           question,
-          kundli,
-          history: chatHistory.slice(-12)
+          chartContext,
+          conversationHistory: chatHistory.slice(-12)
         })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "AI सेवा अभी उपलब्ध नहीं है।"
-        );
+        throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
       }
 
-      if (
-        typeof data.reply !== "string" ||
-        !data.reply.trim()
-      ) {
+      if (typeof data.answer !== "string" || !data.answer.trim()) {
         throw new Error("AI से सही उत्तर प्राप्त नहीं हुआ।");
       }
 
-      loading.textContent = activeAstro + ": " + data.reply;
+      loading.textContent = activeAstro + ": " + data.answer;
 
       chatHistory.push(
         { role: "user", content: question },
-        { role: "assistant", content: data.reply }
+        { role: "assistant", content: data.answer }
       );
 
       chatHistory = chatHistory.slice(-12);
 
     } catch (error) {
-      loading.textContent =
-        "उत्तर प्राप्त नहीं हुआ: " + error.message;
+      loading.textContent = "उत्तर प्राप्त नहीं हुआ: " + error.message;
 
     } finally {
       chatBusy = false;
-      $("chatMessages")?.scrollTo({
-        top: $("chatMessages").scrollHeight,
-        behavior: "smooth"
-      });
+
+      const messages = $("chatMessages");
+      if (messages) {
+        messages.scrollTo({
+          top: messages.scrollHeight,
+          behavior: "smooth"
+        });
+      }
     }
   }
 
