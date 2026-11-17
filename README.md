@@ -3,7 +3,7 @@
 Hindi-first Vedic astrology consultation web application.
 
 ## Implemented in the repository
-- Birth chart calculation endpoint with D1/D9, whole-sign houses, nakshatra/pada, retrograde flags, basic drishti/conjunctions, Vimshottari dasha and Nav Tara.
+- Birth chart calculation endpoint with all 16 classical Shodashvarga charts (D1–D60 set), whole-sign houses, nakshatra/pada, retrograde flags, basic drishti/conjunctions, Vimshottari dasha and Nav Tara.
 - Daily nine-planet Gochar display with sign, degrees, nakshatra/pada, navamsa and house from the selected Moon sign.
 - Daily local Panchang endpoint and UI: tithi, paksha, nakshatra/pada, yoga, karana, sunrise/sunset, moonrise/moonset, Rahu Kaal, Yamaganda, Gulika, Abhijit, Bhadra intervals, day/night Choghadiya and 24 horas.
 - Supabase phone OTP authentication using HttpOnly cookies.
