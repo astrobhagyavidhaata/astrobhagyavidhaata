@@ -235,18 +235,18 @@ alter table public.payments enable row level security;
 alter table public.kundlis enable row level security;
 alter table public.chat_messages enable row level security;
 
-create policy "profile read own" on public.profiles for select to authenticated using (id=auth.uid());
-create policy "profile update own" on public.profiles for update to authenticated using (id=auth.uid()) with check (id=auth.uid());
-create policy "wallet read own" on public.wallets for select to authenticated using (user_id=auth.uid());
-create policy "transactions read own" on public.wallet_transactions for select to authenticated using (user_id=auth.uid());
-create policy "consultations read own" on public.consultations for select to authenticated using (user_id=auth.uid());
-create policy "payments read own" on public.payments for select to authenticated using (user_id=auth.uid());
-create policy "kundlis read own" on public.kundlis for select to authenticated using (user_id=auth.uid());
-create policy "kundlis insert own" on public.kundlis for insert to authenticated with check (user_id=auth.uid());
-create policy "kundlis update own" on public.kundlis for update to authenticated using (user_id=auth.uid()) with check (user_id=auth.uid());
-create policy "kundlis delete own" on public.kundlis for delete to authenticated using (user_id=auth.uid());
-create policy "chat read own" on public.chat_messages for select to authenticated using (user_id=auth.uid());
-create policy "chat insert own" on public.chat_messages for insert to authenticated with check (user_id=auth.uid() and role='user');
+create policy "profile read own" on public.profiles for select to authenticated using (id=(select auth.uid()));
+create policy "profile update own" on public.profiles for update to authenticated using (id=(select auth.uid())) with check (id=(select auth.uid()));
+create policy "wallet read own" on public.wallets for select to authenticated using (user_id=(select auth.uid()));
+create policy "transactions read own" on public.wallet_transactions for select to authenticated using (user_id=(select auth.uid()));
+create policy "consultations read own" on public.consultations for select to authenticated using (user_id=(select auth.uid()));
+create policy "payments read own" on public.payments for select to authenticated using (user_id=(select auth.uid()));
+create policy "kundlis read own" on public.kundlis for select to authenticated using (user_id=(select auth.uid()));
+create policy "kundlis insert own" on public.kundlis for insert to authenticated with check (user_id=(select auth.uid()));
+create policy "kundlis update own" on public.kundlis for update to authenticated using (user_id=(select auth.uid())) with check (user_id=(select auth.uid()));
+create policy "kundlis delete own" on public.kundlis for delete to authenticated using (user_id=(select auth.uid()));
+create policy "chat read own" on public.chat_messages for select to authenticated using (user_id=(select auth.uid()));
+create policy "chat insert own" on public.chat_messages for insert to authenticated with check (user_id=(select auth.uid()) and role='user');
 
 -- No client-side insert/update/delete policies for wallets, payments, transactions or consultations.
 
