@@ -4,6 +4,35 @@ const {askGemini}=require("../lib/gemini");
 const {getAuthenticatedUser,activeConsultation,rpc,serviceFetch}=require("../lib/supabase");
 const recentRequests=new Map();
 
+function compactChartContext(source){
+  if(!source||typeof source!=="object"||Array.isArray(source))return {};
+  const d=source.dasha||{},current=d.current||{};
+  const md=(d.mahadashas||[]).find(x=>x.planet===current.mahadasha);
+  const ad=(md?.antardashas||[]).find(x=>x.planet===current.antardasha);
+  const pd=(ad?.pratyantardashas||[]).find(x=>x.planet===current.pratyantardasha);
+  return {
+    name:source.name||"",
+    birth:source.birth||{},
+    calculation:source.calculation||{},
+    d1:source.d1||null,
+    d9:source.d9||null,
+    vargas:source.vargas||{},
+    relationships:source.relationships||{},
+    dasha:{
+      birthMoon:d.birthMoon||{},
+      startingMahadasha:d.startingMahadasha||null,
+      balanceAtBirthYears:d.balanceAtBirthYears||null,
+      current,
+      currentMahadasha:md?{planet:md.planet,start:md.start,end:md.end}:null,
+      currentAntardasha:ad?{planet:ad.planet,start:ad.start,end:ad.end}:null,
+      currentPratyantardasha:pd?{planet:pd.planet,start:pd.start,end:pd.end}:null,
+      currentMahadashaAntardashas:(md?.antardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end})),
+      currentAntardashaPratyantardashas:(ad?.pratyantardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end}))
+    },
+    taraChart:source.taraChart||[]
+  };
+}
+
 module.exports=async function(req,res){
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
   try{
@@ -20,7 +49,7 @@ module.exports=async function(req,res){
     const billing=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
     if(billing.consultation?.status!=="active")return res.status(402).json({success:false,message:"वॉलेट बैलेंस पूरा हो गया है। परामर्श रोक दिया गया।"});
     recentRequests.set(user.id,now);
-    const chartContext=body.chartContext&&typeof body.chartContext==="object"?body.chartContext:{};
+    const chartContext=compactChartContext(body.chartContext);
     const history=Array.isArray(body.conversationHistory)?body.conversationHistory.slice(-10):[];
     try{
       await serviceFetch("/chat_messages",{
