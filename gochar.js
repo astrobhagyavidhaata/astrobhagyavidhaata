@@ -1,39 +1,174 @@
-const defaultRashis = ["मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"];
 
-let monthlyGocharData = JSON.parse(localStorage.getItem("adi_gochar")) || {
-    "मेष": "शनि बारहवें भाव में वक्री है—खर्चों पर नियंत्रण रखें और धैर्य से काम लें।",
-    "वृषभ": "लाभ भाव का शनि और पंचम के ग्रह करियर में नए अवसर और ज्ञान देंगे।",
-    "मिथुन": "कर्म भाव का शनि मेहनत बढ़ाएगा, वाणी में संयम रखना बेहद ज़रूरी है।",
-    "कर्क": "भाग्य स्थान का शनि धर्म-अध्यात्म में रुचि बढ़ाएगा और रुके काम बनाएगा।",
-    "सिंह": "अष्टम भाव का वक्री शनि गहरी परीक्षा और आत्म-मंथन का समय दे रहा है।",
-    "कन्या": "सप्तम भाव का शनि रिश्तों में गंभीरता और स्पष्ट संवाद की मांग कर रहा है।",
-    "तुला": "छठे भाव का शनि विरोधियों पर विजय दिलाएगा, पर मानसिक तनाव से बचें।",
-    "वृश्चिक": "पंचम भाव का शनि संतान, शिक्षा और पूर्वपुण्य के कर्मों का फल देगा।",
-    "धनु": "चौथे भाव का शनि पारिवारिक जिम्मेदारियां बढ़ाएगा, धैर्य बनाए रखें।",
-    "मकर": "तीसरे भाव का शनि पराक्रम और साहस बढ़ाएगा, यात्रा के योग बनेंगे।",
-    "कुंभ": "दूसरे भाव का शनि धन संचय और परिवार के साथ वाणी में मधुरता मांगता है।",
-    "मीन": "लग्न में वक्री शनि आत्म-सुधार, अनुशासन और जीवन में बड़े बदलाव लाएगा।"
-};
+/*
+ * ASTRO BHAGYA VIDHATA
+ * Server-driven planetary transit (Gochar) module
+ *
+ * Transit calculations and admin permissions must be handled by backend.
+ */
 
-function loadRashiGochar() {
-    let sel = document.getElementById("rashiSelect");
-    let out = document.getElementById("rashiGocharOut");
-    if (!sel || !out) return;
-    let r = sel.value;
-    out.innerHTML = `<b>${r} राशि/लग्न का मासिक गोचर फल:</b><br>${monthlyGocharData[r]}`;
-}
+(() => {
+  "use strict";
 
-function saveAdminGochar() {
-    let pin = prompt("एस्ट्रोलॉजर एडमिन पिन डालें (डिफ़ॉल्ट पिन: 1234):");
-    if (pin !== "1234") {
-        alert("गलत पिन! केवल एडमिन ही गोचर बदल सकते हैं।");
-        return;
+  const API = "/api/gochar";
+
+  const rashis = [
+    "मेष", "वृषभ", "मिथुन", "कर्क",
+    "सिंह", "कन्या", "तुला", "वृश्चिक",
+    "धनु", "मकर", "कुंभ", "मीन"
+  ];
+
+  const $ = id => document.getElementById(id);
+
+  async function request(url, options = {}) {
+    const response = await fetch(url, {
+      credentials: "same-origin",
+      cache: "no-store",
+      ...options,
+      headers: {
+        Accept: "application/json",
+        ...(options.body ? {
+          "Content-Type": "application/json"
+        } : {}),
+        ...(options.headers || {})
+      }
+    });
+
+    let data = {};
+
+    try {
+      data = await response.json();
+    } catch (_) {}
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "गोचर जानकारी प्राप्त नहीं हो सकी।"
+      );
     }
-    let r = document.getElementById("adminRashiSelect").value;
-    let txt = document.getElementById("adminGocharInput").value.trim();
-    if (!txt) { alert("कृपया गोचर फल लिखें!"); return; }
-    monthlyGocharData[r] = txt;
-    localStorage.setItem("adi_gochar", JSON.stringify(monthlyGocharData));
-    loadRashiGochar();
-    alert(r + " राशि का नया गोचर सेव हो गया है!");
-}
+
+    return data;
+  }
+
+  function showOutput(title, content, error = false) {
+    const output = $("rashiGocharOut");
+    if (!output) return;
+
+    output.replaceChildren();
+
+    const heading = document.createElement("b");
+    heading.textContent = title;
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = content;
+
+    output.appendChild(heading);
+    output.appendChild(paragraph);
+
+    if (error) {
+      output.style.color = "#ffb4ab";
+    } else {
+      output.style.color = "";
+    }
+  }
+
+  async function loadRashiGochar() {
+    const select = $("rashiSelect");
+
+    if (!select) return;
+
+    const rashi = select.value;
+
+    if (!rashis.includes(rashi)) {
+      showOutput("त्रुटि", "कृपया सही राशि चुनें।", true);
+      return;
+    }
+
+    showOutput(
+      rashi + " राशि का गोचर",
+      "ग्रहों की वास्तविक स्थिति प्राप्त की जा रही है..."
+    );
+
+    try {
+      const data = await request(
+        API + "?rashi=" + encodeURIComponent(rashi)
+      );
+
+      if (!data.transit || typeof data.transit !== "string") {
+        throw new Error("सर्वर से प्रमाणित गोचर विवरण नहीं मिला।");
+      }
+
+      showOutput(
+        rashi + " राशि का गोचर फल",
+        data.transit
+      );
+
+    } catch (error) {
+      showOutput(
+        rashi + " राशि का गोचर",
+        error.message +
+          " वास्तविक गोचर गणना का सर्वर अभी जोड़ना बाकी है।",
+        true
+      );
+    }
+  }
+
+  async function saveAdminGochar() {
+    const rashi = $("adminRashiSelect")?.value;
+    const text = $("adminGocharInput")?.value.trim();
+
+    if (!rashis.includes(rashi)) {
+      alert("कृपया सही राशि चुनें।");
+      return;
+    }
+
+    if (!text) {
+      alert("कृपया गोचर विवरण लिखें।");
+      return;
+    }
+
+    if (text.length > 10000) {
+      alert("गोचर विवरण बहुत लंबा है।");
+      return;
+    }
+
+    try {
+      await request(API + "/admin", {
+        method: "POST",
+        body: JSON.stringify({
+          rashi,
+          transit: text
+        })
+      });
+
+      alert("गोचर विवरण सर्वर पर सेव हो गया है।");
+      await loadRashiGochar();
+
+    } catch (error) {
+      alert(
+        "गोचर सेव नहीं हुआ: " + error.message +
+        "\nएडमिन लॉगिन और सर्वर सुविधा अभी आवश्यक है।"
+      );
+    }
+  }
+
+  function initializeGochar() {
+    const select = $("rashiSelect");
+
+    if (select) {
+      select.addEventListener("change", loadRashiGochar);
+    }
+  }
+
+  window.loadRashiGochar = loadRashiGochar;
+  window.saveAdminGochar = saveAdminGochar;
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeGochar,
+      { once: true }
+    );
+  } else {
+    initializeGochar();
+  }
+
+})();
