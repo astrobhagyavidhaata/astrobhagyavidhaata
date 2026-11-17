@@ -6,6 +6,14 @@ const app=express();
 const port=Number(process.env.PORT||3000);
 
 app.disable("x-powered-by");
+app.use((req,res,next)=>{
+  res.setHeader("X-Content-Type-Options","nosniff");
+  res.setHeader("Referrer-Policy","strict-origin-when-cross-origin");
+  res.setHeader("X-Frame-Options","DENY");
+  res.setHeader("Permissions-Policy","camera=(), microphone=(), geolocation=()");
+  if(process.env.NODE_ENV==="production")res.setHeader("Strict-Transport-Security","max-age=31536000; includeSubDomains");
+  next();
+});
 
 // Razorpay signs the exact raw bytes. This route must run before express.json().
 app.post("/api/payments/webhook",express.raw({type:"application/json"}),require("./api/payment-webhook"));
