@@ -19,6 +19,8 @@ app.use((req,res,next)=>{
 app.post("/api/payments/webhook",express.raw({type:"application/json"}),require("./api/payment-webhook"));
 app.use(express.json({limit:"1mb"}));
 
+app.get("/healthz",(req,res)=>res.status(200).json({status:"ok"}));
+
 const apiHandlers={
   kundli:require("./api/kundli"),
   consultation:require("./api/consultation"),
