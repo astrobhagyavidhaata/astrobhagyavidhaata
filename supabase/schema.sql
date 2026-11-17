@@ -28,6 +28,8 @@ create table if not exists public.wallet_transactions (
   description text not null default '',
   created_at timestamptz not null default now()
 );
+create index if not exists payments_user_id_idx on public.payments(user_id);
+create index if not exists chat_messages_consultation_id_idx on public.chat_messages(consultation_id);
 create index if not exists wallet_transactions_user_created_idx
   on public.wallet_transactions(user_id, created_at desc);
 
@@ -214,7 +216,9 @@ begin
 end;
 $$;
 
--- Only trusted server-side service-role requests may execute money-changing functions.
+-- Only trusted server-side service-role requests may execute privileged functions.
+revoke all on function public.handle_new_user() from public, anon, authenticated;
+revoke all on function public.rls_auto_enable() from public, anon, authenticated;
 revoke all on function public.start_consultation(uuid,text) from public, anon, authenticated;
 revoke all on function public.heartbeat_consultation(uuid,uuid) from public, anon, authenticated;
 revoke all on function public.stop_consultation(uuid,uuid) from public, anon, authenticated;
@@ -248,7 +252,7 @@ create policy "chat insert own" on public.chat_messages for insert to authentica
 
 
 -- Idempotent wallet credit: amount must match the stored Razorpay order.
-drop function if exists public.credit_payment(text,text);
+drop function if exists public.credit_payment(text,text,bigint);
 create or replace function public.credit_payment(p_order_id text, p_payment_id text, p_amount_paise bigint)
 returns jsonb language plpgsql security definer set search_path = ''
 as $$
