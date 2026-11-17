@@ -1,174 +1,93 @@
-
 /*
  * ASTRO BHAGYA VIDHATA
- * Server-driven planetary transit (Gochar) module
- *
- * Transit calculations and admin permissions must be handled by backend.
+ * Daily sidereal gochar display
  */
-
 (() => {
   "use strict";
-
   const API = "/api/gochar";
-
-  const rashis = [
-    "मेष", "वृषभ", "मिथुन", "कर्क",
-    "सिंह", "कन्या", "तुला", "वृश्चिक",
-    "धनु", "मकर", "कुंभ", "मीन"
-  ];
-
+  const rashis = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
   const $ = id => document.getElementById(id);
 
-  async function request(url, options = {}) {
-    const response = await fetch(url, {
-      credentials: "same-origin",
-      cache: "no-store",
-      ...options,
-      headers: {
-        Accept: "application/json",
-        ...(options.body ? {
-          "Content-Type": "application/json"
-        } : {}),
-        ...(options.headers || {})
-      }
-    });
-
-    let data = {};
-
-    try {
-      data = await response.json();
-    } catch (_) {}
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "गोचर जानकारी प्राप्त नहीं हो सकी।"
-      );
-    }
-
+  async function request(url) {
+    const response = await fetch(url, { credentials:"same-origin", cache:"no-store", headers:{Accept:"application/json"} });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || "गोचर जानकारी प्राप्त नहीं हो सकी।");
     return data;
   }
 
-  function showOutput(title, content, error = false) {
+  function showMessage(title, message, isError=false) {
     const output = $("rashiGocharOut");
     if (!output) return;
+    output.replaceChildren();
+    const h = document.createElement("b");
+    h.textContent = title;
+    const p = document.createElement("p");
+    p.textContent = message;
+    output.append(h,p);
+    output.style.color = isError ? "#ffb4ab" : "";
+  }
 
+  function render(data) {
+    const output = $("rashiGocharOut");
+    if (!output) return;
     output.replaceChildren();
 
     const heading = document.createElement("b");
-    heading.textContent = title;
+    heading.textContent = data.basisRashi + " राशि से आज का गोचर";
+    const stamp = document.createElement("p");
+    stamp.textContent = "गणना समय: " + new Date(data.asOf).toLocaleString("hi-IN") +
+      " | अयनांश: " + data.ayanamsa;
+    output.append(heading,stamp);
 
-    const paragraph = document.createElement("p");
-    paragraph.textContent = content;
-
-    output.appendChild(heading);
-    output.appendChild(paragraph);
-
-    if (error) {
-      output.style.color = "#ffb4ab";
-    } else {
-      output.style.color = "";
+    const table = document.createElement("div");
+    table.style.overflowX = "auto";
+    const rows = [["ग्रह","राशि और अंश","नक्षत्र / चरण","नवांश","भाव","गति"]];
+    for (const p of data.planets || []) {
+      rows.push([p.name, p.rashi + " " + p.degree.text, p.nakshatra + " / " + p.pada,
+        p.navamsa, String(p.house), p.retrograde ? "वक्री" : "मार्गी"]);
     }
+    const t = document.createElement("table");
+    t.style.cssText = "width:100%;border-collapse:collapse;min-width:540px;font-size:13px";
+    rows.forEach((row,index) => {
+      const tr = document.createElement("tr");
+      row.forEach(value => {
+        const cell = document.createElement(index===0 ? "th" : "td");
+        cell.textContent = value;
+        cell.style.cssText = "padding:9px 7px;border-bottom:1px solid #66547f;text-align:left";
+        tr.appendChild(cell);
+      });
+      t.appendChild(tr);
+    });
+    table.appendChild(t);
+    const note = document.createElement("p");
+    note.style.cssText = "font-size:12px;line-height:1.6;color:#d4c9e5";
+    note.textContent = data.note || "";
+    output.append(table,note);
   }
 
   async function loadRashiGochar() {
     const select = $("rashiSelect");
-
     if (!select) return;
-
     const rashi = select.value;
-
-    if (!rashis.includes(rashi)) {
-      showOutput("त्रुटि", "कृपया सही राशि चुनें।", true);
-      return;
-    }
-
-    showOutput(
-      rashi + " राशि का गोचर",
-      "ग्रहों की वास्तविक स्थिति प्राप्त की जा रही है..."
-    );
-
+    if (!rashis.includes(rashi)) return showMessage("त्रुटि","कृपया सही राशि चुनें।",true);
+    showMessage("आज का गोचर","ग्रहों की स्थिति निकाली जा रही है...");
     try {
-      const data = await request(
-        API + "?rashi=" + encodeURIComponent(rashi)
-      );
-
-      if (!data.transit || typeof data.transit !== "string") {
-        throw new Error("सर्वर से प्रमाणित गोचर विवरण नहीं मिला।");
-      }
-
-      showOutput(
-        rashi + " राशि का गोचर फल",
-        data.transit
-      );
-
+      const data = await request(API + "?rashi=" + encodeURIComponent(rashi));
+      if (!Array.isArray(data.planets)) throw new Error("सर्वर से ग्रहों की पूरी सूची नहीं मिली।");
+      render(data);
     } catch (error) {
-      showOutput(
-        rashi + " राशि का गोचर",
-        error.message +
-          " वास्तविक गोचर गणना का सर्वर अभी जोड़ना बाकी है।",
-        true
-      );
+      showMessage("गोचर उपलब्ध नहीं",error.message,true);
     }
   }
 
-  async function saveAdminGochar() {
-    const rashi = $("adminRashiSelect")?.value;
-    const text = $("adminGocharInput")?.value.trim();
-
-    if (!rashis.includes(rashi)) {
-      alert("कृपया सही राशि चुनें।");
-      return;
-    }
-
-    if (!text) {
-      alert("कृपया गोचर विवरण लिखें।");
-      return;
-    }
-
-    if (text.length > 10000) {
-      alert("गोचर विवरण बहुत लंबा है।");
-      return;
-    }
-
-    try {
-      await request(API + "/admin", {
-        method: "POST",
-        body: JSON.stringify({
-          rashi,
-          transit: text
-        })
-      });
-
-      alert("गोचर विवरण सर्वर पर सेव हो गया है।");
-      await loadRashiGochar();
-
-    } catch (error) {
-      alert(
-        "गोचर सेव नहीं हुआ: " + error.message +
-        "\nएडमिन लॉगिन और सर्वर सुविधा अभी आवश्यक है।"
-      );
-    }
-  }
-
-  function initializeGochar() {
+  function initialize() {
     const select = $("rashiSelect");
-
     if (select) {
-      select.addEventListener("change", loadRashiGochar);
+      select.addEventListener("change",loadRashiGochar);
+      loadRashiGochar();
     }
   }
-
   window.loadRashiGochar = loadRashiGochar;
-  window.saveAdminGochar = saveAdminGochar;
-
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializeGochar,
-      { once: true }
-    );
-  } else {
-    initializeGochar();
-  }
-
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",initialize,{once:true});
+  else initialize();
 })();
