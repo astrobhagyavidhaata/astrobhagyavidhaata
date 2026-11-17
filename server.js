@@ -13,7 +13,8 @@ app.use(express.static(path.join(__dirname)));
 const apiHandlers = {
   kundli: require("./api/kundli"),
   consultation: require("./api/consultation"),
-  gochar: require("./api/gochar")
+  gochar: require("./api/gochar"),
+  panchang: require("./api/panchang")
 };
 
 app.all("/api/:name", async (req, res) => {
@@ -39,5 +40,5 @@ app.get("*", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Astro Bhagya Vidhata running on http://localhost:${port}`);
+  console.log("Astro Bhagya Vidhata running on http://localhost:" + port);
 });
