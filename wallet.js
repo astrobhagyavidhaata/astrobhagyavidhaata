@@ -202,8 +202,12 @@
   }
 
   async function startConsultation(astrologerId) {
-    if (consultationId || busy) {
-      message("एक परामर्श पहले से चल रहा है।", true);
+    if (consultationId) {
+      message("आपका परामर्श पहले से सक्रिय है।");
+      return true;
+    }
+    if (busy) {
+      message("पिछली बिलिंग प्रक्रिया पूरी होने दें।", true);
       return false;
     }
 
@@ -334,24 +338,19 @@
     return false;
   }
 
+  const ready=loadWallet().catch(()=>null);
   window.AstroWallet = Object.freeze({
     ratePerMinute: RATE,
+    ready,
     loadWallet,
     addMoney,
     startConsultation,
     stopConsultation,
+    getConsultationId:()=>consultationId,
     deductMoney
   });
 
   window.addMoney = addMoney;
   window.deductMoney = deductMoney;
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      loadWallet().catch(() => {});
-    }, { once: true });
-  } else {
-    loadWallet().catch(() => {});
-  }
 
 })();
