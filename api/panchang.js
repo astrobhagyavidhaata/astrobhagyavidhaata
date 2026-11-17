@@ -39,7 +39,7 @@ function panchangMetrics(date) {
     yogaAngle:norm(sun+moon-2*ayan)
   };
 }
-function findBoundary(start, metric, width) {
+function findBoundary(start, metric, width, zone) {
   const base = metric(start);
   const needed = width - (base % width);
   let left = start, right = null;
@@ -52,7 +52,7 @@ function findBoundary(start, metric, width) {
     const mid = new Date((left.getTime()+right.getTime())/2);
     if (norm(metric(mid)-base) >= needed) right=mid; else left=mid;
   }
-  return fmt(right, "UTC");
+  return fmt(right, zone);
 }
 function segment(start,end,slot,total) {
   const unit=(end.getTime()-start.getTime())/total;
@@ -94,10 +94,10 @@ module.exports = async function handler(req,res) {
     const paksha=tithiIndex<15?"शुक्ल पक्ष":"कृष्ण पक्ष";
     const tithiName=tithiIndex===14?"पूर्णिमा":tithiIndex===29?"अमावस्या":TITHIS[tithiIndex%15];
     const pada=Math.floor((m.moonSidereal%(360/27))/(360/108))+1;
-    const tithiEnd=findBoundary(sunrise,d=>panchangMetrics(d).elongation,12);
-    const nakEnd=findBoundary(sunrise,d=>panchangMetrics(d).moonSidereal,360/27);
-    const yogaEnd=findBoundary(sunrise,d=>panchangMetrics(d).yogaAngle,360/27);
-    const karanaEnd=findBoundary(sunrise,d=>panchangMetrics(d).elongation,6);
+    const tithiEnd=findBoundary(sunrise,d=>panchangMetrics(d).elongation,12,zone);
+    const nakEnd=findBoundary(sunrise,d=>panchangMetrics(d).moonSidereal,360/27,zone);
+    const yogaEnd=findBoundary(sunrise,d=>panchangMetrics(d).yogaAngle,360/27,zone);
+    const karanaEnd=findBoundary(sunrise,d=>panchangMetrics(d).elongation,6,zone);
     const dayMinutes=Math.round((sunset-sunrise)/60000);
     const rahu=segment(sunrise,sunset,RAHU_SLOT[weekday],8);
     const yama=segment(sunrise,sunset,YAMA_SLOT[weekday],8);
