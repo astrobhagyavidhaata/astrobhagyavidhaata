@@ -4,12 +4,12 @@ This is the implementation checklist for the astrology engine and daily almanac.
 
 ## 1. Birth chart and divisional charts
 
-- [ ] D1 Rashi / Lagna chart
+- [x] D1 Rashi / Lagna chart
 - [ ] D2 Hora
 - [ ] D3 Drekkana
 - [ ] D4 Chaturthamsa
 - [ ] D7 Saptamsa
-- [ ] D9 Navamsa
+- [x] D9 Navamsa
 - [ ] D10 Dasamsa
 - [ ] D12 Dvadasamsa
 - [ ] D16 Shodasamsa
@@ -28,10 +28,10 @@ Note: Shodashvarga means the 16 classical divisional charts. A 64-varga set is a
 
 ## 2. Live sky / today's gochar
 
-- [ ] Calculate current sidereal planetary longitudes using the selected ayanamsa.
-- [ ] Show sign, exact degree-minute-second, nakshatra, pada, and retrograde/direct status.
+- [x] Calculate current sidereal planetary longitudes using the current approximate Lahiri model.
+- [x] Show sign, degree-minute-second, nakshatra, pada, and retrograde/direct status.
 - [ ] Show combustion/visibility status only when supported by a documented rule.
-- [ ] Show sign-based house from selected ascendant or Moon sign.
+- [x] Show sign-based house from selected Moon sign.
 - [ ] Show ingress, station, conjunction and aspect events with exact local date/time.
 - [ ] Provide general gochar from all 12 Moon signs and a personalized view against a saved birth chart.
 - [ ] Display calculation timestamp, timezone, ayanamsa and limitations.
@@ -39,22 +39,22 @@ Note: Shodashvarga means the 16 classical divisional charts. A 64-varga set is a
 ## 3. Panchang and daily calendar
 
 - [ ] Tithi with start/end time
-- [ ] Vara (weekday)
+- [x] Vara (weekday at local sunrise)
 - [ ] Nakshatra with start/end time and pada transitions
 - [ ] Yoga with start/end time
 - [ ] Karana with start/end time
-- [ ] Local sunrise, sunset, moonrise and moonset
-- [ ] Location and timezone selection
+- [x] Local sunrise, sunset, moonrise and moonset
+- [x] Location search/selection and automatic timezone lookup
 - [ ] Hindu month, paksha and samvat details according to a selected calendar convention
 
 ## 4. Daily time periods
 
-- [ ] Hora timetable for day and night, calculated from local sunrise/sunset
+- [x] Hora timetable for day and night, calculated from local sunrise/sunset
 - [ ] Current hora and next hora transition
-- [ ] Rahu Kaal, Yamaganda and Gulika
-- [ ] Abhijit Muhurta
-- [ ] Choghadiya
-- [ ] Bhadra / Vishti Karana start and end
+- [x] Rahu Kaal, Yamaganda and Gulika
+- [x] Abhijit Muhurta
+- [x] Day and night Choghadiya
+- [x] Bhadra / Vishti Karana intervals (initial calculation)
 - [ ] Local-time display and next-day handling
 
 ## 5. Muhurta
@@ -77,13 +77,15 @@ Note: Shodashvarga means the 16 classical divisional charts. A 64-varga set is a
 
 - [ ] Select authoritative ephemeris and document ayanamsa, node type (mean/true), house system and calculation conventions.
 - [ ] Validate planetary positions, ascendant, divisional charts, panchang boundaries and muhurta windows against trusted professional references across many dates and locations.
-- [ ] Add automated tests for sign/nakshatra/pada boundaries, leap days, timezones, daylight-saving transitions and sunrise/sunset edge cases.
+- [ ] Expand automated tests for sign/nakshatra/pada boundaries, leap days, timezone transitions and sunrise/sunset edge cases. (Basic chart-engine and Panchang API tests now run in GitHub Actions.)
 - [ ] Do not publish a feature as accurate until its calculations have passed validation.
 - [ ] Show an explicit calculation note wherever the engine uses approximations.
 
-## Current implementation status (known baseline)
+## Current implementation status (updated 2026-11-18)
 
-- Existing engine calculates D1 and D9-related placement data and basic sidereal planetary positions.
-- Existing gochar endpoint currently lists current planetary sign/degree and sign-based house for a selected Rashi.
-- Existing gochar output does not yet provide the complete nakshatra/pada/event timeline, Panchang, Hora, Bhadra or Muhurta features above.
-- Existing ephemeris uses Astronomy Engine with an approximate Lahiri ayanamsa; it is not Swiss Ephemeris and must be validated before commercial claims.
+- D1 and D9 are calculated; the current chart engine now also returns all 16 classical Shodashvarga charts (D1, D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30, D40, D45 and D60) using documented common Parashari division rules. These rules still require independent reference-chart validation.
+- Daily Gochar displays nine grahas with sidereal sign, degree-minute-second, nakshatra/pada, navamsa, house from selected Moon sign and retrograde/direct status.
+- Daily Panchang currently shows sunrise-based five limbs, end-time estimates, local sunrise/sunset/moonrise/moonset, Rahu Kaal, Yamaganda, Gulika, Abhijit, Bhadra, day/night Choghadiya and 24 horas.
+- Mobile OTP, wallet, Razorpay and paid consultation server routes have been added, but they require Supabase/Razorpay configuration, SQL migration execution and staging end-to-end tests before use.
+- Astronomy Engine positions now use apparent geocentric ecliptic coordinates. Lahiri ayanamsa remains a linear approximation; the system is not Swiss Ephemeris and has not passed independent professional validation.
+- The 64-varga extended catalogue, event timelines, festival rules, personalized muhurta, Shadbala and independent ephemeris validation remain future work.
