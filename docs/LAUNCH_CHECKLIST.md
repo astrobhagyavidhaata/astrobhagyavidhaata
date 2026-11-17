@@ -55,16 +55,17 @@ Still required:
 
 ## F. Legal and privacy readiness
 
-1. Replace operator legal name, registered address, privacy email and grievance officer placeholders in TERMS.md and PRIVACY.md.
-2. Confirm provider disclosures, retention periods, refund process and data-deletion workflow.
-3. Obtain Indian legal review of Terms and Privacy Policy.
+1. Support contact details supplied and added to the app and policy drafts: vipank01509@gmail.com and +91 82080 91073 (phone/WhatsApp).
+2. Still required: actual operator/legal name, business or correspondence address, and the appointed Grievance Officer's name/details. Do not invent these.
+3. Confirm provider disclosures, retention periods, refund process and data-deletion workflow.
+4. Obtain Indian legal review of Terms and Privacy Policy.
 4. Obtain an independent security review before accepting real customer money.
 
 ## Verified status on 18 November 2026
 
 - Live database: configured; seven tables and RLS verified.
 - Supabase security advisor: no security lints.
-- GitHub CI: latest run successful.
+- GitHub CI: latest OTP consent changes passed; CI runs for the new support-contact and policy edits are currently in progress (verify before launch).
 - Not yet deployed to public hosting.
 - SMS provider, Gemini and Razorpay credentials are not configured in hosting.
 - Real end-to-end OTP, AI and payment tests remain pending.
