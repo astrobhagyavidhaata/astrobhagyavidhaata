@@ -3,6 +3,7 @@
 **Draft for product implementation; requires review by an Indian privacy lawyer before public launch.**  
 **Effective date:** To be filled before launch.  
 **Data Fiduciary / operator:** Vipin Kumar (individual operator; not a registered firm).  
+**Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (S U D H A R N), Post Office Barmaad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
 **Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.  
 **Privacy contact:** vipank01509@gmail.com (must be monitored by the operator).  
 **Customer support phone / WhatsApp:** +91 82080 91073.
@@ -82,8 +83,10 @@ We may revise this Policy when services, providers or legal requirements change.
 ## 12. Privacy and grievance contact
 **Privacy contact:** vipank01509@gmail.com  
 **Customer support phone / WhatsApp:** +91 82080 91073  
-**Grievance Officer:** The operator must appoint the appropriate person and publish their name and required contact details before public launch.  
-**Legal operator name and registered address:** To be supplied and published by the operator before public launch.
+**Grievance Officer:** Vipin Kumar (owner/operator).  
+**Grievance email:** vipank01509@gmail.com  
+**Grievance phone / WhatsApp:** +91 82080 91073  
+**Legal operator name and postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (S U D H A R N), Post Office Barmaad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
 
 ---
 
