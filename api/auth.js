@@ -16,6 +16,7 @@ module.exports=async function(req,res) {
       return res.json({success:true,user:{id:user.id,phone:user.phone||""}});
     }
     if(action==="send-otp"&&req.method==="POST") {
+      if(req.body?.termsAccepted!==true) return res.status(400).json({success:false,message:"OTP से पहले नियम और प्राइवेसी पॉलिसी की सहमति आवश्यक है।"});
       const phone=normalizePhone(req.body?.phone);
       if(!phone) return res.status(400).json({success:false,message:"सही मोबाइल नंबर लिखें।"});
       const response=await authFetch("/otp",{method:"POST",body:JSON.stringify({phone,create_user:true})});
@@ -24,6 +25,7 @@ module.exports=async function(req,res) {
       return res.json({success:true,message:"OTP भेज दिया गया है।"});
     }
     if(action==="verify-otp"&&req.method==="POST") {
+      if(req.body?.termsAccepted!==true) return res.status(400).json({success:false,message:"लॉगिन से पहले नियम और प्राइवेसी पॉलिसी की सहमति आवश्यक है।"});
       const phone=normalizePhone(req.body?.phone),token=String(req.body?.token||"").trim();
       if(!phone||!/^\d{6}$/.test(token)) return res.status(400).json({success:false,message:"मोबाइल नंबर और 6 अंकों का OTP भरें।"});
       const response=await authFetch("/verify",{method:"POST",body:JSON.stringify({phone,token,type:"sms"})});
