@@ -86,6 +86,21 @@
     );
   }
 
+  async function syncActiveSession() {
+    try {
+      const data=await request("/api/consultations/active");
+      const active=data.consultation;
+      if(active&&active.id&&active.status==="active"){
+        consultationId=active.id;
+        if(timer===null)timer=window.setInterval(heartbeat,15000);
+        if(data.wallet)updateWallet(data.wallet);
+      }else{
+        consultationId=null;
+        clearTimer();
+      }
+    } catch (_) {}
+  }
+
   async function loadWallet() {
     try {
       const data = await request(API.wallet);
@@ -95,6 +110,7 @@
       }
 
       updateWallet(data.wallet);
+      await syncActiveSession();
 
       return data.wallet;
 
@@ -193,6 +209,7 @@
       }
 
       consultationId = data.consultation.id;
+      if(data.wallet)updateWallet(data.wallet);
 
       timer = window.setInterval(heartbeat, 15000);
 
