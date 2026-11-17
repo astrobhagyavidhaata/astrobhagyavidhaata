@@ -175,7 +175,7 @@ $$;
 
 create or replace function public.stop_consultation(p_user_id uuid, p_consultation_id uuid)
 returns jsonb language plpgsql security definer set search_path = ''
-as $
+as $$
 declare c public.consultations%rowtype; w public.wallets%rowtype;
         due_minutes integer; affordable integer; debit bigint; v_ended_at timestamptz;
 begin
@@ -212,7 +212,7 @@ begin
   end if;
   return jsonb_build_object('consultation',to_jsonb(c),'wallet',to_jsonb(w));
 end;
-$;
+$$;
 
 -- Only trusted server-side service-role requests may execute money-changing functions.
 revoke all on function public.start_consultation(uuid,text) from public, anon, authenticated;
