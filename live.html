@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>एस्ट्रो भाग्य विधाता - वैदिक ज्योतिष</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+  body{background:#f0f2f5;padding-bottom:45px;color:#1a1a2e}
+  .top{background:#1a1a2e;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:6px}
+  .logo{color:#f5b041;font-weight:bold;font-size:18px}
+  .wal{background:#f5b041;color:#000;padding:7px 14px;border-radius:20px;font-weight:bold;font-size:14px}
+  .box{background:#fff;margin:12px;padding:16px;border-radius:14px;box-shadow:0 3px 10px rgba(0,0,0,0.08)}
+  h3{color:#1a1a2e;border-left:4px solid #e67e22;padding-left:10px;margin-bottom:14px;font-size:17px}
+  label{display:block;font-size:14px;font-weight:bold;margin:14px 0 6px;color:#333}
+  input,select,textarea,button{width:100%;padding:14px;border-radius:10px;border:2px solid #999;font-size:16px;background:#fff;color:#111}
+  .row3{display:flex;gap:8px}
+  .row3 input,.row3 button{flex:1;text-align:center;font-weight:bold;font-size:16px}
+  .btn{background:#1a1a2e;color:#f5b041;font-weight:bold;border:none;margin-top:18px;font-size:17px;padding:15px}
+  .res{margin-top:14px;background:#fef9e7;border:1.5px solid #e67e22;padding:12px;border-radius:10px;font-size:14px;line-height:1.6}
+  .clist{border:2px solid #d35400;background:#fff;border-radius:10px;max-height:220px;overflow-y:auto;display:none;margin-top:6px}
+  .citem{padding:13px;border-bottom:1px solid #eee;font-size:15px;font-weight:bold;color:#1a1a2e}
+  .citem small{display:block;font-weight:normal;color:#117864;font-size:12px;margin-top:2px}
+  .chart-tabs{display:flex;gap:6px;margin:14px 0}
+  .ctab{flex:1;padding:11px;background:#eee;border:none;border-radius:8px;font-weight:bold;font-size:14px}
+  .ctab.active{background:#d35400;color:#fff}
+  svg{width:100%;max-width:310px;background:#fffdf5;border:2px solid #d35400;margin:0 auto;display:block}
+  .hn{font-size:11px;fill:#d35400;font-weight:bold}
+  .pt{font-size:10px;fill:#1a1a2e;font-weight:bold}
+  .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);z-index:200;padding:15px}
+  .modal-box{background:#fff;border-radius:14px;padding:16px;max-width:420px;margin:25px auto}
+  .chat-area{height:230px;overflow-y:auto;border:1px solid #ddd;padding:10px;border-radius:10px;background:#f9f9f9;margin:10px 0;font-size:14px}
+  .msg-bot{background:#fef9e7;padding:10px;border-radius:10px;margin-bottom:8px;border-left:3px solid #e67e22}
+  .msg-user{background:#e8f8f5;padding:10px;border-radius:10px;margin-bottom:8px;text-align:right}
+  .disclaimer{font-size:11px;color:#666;text-align:center;margin:16px;line-height:1.4}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">🔮 एस्ट्रो भाग्य विधाता</div>
+  <div id="google_translate_element"></div>
+  <div class="wal" onclick="addMoney(100)">₹ <span id="bal">100</span> + Add</div>
+</div>
+
+<div class="box">
+  <h3>जन्म कुंडली (D1, D9 नवांश, D10 दशमांश)</h3>
+  <label>पूरा नाम:</label>
+  <input type="text" id="un" placeholder="यहाँ अपना नाम लिखें">
+  
+  <label>जन्म तारीख (दिन / महीना / साल लिखें):</label>
+  <div class="row3">
+    <input type="number" id="dob_d" value="24" min="1" max="31" placeholder="दिन (24)">
+    <input type="number" id="dob_m" value="7" min="1" max="12" placeholder="महीना (7)">
+    <input type="number" id="dob_y" value="1990" min="1920" max="2026" placeholder="साल (1990)">
+  </div>
+
+  <label>जन्म समय (घंटा / मिनट / AM-PM):</label>
+  <div class="row3">
+    <input type="number" id="tob_h" value="8" min="1" max="12" placeholder="घंटा (8)">
+    <input type="number" id="tob_m" value="30" min="0" max="59" placeholder="मिनट (30)">
+    <button type="button" id="ampmBtn" onclick="toggleAmPm()" style="background:#f5b041;color:#000;border:none">AM (सुबह)</button>
+  </div>
+
+  <label>जन्म स्थान (दुनिया के किसी भी शहर का नाम लिखें):</label>
+  <input type="text" id="pl" placeholder="जैसे: Ludhiana, Delhi, London, New York..." oninput="searchCityAPI()">
+  <div class="clist" id="cList"></div>
+  <div id="cInfo" style="font-size:13px;color:#117864;font-weight:bold;margin-top:8px;background:#e8f8f5;padding:8px;border-radius:8px">📍 स्थान: Ludhiana, Punjab, India (Lat: 30.90°N, Lon: 75.85°E)</div>
+  
+  <button class="btn" onclick="buildAllKundlis()">सभी कुंडली चार्ट बनाएं</button>
+
+  <div id="kBox" style="display:none">
+    <div class="res" id="kTxt"></div>
+    <div class="chart-tabs">
+      <button class="ctab active" onclick="showChart('d1', this)">D1 लग्न</button>
+      <button class="ctab" onclick="showChart('d9', this)">D9 नवांश</button>
+      <button class="ctab" onclick="showChart('d10', this)">D10 दशमांश</button>
+    </div>
+    <div id="chart_d1"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d1_r1" x="145" y="130" class="hn"></text><text id="d1_r2" x="72" y="65" class="hn"></text><text id="d1_r3" x="52" y="82" class="hn"></text><text id="d1_r4" x="125" y="154" class="hn"></text><text id="d1_r5" x="52" y="225" class="hn"></text><text id="d1_r6" x="72" y="245" class="hn"></text><text id="d1_r7" x="145" y="178" class="hn"></text><text id="d1_r8" x="218" y="245" class="hn"></text><text id="d1_r9" x="238" y="225" class="hn"></text><text id="d1_r10" x="165" y="154" class="hn"></text><text id="d1_r11" x="238" y="82" class="hn"></text><text id="d1_r12" x="218" y="65" class="hn"></text><text id="d1_p1" x="130" y="85" class="pt"></text><text id="d1_p2" x="60" y="35" class="pt"></text><text id="d1_p3" x="12" y="82" class="pt"></text><text id="d1_p4" x="60" y="154" class="pt"></text><text id="d1_p5" x="12" y="225" class="pt"></text><text id="d1_p6" x="60" y="275" class="pt"></text><text id="d1_p7" x="130" y="220" class="pt"></text><text id="d1_p8" x="200" y="275" class="pt"></text><text id="d1_p9" x="245" y="225" class="pt"></text><text id="d1_p10" x="200" y="154" class="pt"></text><text id="d1_p11" x="245" y="82" class="pt"></text><text id="d1_p12" x="190" y="35" class="pt"></text></svg></div>
+    <div id="chart_d9" style="display:none"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d9_r1" x="145" y="130" class="hn"></text><text id="d9_r2" x="72" y="65" class="hn"></text><text id="d9_r3" x="52" y="82" class="hn"></text><text id="d9_r4" x="125" y="154" class="hn"></text><text id="d9_r5" x="52" y="225" class="hn"></text><text id="d9_r6" x="72" y="245" class="hn"></text><text id="d9_r7" x="145" y="178" class="hn"></text><text id="d9_r8" x="218" y="245" class="hn"></text><text id="d9_r9" x="238" y="225" class="hn"></text><text id="d9_r10" x="165" y="154" class="hn"></text><text id="d9_r11" x="238" y="82" class="hn"></text><text id="d9_r12" x="218" y="65" class="hn"></text><text id="d9_p1" x="130" y="85" class="pt"></text><text id="d9_p2" x="60" y="35" class="pt"></text><text id="d9_p3" x="12" y="82" class="pt"></text><text id="d9_p4" x="60" y="154" class="pt"></text><text id="d9_p5" x="12" y="225" class="pt"></text><text id="d9_p6" x="60" y="275" class="pt"></text><text id="d9_p7" x="130" y="220" class="pt"></text><text id="d9_p8" x="200" y="275" class="pt"></text><text id="d9_p9" x="245" y="225" class="pt"></text><text id="d9_p10" x="200" y="154" class="pt"></text><text id="d9_p11" x="245" y="82" class="pt"></text><text id="d9_p12" x="190" y="35" class="pt"></text></svg></div>
+    आपकी समस्या बिल्कुल साफ़ है—मोबाइल ब्राउज़र में सामान्य <select> ड्रॉपडाउन कई बार ठीक से काम नहीं करते हैं।
+इस परेशानी को हमेशा के लिए खत्म करने के लिए हम <select> ड्रॉपडाउन का झंझट ही हटा देते हैं। अब तारीख और समय के लिए सीधे बड़े कीपैड वाले आसान बॉक्स (तारीख, महीना, साल और घंटा, मिनट, AM/PM) होंगे। इन पर उंगली रखते ही मोबाइल का नंबर वाला कीपैड खुलेगा और आप १ सेकंड में तारीख-समय डाल पाएंगे।
+
+इसे १० सेकंड में ऐसे ठीक करें:
+
+• १. नई फ़ाइल बनाएं (live.html): GitHub पर मुख्य लिस्ट में जाएं ➔ ••• ➔ Create new file पर दबाएं ➔ और नाम लिखें: live.html
+• २. नीचे वाला कोड पेस्ट करें: काले डिब्बे के ऊपर कोने वाले Copy आइकन पर एक बार दबाएं ➔ खाली पन्ने पर Paste करें ➔ और ऊपर हरा बटन Commit changes दबा दें।
+• ३. नया लिंक खोलें: २० सेकंड बाद Chrome में ऊपर पता लिखने वाली जगह पर लिखें: astrobhagyavidhaata.netlify.app/live.html
+html
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>एस्ट्रो भाग्य विधाता - वैदिक ज्योतिष</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+  body{background:#f0f2f5;padding-bottom:45px;color:#1a1a2e}
+  .top{background:#1a1a2e;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:6px}
+  .logo{color:#f5b041;font-weight:bold;font-size:18px}
+  .wal{background:#f5b041;color:#000;padding:7px 14px;border-radius:20px;font-weight:bold;font-size:14px}
+  .box{background:#fff;margin:12px;padding:16px;border-radius:14px;box-shadow:0 3px 10px rgba(0,0,0,0.08)}
+  h3{color:#1a1a2e;border-left:4px solid #e67e22;padding-left:10px;margin-bottom:14px;font-size:17px}
+  label{display:block;font-size:14px;font-weight:bold;margin:14px 0 6px;color:#333}
+  input,select,textarea,button{width:100%;padding:14px;border-radius:10px;border:2px solid #999;font-size:16px;background:#fff;color:#111}
+  .row3{display:flex;gap:8px}
+  .row3 input,.row3 button{flex:1;text-align:center;font-weight:bold;font-size:16px}
+  .btn{background:#1a1a2e;color:#f5b041;font-weight:bold;border:none;margin-top:18px;font-size:17px;padding:15px}
+  .res{margin-top:14px;background:#fef9e7;border:1.5px solid #e67e22;padding:12px;border-radius:10px;font-size:14px;line-height:1.6}
+  .clist{border:2px solid #d35400;background:#fff;border-radius:10px;max-height:220px;overflow-y:auto;display:none;margin-top:6px}
+  .citem{padding:13px;border-bottom:1px solid #eee;font-size:15px;font-weight:bold;color:#1a1a2e}
+  .citem small{display:block;font-weight:normal;color:#117864;font-size:12px;margin-top:2px}
+  .chart-tabs{display:flex;gap:6px;margin:14px 0}
+  .ctab{flex:1;padding:11px;background:#eee;border:none;border-radius:8px;font-weight:bold;font-size:14px}
+  .ctab.active{background:#d35400;color:#fff}
+  svg{width:100%;max-width:310px;background:#fffdf5;border:2px solid #d35400;margin:0 auto;display:block}
+  .hn{font-size:11px;fill:#d35400;font-weight:bold}
+  .pt{font-size:10px;fill:#1a1a2e;font-weight:bold}
+  .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);z-index:200;padding:15px}
+  .modal-box{background:#fff;border-radius:14px;padding:16px;max-width:420px;margin:25px auto}
+  .chat-area{height:230px;overflow-y:auto;border:1px solid #ddd;padding:10px;border-radius:10px;background:#f9f9f9;margin:10px 0;font-size:14px}
+  .msg-bot{background:#fef9e7;padding:10px;border-radius:10px;margin-bottom:8px;border-left:3px solid #e67e22}
+  .msg-user{background:#e8f8f5;padding:10px;border-radius:10px;margin-bottom:8px;text-align:right}
+  .disclaimer{font-size:11px;color:#666;text-align:center;margin:16px;line-height:1.4}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">🔮 एस्ट्रो भाग्य विधाता</div>
+  <div id="google_translate_element"></div>
+  <div class="wal" onclick="addMoney(100)">₹ <span id="bal">100</span> + Add</div>
+</div>
+
+<div class="box">
+  <h3>जन्म कुंडली (D1, D9 नवांश, D10 दशमांश)</h3>
+  <label>पूरा नाम:</label>
+  <input type="text" id="un" placeholder="यहाँ अपना नाम लिखें">
+  
+  <label>जन्म तारीख (दिन / महीना / साल लिखें):</label>
+  <div class="row3">
+    <input type="number" id="dob_d" value="24" min="1" max="31" placeholder="दिन (24)">
+    <input type="number" id="dob_m" value="7" min="1" max="12" placeholder="महीना (7)">
+    <input type="number" id="dob_y" value="1990" min="1920" max="2026" placeholder="साल (1990)">
+  </div>
+
+  <label>जन्म समय (घंटा / मिनट / AM-PM):</label>
+  <div class="row3">
+    <input type="number" id="tob_h" value="8" min="1" max="12" placeholder="घंटा (8)">
+    <input type="number" id="tob_m" value="30" min="0" max="59" placeholder="मिनट (30)">
+    <button type="button" id="ampmBtn" onclick="toggleAmPm()" style="background:#f5b041;color:#000;border:none">AM (सुबह)</button>
+  </div>
+
+  <label>जन्म स्थान (दुनिया के किसी भी शहर का नाम लिखें):</label>
+  <input type="text" id="pl" placeholder="जैसे: Ludhiana, Delhi, London, New York..." oninput="searchCityAPI()">
+  <div class="clist" id="cList"></div>
+  <div id="cInfo" style="font-size:13px;color:#117864;font-weight:bold;margin-top:8px;background:#e8f8f5;padding:8px;border-radius:8px">📍 स्थान: Ludhiana, Punjab, India (Lat: 30.90°N, Lon: 75.85°E)</div>
+  
+  <button class="btn" onclick="buildAllKundlis()">सभी कुंडली चार्ट बनाएं</button>
+
+  <div id="kBox" style="display:none">
+    <div class="res" id="kTxt"></div>
+    <div class="chart-tabs">
+      <button class="ctab active" onclick="showChart('d1', this)">D1 लग्न</button>
+      <button class="ctab" onclick="showChart('d9', this)">D9 नवांश</button>
+      <button class="ctab" onclick="showChart('d10', this)">D10 दशमांश</button>
+    </div>
+    <div id="chart_d1"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d1_r1" x="145" y="130" class="hn"></text><text id="d1_r2" x="72" y="65" class="hn"></text><text id="d1_r3" x="52" y="82" class="hn"></text><text id="d1_r4" x="125" y="154" class="hn"></text><text id="d1_r5" x="52" y="225" class="hn"></text><text id="d1_r6" x="72" y="245" class="hn"></text><text id="d1_r7" x="145" y="178" class="hn"></text><text id="d1_r8" x="218" y="245" class="hn"></text><text id="d1_r9" x="238" y="225" class="hn"></text><text id="d1_r10" x="165" y="154" class="hn"></text><text id="d1_r11" x="238" y="82" class="hn"></text><text id="d1_r12" x="218" y="65" class="hn"></text><text id="d1_p1" x="130" y="85" class="pt"></text><text id="d1_p2" x="60" y="35" class="pt"></text><text id="d1_p3" x="12" y="82" class="pt"></text><text id="d1_p4" x="60" y="154" class="pt"></text><text id="d1_p5" x="12" y="225" class="pt"></text><text id="d1_p6" x="60" y="275" class="pt"></text><text id="d1_p7" x="130" y="220" class="pt"></text><text id="d1_p8" x="200" y="275" class="pt"></text><text id="d1_p9" x="245" y="225" class="pt"></text><text id="d1_p10" x="200" y="154" class="pt"></text><text id="d1_p11" x="245" y="82" class="pt"></text><text id="d1_p12" x="190" y="35" class="pt"></text></svg></div>
+    <div id="chart_d9" style="display:none"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d9_r1" x="145" y="130" class="hn"></text><text id="d9_r2" x="72" y="65" class="hn"></text><text id="d9_r3" x="52" y="82" class="hn"></text><text id="d9_r4" x="125" y="154" class="hn"></text><text id="d9_r5" x="52" y="225" class="hn"></text><text id="d9_r6" x="72" y="245" class="hn"></text><text id="d9_r7" x="145" y="178" class="hn"></text><text id="d9_r8" x="218" y="245" class="hn"></text><text id="d9_r9" x="238" y="225" class="hn"></text><text id="d9_r10" x="165" y="154" class="hn"></text><text id="d9_r11" x="238" y="82" class="hn"></text><text id="d9_r12" x="218" y="65" class="hn"></text><text id="d9_p1" x="130" y="85" class="pt"></text><text id="d9_p2" x="60" y="35" class="pt"></text><text id="d9_p3" x="12" y="82" class="pt"></text><text id="d9_p4" x="60" y="154" class="pt"></text><text id="d9_p5" x="12" y="225" class="pt"></text><text id="d9_p6" x="60" y="275" class="pt"></text><text id="d9_p7" x="130" y="220" class="pt"></text><text id="d9_p8" x="200" y="275" class="pt"></text><text id="d9_p9" x="245" y="225" class="pt"></text><text id="d9_p10" x="200" y="154" class="pt"></text><text id="d9_p11" x="245" y="82" class="pt"></text><text id="d9_p12" x="190" y="35" class="pt"></text></svg></div>
+Use code with caution.
+मासिक गोचर भविष्यफल (राशि/लग्न अनुसार)
+
+मेष (Aries)वृषभ (Taurus)मिथुन (Gemini)
+कर्क (Cancer)सिंह (Leo)कन्या (Virgo)
+तुला (Libra)वृश्चिक (Scorpio)धनु (Sagittarius)
+मकर (Capricorn)कुंभ (Aquarius)मीन (Pisces)
+
+मेष राशि/लग्न का मासिक गोचर फल:
+शनि बारहवें भाव में वक्री है—खर्चों पर नियंत्रण रखें और धैर्य से काम लें।
+⚙️ एस्ट्रोलॉजर एडमिन पैनल (गोचर और AI ज्ञान बदलें)
+राशि चुनें:
+मेषवृषभमिथुन
+कर्कसिंहकन्या
+तुलावृश्चिकधनु
+मकरकुंभमीन
+नया गोचर फल लिखें:
+नया गोचर सेव करें (Pin: 1234)
+Google Gemini API Key (असली AI जोड़ने के लिए):
+AI को अपना ज्योतिष ज्ञान सिखाएं (Prediction Rules):
+AI ज्ञान और API Key सेव करें
+
+27 नक्षत्र ज्ञान एवं लाइव AI परामर्श
+
+अश्विनी (केतु): तेज़ गति, नई शुरुआत और उपचार शक्ति।
+लाइव AI ज्योतिषी से Chat करें (₹11/मिनट)
+कानूनी सूचना (Disclaimer): एस्ट्रो भाग्य विधाता पर उपलब्ध सभी गणनाएं एवं परामर्श केवल आध्यात्मिक मार्गदर्शन के लिए हैं। यह किसी चिकित्सीय, कानूनी या वित्तीय सलाह का विकल्प नहीं है।
+लाइव चैट
+बंद करें
+
+
+
+
+भेजें
+
+
+let isPM = false;
+function toggleAmPm() {
+isPM = !isPM;
+let btn = document.getElementById("ampmBtn");
+btn.innerText = isPM ? "PM (शाम/रात)" : "AM (सुबह)";
+btn.style.background = isPM ? "#1a1a2e" : "#f5b041";
+btn.style.color = isPM ? "#f5b041" : "#000";
+}
+let adiBalance = 100;
+function addMoney(amt) { adiBalance += amt; document.getElementById("bal").innerText = adiBalance; alert("वॉलेट में ₹" + amt + " जुड़ गए हैं!"); }
+function deductMoney(rate) { if (adiBalance >= rate) { adiBalance -= rate; document.getElementById("bal").innerText = adiBalance; return true; } alert("बैलेंस कम है! कृपया '+ Add' दबाकर रिचार्ज करें।"); return false; }
+const defaultRashis = ["मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"];
+let monthlyGocharData = JSON.parse(localStorage.getItem("adi_gochar")) || {
+"मेष": "शनि बारहवें भाव में वक्री है—खर्चों पर नियंत्रण रखें और धैर्य से काम लें।",
+"वृषभ": "लाभ भाव का शनि और पंचम के ग्रह करियर में नए अवसर और ज्ञान देंगे।",
+"मिथुन": "कर्म भाव का शनि मेहनत बढ़ाएगा, वाणी में संयम रखना बेहद ज़रूरी है।",
+"कर्क": "भाग्य स्थान का शनि धर्म-अध्यात्म में रुचि बढ़ाएगा और रुके काम बनाएगा।",
+"सिंह": "अष्टम भाव का वक्री शनि गहरी परीक्षा और आत्म-मंथन का समय दे रहा है।",
+"कन्या": "सप्तम भाव का शनि रिश्तों में गंभीरता और स्पष्ट संवाद की मांग कर रहा है।",
+"तुला": "छठे भाव का शनि विरोधियों पर विजय दिलाएगा, पर मानसिक तनाव से बचें।",
+"वृश्चिक": "पंचम भाव का शनि संतान, शिक्षा और पूर्वपुण्य के कर्मों का फल देगा।",
+"धनु": "चौथे भाव का शनि पारिवारिक जिम्मेदारियां बढ़ाएगा, धैर्य बनाए रखें।",
+"मकर": "तीसरे भाव का शनि पराक्रम और साहस बढ़ाएगा, यात्रा के योग बनेंगे।",
+"कुंभ": "दूसरे भाव का शनि धन संचय और परिवार के साथ वाणी में मधुरता मांगता है।",
+"मीन": "लग्न में वक्री शनि आत्म-सुधार, अनुशासन और जीवन में बड़े बदलाव लाएगा।"
+};
+function loadRashiGochar() { let r = document.getElementById("rashiSelect").value; document.getElementById("rashiGocharOut").innerHTML = <b>${r} राशि/लग्न का मासिक गोचर फल:</b><br>${monthlyGocharData[r]}; }
+function saveAdminGochar() {
+if (prompt("एडमिन पिन डालें (1234):") !== "1234") { alert("गलत पिन!"); return; }
+let r = document.getElementById("adminRashiSelect").value, txt = document.getElementById("adminGocharInput").value.trim();
+if (!txt) return; monthlyGocharData[r] = txt; localStorage.setItem("adi_gochar", JSON.stringify(monthlyGocharData)); loadRashiGochar(); alert("नया गोचर सेव हो गया!");
+}
+const nak27 = [
+"अश्विनी (केतु): तेज़ गति, नई शुरुआत और उपचार शक्ति।", "भरणी (शुक्र): रचनात्मकता, धैर्य और गहरी जिम्मेदारी।", "कृत्तिका (सूर्य): तेजस्वी, स्पष्टवादी और सत्य का मार्ग।",
+"रोहिणी (चंद्र): आकर्षण, कला, समृद्धि और स्थिरता।", "मृगशिरा (मंगल): जिज्ञासु, खोजबीन और सौम्य स्वभाव।", "आर्द्रा (राहु): गहरा चिंतन, बदलाव और तीव्र बुद्धि।",
+"पुनर्वसु (गुरु): सौभाग्य, पुनरुत्थान और ज्ञान।", "पुष्य (शनि): पोषण, धर्म, सेवा और शुभ फल।", "आश्लेषा (बुध): सूक्ष्म दृष्टि, रहस्य और तीव्र अंतर्ज्ञान।",
+"मघा (केतु): राजसी स्वभाव, पितृ आशीर्वाद और नेतृत्व।", "पूर्वाफाल्गुनी (शुक्र): आनंद, कला, प्रेम और विश्राम।", "उत्तराफाल्गुनी (सूर्य): मित्रता, वचनबद्धता और सामाजिक सम्मान।",
+"हस्त (चंद्र): कौशल, हस्तकला और व्यावहारिक बुद्धि।", "चित्रा (मंगल): सुंदरता, वास्तुकला और आकर्षक व्यक्तित्व।", "स्वाति (राहु): स्वतंत्रता, व्यापारिक बुद्धि और लचीलापन।",
+"विशाखा (गुरु): लक्ष्य के प्रति समर्पण और दृढ़ संकल्प।", "अनुराधा (शनि): भक्ति, मित्रता और संगठन क्षमता।", "ज्येष्ठा (बुध): वरिष्ठता, संरक्षण और गूढ़ ज्ञान।",
+"मूल (केतु): जड़ तक जाने की क्षमता और आध्यात्मिक खोज।", "पूर्वाषाढ़ा (शुक्र): अजेय उत्साह, प्रभावशाली वाणी।", "उत्तराषाढ़ा (सूर्य): स्थायी विजय, धर्म और सिद्धांत।",
+"श्रवण (चंद्र): सुनने और सीखने की अद्भुत कला।", "धनिष्ठा (मंगल): संगीत, समृद्धि और सामूहिक सफलता।", "शतभिषा (राहु): रहस्यमयी उपचार, शोध और एकांतप्रियता।",
+"पूर्वाभाद्रपद (गुरु): तपस्या, आदर्शवाद और गहरी दृष्टि।", "उत्तराभाद्रपद (शनि): स्थिरता, करुणा और आध्यात्मिक गहराई।", "रेवती (बुध): कोमलता, मार्गदर्शक और पूर्णता।"
+];
+let ns = document.getElementById("nSel");
+nak27.forEach((n, i) => { let opt = document.createElement("option"); opt.value = i; opt.innerText = n.split(" (")[0]; ns.appendChild(opt); });
+const instantCities = [
+{n:"Ludhiana, Punjab, India", lat:30.90, lon:75.85}, {n:"New Delhi, Delhi, India", lat:28.61, lon:77.20}, {n:"Chandigarh, India", lat:30.73, lon:76.77},
+{n:"Amritsar, Punjab, India", lat:31.63, lon:74.87}, {n:"Jalandhar, Punjab, India", lat:31.32, lon:75.57}, {n:"Patiala, Punjab, India", lat:30.33, lon:76.38},
+{n:"Shimla, Himachal Pradesh, India", lat:31.10, lon:77.17}, {n:"Kangra, Himachal Pradesh, India", lat:32.09, lon:76.26}, {n:"Mandi, Himachal Pradesh, India", lat:31.58, lon:76.91},
+{n:"Mumbai, Maharashtra, India", lat:19.07, lon:72.87}, {n:"Jaipur, Rajasthan, India", lat:26.91, lon:75.78}, {n:"Lucknow, Uttar Pradesh, India", lat:26.84, lon:80.94},
+{n:"Toronto, Ontario, Canada", lat:43.65, lon:-79.38}, {n:"Brampton, Ontario, Canada", lat:43.73, lon:-79.76}, {n:"New York, USA", lat:40.71, lon:-74.00},
+{n:"London, United Kingdom", lat:51.50, lon:-0.12}, {n:"Paris, France", lat:48.85, lon:2.35}, {n:"Dubai, UAE", lat:25.20, lon:55.27}, {n:"Melbourne, Australia", lat:-37.81, lon:144.96}
+];
+let selLat = 30.90, selLon = 75.85, selCity = "Ludhiana, Punjab, India";
+function formatCoords(lat, lon) { return Lat: ${Math.abs(lat).toFixed(2)}${lat>=0?"°N":"°S"}, Lon: ${Math.abs(lon).toFixed(2)}${lon>=0?"°E":"°W"}; }
+function selectCityItem(name, lat, lon) {
+selLat = lat; selLon = lon; selCity = name; document.getElementById("pl").value = name;
+document.getElementById("cInfo").innerText = 📍 स्थान: ${name} (${formatCoords(selLat, selLon)}); document.getElementById("cList").style.display = "none";
+}
+async function searchCityAPI() {
+let q = document.getElementById("pl").value.trim(), list = document.getElementById("cList");
+if (q.length < 2) { list.style.display = "none"; return; }
+let matched = instantCities.filter(c => c.n.toLowerCase().includes(q.toLowerCase()));
+list.innerHTML = "";
+matched.forEach(c => {
+let div = document.createElement("div"); div.className = "citem"; div.innerHTML = 📍 ${c.n} <small>${formatCoords(c.lat, c.lon)}</small>;
+div.onclick = () => selectCityItem(c.n, c.lat, c.lon); list.appendChild(div);
+});
+if (matched.length > 0) list.style.display = "block";
+try {
+let res = await fetch(https://open-meteo.com{encodeURIComponent(q)}&count=6&language=en);
+let data = await res.json();
+if (data.results) {
+data.results.forEach(c => {
+let full = ${c.name}, ${c.admin1 ? c.admin1 + ', ' : ''}${c.country || ''};
+let div = document.createElement("div"); div.className = "citem"; div.innerHTML = 🌐 ${full} <small>${formatCoords(c.latitude, c.longitude)}</small>;
+div.onclick = () => selectCityItem(full, c.latitude, c.longitude); list.appendChild(div);
+});
+list.style.display = "block";
+}
+} catch (e) {}
+}
+function showChart(type, btn) {
+document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+document.getElementById('chart_d1').style.display = (type === 'd1') ? 'block' : 'none';
+document.getElementById('chart_d9').style.display = (type === 'd9') ? 'block' : 'none';
+document.getElementById('chart_d10').style.display = (type === 'd10') ? 'block' : 'none';
+}
+function buildAllKundlis() {
+let name = document.getElementById("un").value.trim() || "जातक";
+let d = String(document.getElementById("dob_d").value || 24).padStart(2,'0');
+let m = String(document.getElementById("dob_m").value || 7).padStart(2,'0');
+let y = String(document.getElementById("dob_y").value || 1990);
+let h = parseInt(document.getElementById("tob_h").value || 8, 10);
+let min = String(document.getElementById("tob_m").value || 30).padStart(2,'0');
+if (isPM && h < 12) h += 12; if (!isPM && h === 12) h = 0;
+let dObj = new Date(${y}-${m}-${d}T${String(h).padStart(2,'0')}:${min}:00);
+let jDays = (dObj.getTime() / 86400000) - 10957.5, ayanamsa = 23.85 + (jDays / 365.25) * 0.0139;
+let sunLon = (280.46 + 0.9856474 * jDays - ayanamsa + 3600) % 360, moonLon = (218.32 + 13.176396 * jDays - ayanamsa + 3600) % 360;
+let marsLon = (355.45 + 0.5240207 * jDays - ayanamsa + 3600) % 360, mercLon = (252.25 + 4.0923344 * jDays - ayanamsa + 3600) % 360;
+let jupLon = (34.40 + 0.0830853 * jDays - ayanamsa + 3600) % 360, venLon = (181.98 + 1.6021302 * jDays - ayanamsa + 3600) % 360;
+let satLon = (49.94 + 0.0334442 * jDays - ayanamsa + 3600) % 360, rahuLon = (125.04 - 0.0529538 * jDays - ayanamsa + 3600) % 360;
+let ketuLon = (rahuLon + 180) % 360;
+let hrs = dObj.getHours() + dObj.getMinutes() / 60;
+let lagnaLon = ((sunLon + (hrs - 6) * 15 + (selLon - 82.5) + 360) % 360 + (selLat - 23) * 0.25 + 360) % 360;
+let d1Lagna = Math.floor(lagnaLon / 30), moonSign = Math.floor(moonLon / 30);
+let nakName = nak27[Math.floor(moonLon / (360 / 27))].split(" (")[0];
+let planets = [{n:"सू",lon:sunLon},{n:"चं",lon:moonLon},{n:"मं",lon:marsLon},{n:"बु",lon:mercLon},{n:"गु",lon:jupLon},{n:"शु",lon:venLon},{n:"श",lon:satLon},{n:"रा",lon:rahuLon},{n:"के",lon:ketuLon}];
+let d1Map = {}, d9Map = {}, d10Map = {}, d9Lagna = Math.floor((lagnaLon * 9) / 30) % 12, d10Lagna = Math.floor((lagnaLon * 10) / 30) % 12;
+planets.forEach(p => {
+let h1 = ((Math.floor(p.lon / 30) - d1Lagna + 12) % 12) + 1; (d1Map[h1] = d1Map[h1] || []).push(p.n);
+let h9 = (((Math.floor((p.lon * 9) / 30) % 12) - d9Lagna + 12) % 12) + 1; (d9Map[h9] = d9Map[h9] || []).push(p.n);
+let h10 = (((Math.floor((p.lon * 10) / 30) % 12) - d10Lagna + 12) % 12) + 1; (d10Map[h10] = d10Map[h10] || []).push(p.n);
+});
+[["d1", d1Lagna, d1Map], ["d9", d9Lagna, d9Map], ["d10", d10Lagna, d10Map]].forEach(arr => {
+for (let i = 1; i <= 12; i++) {
+document.getElementById(${arr[0]}_r${i}).innerText = ((arr[1] + i - 1) % 12) + 1;
+document.getElementById(${arr[0]}_p${i}).innerText = (arr[2][i] || []).join(" ");
+}
+});
+document.getElementById("kTxt").innerHTML = <b>नाम:</b> ${name} | <b>स्थान:</b> ${selCity} (${formatCoords(selLat, selLon)})<br><b>लग्न:</b> ${defaultRashis[d1Lagna]} | <b>चंद्र राशि:</b> $
