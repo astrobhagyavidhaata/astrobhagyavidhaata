@@ -5,7 +5,7 @@
 **Platform operator:** Vipin Kumar (individual operator; not a registered firm).  
 **Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.  
 **Customer support email:** vipank01509@gmail.com  
-**Customer support phone / WhatsApp:** +91 82080 91073. This is a support contact only; the appointed Grievance Officer's name and required details must be added before public launch.
+**Customer support phone / WhatsApp:** +91 82080 91073. These are also the Grievance Officer contact details.
 
 These Terms govern access to the Astro Bhagya Vidhata website, application, kundli tools, AI-assisted astrology features, wallet and paid consultations (collectively, the “Services”). By creating an account, ticking the acceptance box, adding money or using a paid feature, you agree to the version of these Terms shown to you. If you do not agree, do not use the paid Services.
 
@@ -91,4 +91,4 @@ If any provision is held invalid or unenforceable, it will be limited or severed
 
 ---
 
-**Launch checklist — do not publish this draft as final until completed:** confirm the operator name and postal address, fill the appointed Grievance Officer's details, effective date and applicable tax display; verify the support email and phone/WhatsApp are monitored; confirm the final recharge/refund process; and obtain Indian legal review. Confirm actual OTP, AI, payment and data practices match the live app before asking users to accept these Terms.
+**Launch checklist — do not publish this draft as final until completed:** confirm the operator name, postal address and Grievance Officer contact process, effective date and applicable tax display; verify the support email and phone/WhatsApp are monitored; confirm the final recharge/refund process; and obtain Indian legal review. Confirm actual OTP, AI, payment and data practices match the live app before asking users to accept these Terms.
