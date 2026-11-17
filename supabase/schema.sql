@@ -155,7 +155,7 @@ begin
         where id=p_consultation_id returning * into c;
     end if;
     if affordable < due_minutes then
-      update public.consultations set status='stopped', ended_at=now()
+      update public.consultations set status='stopped', ended_at=last_billed_at
         where id=p_consultation_id returning * into c;
     end if;
   else
