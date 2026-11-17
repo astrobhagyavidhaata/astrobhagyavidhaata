@@ -54,6 +54,47 @@ function findBoundary(start, metric, width, zone) {
   }
   return fmt(right, zone);
 }
+
+function isVishti(date) {
+  return Math.floor(panchangMetrics(date).elongation / 6) % 60 >= 1 &&
+    (Math.floor(panchangMetrics(date).elongation / 6) - 1) % 7 === 6 &&
+    Math.floor(panchangMetrics(date).elongation / 6) <= 56;
+}
+function findVishtiIntervals(start, end, zone) {
+  const intervals=[];
+  let open=isVishti(start)?start:null;
+  let previous=start;
+  for(let t=start.getTime()+5*60000;t<=end.getTime()+5*60000;t+=5*60000) {
+    const current=new Date(Math.min(t,end.getTime()));
+    const state=isVishti(current);
+    if(state!==isVishti(previous)) {
+      let low=previous,high=current,oldState=isVishti(previous);
+      for(let i=0;i<24;i++) {
+        const mid=new Date((low.getTime()+high.getTime())/2);
+        if(isVishti(mid)===oldState) low=mid; else high=mid;
+      }
+      const boundary=high;
+      if(state) open=boundary;
+      else if(open) { intervals.push(periodLabel(open,boundary,zone)); open=null; }
+    }
+    previous=current;
+    if(current.getTime()===end.getTime()) break;
+  }
+  if(open) intervals.push(periodLabel(open,end,zone));
+  return intervals;
+}
+function makeChoghadiya(start,end,weekday,night,zone) {
+  const names=["उद्वेग","चर","लाभ","अमृत","काल","शुभ","रोग"];
+  const dayFirst=[0,3,6,2,5,1,4];
+  const nightFirst=[5,1,4,0,3,6,2];
+  const first=night?nightFirst[weekday]:dayFirst[weekday];
+  const unit=(end.getTime()-start.getTime())/8;
+  return Array.from({length:8},(_,i)=>{
+    const a=new Date(start.getTime()+i*unit),b=new Date(start.getTime()+(i+1)*unit);
+    return {number:i+1,name:names[(first+(night?i*5:i))%7],time:periodLabel(a,b,zone)};
+  });
+}
+
 function segment(start,end,slot,total) {
   const unit=(end.getTime()-start.getTime())/total;
   return {
@@ -105,6 +146,9 @@ module.exports = async function handler(req,res) {
     const abhijit=segment(sunrise,sunset,8,15);
     const nextRise=Astronomy.SearchRiseSet("Sun",observer,+1,plusMinutes(sunset,1),2);
     const nightEnd=nextRise?nextRise.date:plusMinutes(sunset,dayMinutes);
+    const bhadra=findVishtiIntervals(sunrise,nightEnd,zone);
+    const dayChoghadiya=makeChoghadiya(sunrise,sunset,weekday,false,zone);
+    const nightChoghadiya=makeChoghadiya(sunset,nightEnd,weekday,true,zone);
     const dayUnit=(sunset-sunrise)/12, nightUnit=(nightEnd-sunset)/12;
     const firstLord=WEEKDAY_LORD_INDEX[weekday], hora=[];
     for(let i=0;i<24;i++){
@@ -131,8 +175,10 @@ module.exports = async function handler(req,res) {
         rahuKaal:periodLabel(rahu.start,rahu.end,zone),
         yamagand:periodLabel(yama.start,yama.end,zone),
         gulika:periodLabel(gulika.start,gulika.end,zone),
-        abhijit:periodLabel(abhijit.start,abhijit.end,zone)
+        abhijit:periodLabel(abhijit.start,abhijit.end,zone),
+        bhadraIntervals:bhadra
       },
+      choghadiya:{day:dayChoghadiya,night:nightChoghadiya},
       hora,
       calculation:{method:"Drik-style geocentric Sun/Moon longitude + local sunrise",ayanamsa:"Lahiri linear approximation",dayLengthMinutes:dayMinutes},
       note:"यह प्रारंभिक गणना इंजन है। अयनांश और ग्रह-स्थिति वर्तमान अनुमानित मॉडल पर आधारित हैं; पर्व/व्रत/विवाह जैसे महत्वपूर्ण निर्णय से पहले प्रमाणित पंचांग से मिलान आवश्यक है।"
