@@ -6,6 +6,9 @@ create extension if not exists pgcrypto;
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   display_name text not null default '',
+  terms_accepted_at timestamptz,
+  terms_version text,
+  privacy_version text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -77,6 +80,10 @@ create table if not exists public.chat_messages (
   created_at timestamptz not null default now()
 );
 create index if not exists chat_messages_user_created_idx on public.chat_messages(user_id, created_at);
+
+alter table public.profiles add column if not exists terms_accepted_at timestamptz;
+alter table public.profiles add column if not exists terms_version text;
+alter table public.profiles add column if not exists privacy_version text;
 
 -- New account gets an empty profile and wallet automatically.
 create or replace function public.handle_new_user()
