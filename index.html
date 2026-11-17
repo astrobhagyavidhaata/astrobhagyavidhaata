@@ -1,1 +1,83 @@
 
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>एस्ट्रो भाग्य विधाता - वैदिक ज्योतिष</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+  body{background:#f2f4f8;padding-bottom:40px;color:#222}
+  .top{background:#1a1a2e;color:#fff;padding:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:6px}
+  .logo{color:#f5b041;font-weight:bold;font-size:18px}
+  .wal{background:#f5b041;color:#000;padding:6px 12px;border-radius:15px;font-weight:bold;font-size:13px;cursor:pointer}
+  .box{background:#fff;margin:12px;padding:14px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+  h3{color:#1a1a2e;border-left:4px solid #e67e22;padding-left:8px;margin-bottom:10px;font-size:16px}
+  label{display:block;font-size:13px;font-weight:bold;margin:8px 0 4px}
+  input,select,textarea,button{width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;font-size:14px}
+  .btn{background:#1a1a2e;color:#f5b041;font-weight:bold;border:none;margin-top:12px;cursor:pointer}
+  .res{margin-top:12px;background:#fef9e7;border:1px solid #e67e22;padding:10px;border-radius:8px;font-size:13px;line-height:1.5}
+  .clist{border:1px solid #e67e22;background:#fff;border-radius:6px;max-height:140px;overflow-y:auto;display:none;margin-top:2px}
+  .citem{padding:8px;border-bottom:1px solid #eee;font-size:13px;cursor:pointer}
+  .chart-tabs{display:flex;gap:6px;margin:12px 0}
+  .ctab{flex:1;padding:8px;background:#eee;border:none;border-radius:6px;font-weight:bold;font-size:12px}
+  .ctab.active{background:#d35400;color:#fff}
+  svg{width:100%;max-width:300px;background:#fffdf5;border:2px solid #d35400;margin:0 auto;display:block}
+  .hn{font-size:11px;fill:#d35400;font-weight:bold}
+  .pt{font-size:10px;fill:#1a1a2e;font-weight:bold}
+  .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:200;padding:15px}
+  .modal-box{background:#fff;border-radius:12px;padding:15px;max-width:420px;margin:30px auto}
+  .chat-area{height:220px;overflow-y:auto;border:1px solid #ddd;padding:10px;border-radius:8px;background:#f9f9f9;margin:10px 0;font-size:13px}
+  .msg-bot{background:#fef9e7;padding:8px;border-radius:8px;margin-bottom:8px;border-left:3px solid #e67e22}
+  .msg-user{background:#e8f8f5;padding:8px;border-radius:8px;margin-bottom:8px;text-align:right}
+  .disclaimer{font-size:11px;color:#666;text-align:center;margin:15px;line-height:1.4}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">🔮 एस्ट्रो भाग्य विधाता</div>
+  <div id="google_translate_element"></div>
+  <div class="wal" onclick="addMoney(100)">₹ <span id="bal">100</span> + Add</div>
+</div>
+
+<!-- 1. Kundli D1, D9, D10 & City Search -->
+<div class="box">
+  <h3>जन्म कुंडली (D1, D9 नवांश, D10 दशमांश)</h3>
+  <label>नाम:</label><input type="text" id="un" placeholder="नाम लिखें">
+  <label>जन्म तारीख:</label><input type="date" id="dt" value="1990-07-24">
+  <label>जन्म समय:</label><input type="time" id="tm" value="08:30">
+  <label>जन्म स्थान (शहर लिखें):</label>
+  <input type="text" id="pl" placeholder="जैसे: Ludhiana" onkeyup="searchCityAPI()">
+  <div class="clist" id="cList"></div>
+  <div id="cInfo" style="font-size:11px;color:#117864;margin-top:4px">स्थान: Ludhiana (30.90°N, 75.85°E)</div>
+  <button class="btn" onclick="buildAllKundlis()">सभी कुंडली चार्ट बनाएं</button>
+
+  <div id="kBox" style="display:none">
+    <div class="res" id="kTxt"></div>
+    <div class="chart-tabs">
+      <button class="ctab active" onclick="showChart('d1', this)">D1 लग्न</button>
+      <button class="ctab" onclick="showChart('d9', this)">D9 नवांश</button>
+      <button class="ctab" onclick="showChart('d10', this)">D10 दशमांश</button>
+    </div>
+    <div id="chart_d1"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d1_r1" x="145" y="130" class="hn"></text><text id="d1_r2" x="72" y="65" class="hn"></text><text id="d1_r3" x="52" y="82" class="hn"></text><text id="d1_r4" x="125" y="154" class="hn"></text><text id="d1_r5" x="52" y="225" class="hn"></text><text id="d1_r6" x="72" y="245" class="hn"></text><text id="d1_r7" x="145" y="178" class="hn"></text><text id="d1_r8" x="218" y="245" class="hn"></text><text id="d1_r9" x="238" y="225" class="hn"></text><text id="d1_r10" x="165" y="154" class="hn"></text><text id="d1_r11" x="238" y="82" class="hn"></text><text id="d1_r12" x="218" y="65" class="hn"></text><text id="d1_p1" x="130" y="85" class="pt"></text><text id="d1_p2" x="60" y="35" class="pt"></text><text id="d1_p3" x="12" y="82" class="pt"></text><text id="d1_p4" x="60" y="154" class="pt"></text><text id="d1_p5" x="12" y="225" class="pt"></text><text id="d1_p6" x="60" y="275" class="pt"></text><text id="d1_p7" x="130" y="220" class="pt"></text><text id="d1_p8" x="200" y="275" class="pt"></text><text id="d1_p9" x="245" y="225" class="pt"></text><text id="d1_p10" x="200" y="154" class="pt"></text><text id="d1_p11" x="245" y="82" class="pt"></text><text id="d1_p12" x="190" y="35" class="pt"></text></svg></div>
+    <div id="chart_d9" style="display:none"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d9_r1" x="145" y="130" class="hn"></text><text id="d9_r2" x="72" y="65" class="hn"></text><text id="d9_r3" x="52" y="82" class="hn"></text><text id="d9_r4" x="125" y="154" class="hn"></text><text id="d9_r5" x="52" y="225" class="hn"></text><text id="d9_r6" x="72" y="245" class="hn"></text><text id="d9_r7" x="145" y="178" class="hn"></text><text id="d9_r8" x="218" y="245" class="hn"></text><text id="d9_r9" x="238" y="225" class="hn"></text><text id="d9_r10" x="165" y="154" class="hn"></text><text id="d9_r11" x="238" y="82" class="hn"></text><text id="d9_r12" x="218" y="65" class="hn"></text><text id="d9_p1" x="130" y="85" class="pt"></text><text id="d9_p2" x="60" y="35" class="pt"></text><text id="d9_p3" x="12" y="82" class="pt"></text><text id="d9_p4" x="60" y="154" class="pt"></text><text id="d9_p5" x="12" y="225" class="pt"></text><text id="d9_p6" x="60" y="275" class="pt"></text><text id="d9_p7" x="130" y="220" class="pt"></text><text id="d9_p8" x="200" y="275" class="pt"></text><text id="d9_p9" x="245" y="225" class="pt"></text><text id="d9_p10" x="200" y="154" class="pt"></text><text id="d9_p11" x="245" y="82" class="pt"></text><text id="d9_p12" x="190" y="35" class="pt"></text></svg></div>
+    <div id="chart_d10" style="display:none"><svg viewBox="0 0 300 300"><rect x="2" y="2" width="296" height="296" fill="none" stroke="#d35400" stroke-width="2"/><line x1="2" y1="2" x2="298" y2="298" stroke="#d35400"/><line x1="298" y1="2" x2="2" y2="298" stroke="#d35400"/><line x1="150" y1="2" x2="2" y2="150" stroke="#d35400"/><line x1="2" y1="150" x2="150" y2="298" stroke="#d35400"/><line x1="150" y1="298" x2="298" y2="150" stroke="#d35400"/><line x1="298" y1="150" x2="150" y2="2" stroke="#d35400"/><text id="d10_r1" x="145" y="130" class="hn"></text><text id="d10_r2" x="72" y="65" class="hn"></text><text id="d10_r3" x="52" y="82" class="hn"></text><text id="d10_r4" x="125" y="154" class="hn"></text><text id="d10_r5" x="52" y="225" class="hn"></text><text id="d10_r6" x="72" y="245" class="hn"></text><text id="d10_r7" x="145" y="178" class="hn"></text><text id="d10_r8" x="218" y="245" class="hn"></text><text id="d10_r9" x="238" y="225" class="hn"></text><text id="d10_r10" x="165" y="154" class="hn"></text><text id="d10_r11" x="238" y="82" class="hn"></text><text id="d10_r12" x="218" y="65" class="hn"></text><text id="d10_p1" x="130" y="85" class="pt"></text><text id="d10_p2" x="60" y="35" class="pt"></text><text id="d10_p3" x="12" y="82" class="pt"></text><text id="d10_p4" x="60" y="154" class="pt"></text><text id="d10_p5" x="12" y="225" class="pt"></text><text id="d10_p6" x="60" y="275" class="pt"></text><text id="d10_p7" x="130" y="220" class="pt"></text><text id="d10_p8" x="200" y="275" class="pt"></text><text id="d10_p9" x="245" y="225" class="pt"></text><text id="d10_p10" x="200" y="154" class="pt"></text><text id="d10_p11" x="245" y="82" class="pt"></text><text id="d10_p12" x="190" y="35" class="pt"></text></svg></div>
+  </div>
+</div>
+
+<!-- 2. Monthly Gochar + Astrologer Admin Panel -->
+<div class="box">
+  <h3>मासिक गोचर भविष्यफल (राशि/लग्न अनुसार)</h3>
+  <select id="rashiSelect" onchange="loadRashiGochar()"></select>
+  <div class="res" id="rashiGocharOut"></div>
+
+  <details style="margin-top:12px;border-top:1px dashed #ccc;padding-top:8px">
+    <summary style="font-size:13px;font-weight:bold;color:#d35400;cursor:pointer">⚙️ एस्ट्रोलॉजर एडमिन पैनल (गोचर और AI ज्ञान बदलें)</summary>
+    <label>राशि चुनें:</label><select id="adminRashiSelect"></select>
+    <label>नया गोचर फल लिखें:</label><textarea id="adminGocharInput" rows="2" placeholder="इस महीने का नया गोचर लिखें..."></textarea>
+    <button class="btn" onclick="saveAdminGochar()">नया गोचर सेव करें (Pin: 1234)</button>
+
+    <hr style="margin:12px 0;border:0;border-top:1px dashed #ccc">
+    <label>Google Gemini API Key (असली AI जोड़ने के लिए):</label>
+    
