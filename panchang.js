@@ -5,6 +5,38 @@
   if(!form)return;
   $("panchangDate").value=new Date().toISOString().slice(0,10);
   const out=$("panchangOutput"), status=$("panchangMessage");
+  const placeButton=$("panchangFindPlace"), placeSelect=$("panchangPlaceResults");
+  let foundPlaces=[];
+  function applyPlace(){
+    const place=foundPlaces[Number(placeSelect.value)];
+    if(!place)return;
+    $("panchangLat").value=String(place.latitude);
+    $("panchangLon").value=String(place.longitude);
+    status.textContent="स्थान चुना गया: "+[place.name,place.admin1,place.country].filter(Boolean).join(", ");
+    status.style.display="block";
+  }
+  placeButton.addEventListener("click",async()=>{
+    const query=$("panchangPlace").value.trim();
+    if(!query){status.textContent="पहले शहर या गाँव का नाम लिखें।";status.style.display="block";return;}
+    placeButton.disabled=true;status.textContent="स्थान खोजा जा रहा है…";status.style.display="block";
+    try{
+      const url="https://geocoding-api.open-meteo.com/v1/search?"+new URLSearchParams({name:query,count:"8",language:"en",format:"json"});
+      const response=await fetch(url);
+      if(!response.ok)throw new Error("स्थान खोजने में समस्या आई।");
+      const data=await response.json();foundPlaces=Array.isArray(data.results)?data.results:[];
+      if(!foundPlaces.length)throw new Error("स्थान नहीं मिला। शहर या गाँव का नाम जाँचें।");
+      placeSelect.replaceChildren();
+      foundPlaces.forEach((place,index)=>{
+        const option=document.createElement("option");
+        option.value=String(index);
+        option.textContent=[place.name,place.admin1,place.country].filter(Boolean).join(", ");
+        placeSelect.appendChild(option);
+      });
+      placeSelect.style.display="block";placeSelect.value="0";applyPlace();
+    }catch(error){status.textContent=error.message;status.style.display="block";}
+    finally{placeButton.disabled=false;}
+  });
+  placeSelect.addEventListener("change",applyPlace);
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function render(d){
     const p=d.panchang,k=d.kaal;
