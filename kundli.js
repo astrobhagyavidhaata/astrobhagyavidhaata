@@ -254,7 +254,7 @@
       lines.push("गणना नोट: " + chart.calculation.accuracyNote);
 
       const output = $("kTxt");
-      if (output) output.textContent = lines.join("\\n");
+      if (output) output.textContent = lines.join("\n");
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
 
