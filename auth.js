@@ -47,8 +47,14 @@
     finally{$("verifyOtpButton").disabled=false;}
   });
   $("logoutButton").addEventListener("click",async()=>{
-    try{await call("logout",{});currentUser=null;otpSent=false;otpRow.style.display="none";render();show("आप लॉगआउट हो गए हैं।");if($("bal"))$("bal").textContent="0.00";document.dispatchEvent(new CustomEvent("astro:auth-changed",{detail:null}));}
-    catch(error){show(error.message,true);}
+    try{
+      if(window.AstroWallet)await window.AstroWallet.stopConsultation();
+      await call("logout",{});
+      currentUser=null;otpSent=false;otpRow.style.display="none";render();
+      show("आप लॉगआउट हो गए हैं।");
+      if($("bal"))$("bal").textContent="0.00";
+      document.dispatchEvent(new CustomEvent("astro:auth-changed",{detail:null}));
+    }catch(error){show(error.message,true);}
   });
   window.AstroAuth=Object.freeze({loadUser,getUser:()=>currentUser});
   loadUser().then(user=>{
