@@ -43,6 +43,14 @@
     #panchangOutput table{color:#eee}
     #panchangOutput th{text-align:left;padding:7px;color:#f5c66b}
     #panchangOutput td{padding:7px;border-top:1px solid #493568}
+
+    .support-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    .support-link{display:block;text-align:center;text-decoration:none;padding:13px 10px;border-radius:9px;background:#e8b957;color:#211638;font-weight:bold}
+    .support-link.whatsapp{background:#1f8f5f;color:#fff}
+    .support-note{color:#d4c9e5;font-size:14px;line-height:1.7}
+    .support-topics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+    .support-topics a{display:block;text-align:center;text-decoration:none;padding:11px 8px;border:1px solid #66547f;border-radius:8px;color:#f5d994;font-size:13px}
+    @media(max-width:360px){.support-actions,.support-topics{grid-template-columns:1fr}}
     footer{text-align:center;padding:20px 14px;color:#a99bbd;font-size:12px;line-height:1.7}
     @media(max-width:420px){header h1{font-size:21px}.panel{padding:15px}#chatMessages{height:300px}}
   </style>
@@ -125,6 +133,23 @@
       <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न AI ज्योतिष सहायक से पूछें। पहला ₹5 सत्र शुरू होते ही कटेगा; उसके बाद हर पूरा अतिरिक्त मिनट ₹5 है। परामर्श शुरू करने से पहले वॉलेट में पर्याप्त बैलेंस रखें।</p>
       <button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">चैट शुरू करें</button>
       <div id="walletMessage" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" id="customerCare">
+      <h2>☎️ Customer Care / सहायता केंद्र</h2>
+      <p class="support-note">पेमेंट कटने, वॉलेट बैलेंस, लॉगिन, कुंडली, चैट या ऐप में किसी समस्या के लिए हमसे संपर्क करें। अपने सुझाव भी भेज सकते हैं।</p>
+      <p class="support-note"><strong>सहायता नंबर:</strong> <a href="tel:8208091073" style="color:#f5c66b;text-decoration:none">8208091073</a></p>
+      <div class="support-actions">
+        <a class="support-link" href="tel:8208091073">📞 अभी कॉल करें</a>
+        <a class="support-link whatsapp" href="https://wa.me/918208091073?text=Namaste%2C%20mujhe%20Astro%20Bhagya%20Vidhata%20app%20mein%20sahayata%20chahiye." target="_blank" rel="noopener noreferrer">WhatsApp करें</a>
+      </div>
+      <div class="support-topics">
+        <a href="https://wa.me/918208091073?text=Payment%20complaint%3A%20mere%20paise%20kat%20gaye%20hain%2C%20kripya%20madad%20karein." target="_blank" rel="noopener noreferrer">पेमेंट की शिकायत</a>
+        <a href="https://wa.me/918208091073?text=App%20problem%3A%20mujhe%20app%20mein%20takneeki%20samasya%20aa%20rahi%20hai." target="_blank" rel="noopener noreferrer">ऐप की समस्या</a>
+        <a href="https://wa.me/918208091073?text=Namaste%2C%20main%20app%20ke%20baare%20mein%20sujhav%20dena%20chahta%2Fchahti%20hoon." target="_blank" rel="noopener noreferrer">सुझाव / Feedback</a>
+        <a href="https://wa.me/918208091073?text=Namaste%2C%20mujhe%20wallet%20balance%20ke%20baare%20mein%20sahayata%20chahiye." target="_blank" rel="noopener noreferrer">वॉलेट बैलेंस</a>
+      </div>
+      <p class="support-note" style="margin-bottom:0">पेमेंट की शिकायत करते समय Transaction ID और भुगतान का समय लिखें। OTP, पासवर्ड या बैंक PIN कभी साझा न करें।</p>
     </section>
   </main>
   <div id="chatModal" class="modal"><div class="modal-box">
