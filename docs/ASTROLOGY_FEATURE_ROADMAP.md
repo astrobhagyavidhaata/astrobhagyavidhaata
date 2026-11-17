@@ -5,21 +5,21 @@ This is the implementation checklist for the astrology engine and daily almanac.
 ## 1. Birth chart and divisional charts
 
 - [x] D1 Rashi / Lagna chart
-- [ ] D2 Hora
-- [ ] D3 Drekkana
-- [ ] D4 Chaturthamsa
-- [ ] D7 Saptamsa
+- [x] D2 Hora
+- [x] D3 Drekkana
+- [x] D4 Chaturthamsa
+- [x] D7 Saptamsa
 - [x] D9 Navamsa
-- [ ] D10 Dasamsa
-- [ ] D12 Dvadasamsa
-- [ ] D16 Shodasamsa
-- [ ] D20 Vimsamsa
-- [ ] D24 Chaturvimsamsa
-- [ ] D27 Saptavimsamsa
-- [ ] D30 Trimsamsa
-- [ ] D40 Khavedamsa
-- [ ] D45 Akshavedamsa
-- [ ] D60 Shashtiamsa
+- [x] D10 Dasamsa
+- [x] D12 Dvadasamsa
+- [x] D16 Shodasamsa
+- [x] D20 Vimsamsa
+- [x] D24 Chaturvimsamsa
+- [x] D27 Saptavimsamsa
+- [x] D30 Trimsamsa
+- [x] D40 Khavedamsa
+- [x] D45 Akshavedamsa
+- [x] D60 Shashtiamsa
 - [ ] Extend to a clearly documented 64-varga catalogue only after selecting and documenting the tradition and calculation rules.
 - [ ] Show planetary sign, degree, house, nakshatra, pada, dignity and retrograde status in each applicable chart.
 - [ ] Add chart export/print and clear calculation settings.
