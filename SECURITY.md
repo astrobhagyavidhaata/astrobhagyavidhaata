@@ -31,7 +31,7 @@ The database charges ₹5 at consultation start for the first minute, then ₹5 
 - `/api/wallet`: authenticated balance read.
 - `/api/payments/create-order` and `/api/payments/verify`: authenticated Razorpay Checkout order and server verification.
 - `/api/payments/webhook`: raw-body HMAC verification and idempotent credit.
-- `/api/consultations/start|heartbeat|stop`: server-side ₹5/minute billing RPCs.
+- `/api/consultations/start|heartbeat|stop`: server-side ₹5/minute billing RPCs; a 45-second heartbeat lease stops abandoned sessions after a disconnect.
 - `/api/consultation`: AI answers only for an authenticated user with an active paid session.
 
 ## Before accepting real payments
