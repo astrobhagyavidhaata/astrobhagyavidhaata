@@ -3,7 +3,8 @@
   const $=id=>document.getElementById(id);
   const form=$("panchangForm");
   if(!form)return;
-  $("panchangDate").value=new Date().toISOString().slice(0,10);
+  const today=new Date();
+  $("panchangDate").value=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
   const out=$("panchangOutput"), status=$("panchangMessage");
   const placeButton=$("panchangFindPlace"), placeSelect=$("panchangPlaceResults");
   let foundPlaces=[];
