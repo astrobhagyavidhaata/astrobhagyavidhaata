@@ -175,15 +175,40 @@
         throw new Error("सर्वर से सही कुंडली प्राप्त नहीं हुई।");
       }
 
-      showMessage(
-        result.message || "कुंडली की गणना पूरी हुई।"
-      );
+      const chart = result.chart;
+      window.AstroKundli = chart;
 
-      document.dispatchEvent(
-        new CustomEvent("astro:kundli-ready", {
-          detail: result.chart
-        })
-      );
+      const lines = [];
+      lines.push("नाम: " + (chart.name || details.name));
+      lines.push("जन्म: " + chart.birth.localDate + " " + chart.birth.localTime);
+      lines.push("स्थान: " + chart.birth.place + " (" + chart.birth.timezone + ")");
+      lines.push("अयनांश: " + Number(chart.calculation.ayanamsaDegrees).toFixed(4) + "°");
+      lines.push("");
+      lines.push("D1 जन्म कुंडली");
+      lines.push("लग्न: " + chart.d1.ascendant.rashi + " " + Number(chart.d1.ascendant.degreeInRashi).toFixed(2) + "°");
+      for (const [name, p] of Object.entries(chart.d1.planets || {})) {
+        lines.push(name + ": " + p.rashi + " " + Number(p.degreeInRashi).toFixed(2) + "° | भाव " + p.house + " | " + p.nakshatra + " पाद " + p.pada + (p.retrograde ? " (वक्री)" : ""));
+      }
+      lines.push("");
+      lines.push("D9 नवांश लग्न: " + chart.d9.ascendant.rashi);
+      for (const [name, p] of Object.entries(chart.d9.planets || {})) {
+        lines.push(name + ": " + p.rashi + " | भाव " + p.house);
+      }
+      lines.push("");
+      lines.push("विंशोत्तरी दशा");
+      lines.push("वर्तमान महादशा: " + (chart.dasha.current.mahadasha || "उपलब्ध नहीं"));
+      lines.push("वर्तमान अंतर्दशा: " + (chart.dasha.current.antardasha || "उपलब्ध नहीं"));
+      lines.push("वर्तमान प्रत्यंतर: " + (chart.dasha.current.pratyantardasha || "उपलब्ध नहीं"));
+      lines.push("");
+      lines.push("गणना नोट: " + chart.calculation.accuracyNote);
+
+      const output = $("kTxt");
+      if (output) output.textContent = lines.join("\\n");
+      const panel = $("kBox");
+      if (panel) panel.style.display = "block";
+
+      showMessage(result.message || "कुंडली गणना पूरी हुई।");
+      document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
 
     } catch (error) {
       if (error instanceof TypeError) {
