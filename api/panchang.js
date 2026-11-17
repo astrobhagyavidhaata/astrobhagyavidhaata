@@ -30,8 +30,8 @@ function plusMinutes(date, minutes) { return new Date(date.getTime() + minutes *
 function periodLabel(a,b,zone) { return fmt(a,zone) + " – " + fmt(b,zone); }
 
 function panchangMetrics(date) {
-  const sun = Astronomy.EclipticLongitude(Astronomy.Body.Sun, date);
-  const moon = Astronomy.EclipticLongitude(Astronomy.Body.Moon, date);
+  const sun = Astronomy.SunPosition(date).elon;
+  const moon = Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Moon,date,true)).elon;
   const ayan = lahiriAyanamsa(date);
   return {
     elongation:norm(moon-sun),
