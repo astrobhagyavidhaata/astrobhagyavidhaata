@@ -2,9 +2,10 @@
 
 **Draft for product implementation; requires review by an Indian lawyer before public launch.**  
 **Effective date:** To be filled before launch.  
-**Platform operator:** The owner/operator of Astro Bhagya Vidhata (legal name and registered address to be published before launch).  
+**Platform operator:** Vipin Kumar (individual operator; not a registered firm).  
+**Postal / correspondence address:** Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.  
 **Customer support email:** vipank01509@gmail.com  
-**Customer support phone / WhatsApp:** +91 82080 91073. This is a support contact only; the appointed Grievance Officer's name and any legally required postal/business address must be added before public launch.
+**Customer support phone / WhatsApp:** +91 82080 91073. This is a support contact only; the appointed Grievance Officer's name and required details must be added before public launch.
 
 These Terms govern access to the Astro Bhagya Vidhata website, application, kundli tools, AI-assisted astrology features, wallet and paid consultations (collectively, the “Services”). By creating an account, ticking the acceptance box, adding money or using a paid feature, you agree to the version of these Terms shown to you. If you do not agree, do not use the paid Services.
 
@@ -77,7 +78,7 @@ Customers may contact support by email at vipank01509@gmail.com or by phone/What
 **Support email:** vipank01509@gmail.com  
 **Support phone / WhatsApp:** +91 82080 91073  
 **Grievance Officer:** The operator must appoint the appropriate person and publish their name and required contact details before public launch.  
-**Registered business name and address:** To be supplied and published by the operator before public launch.
+**Operator name and postal / correspondence address:** Vipin Kumar, Vipin Kumar, son of Shri Subhash Chand, Village Sudharn (SUDHARN), Post Office Barmad, Tehsil Jawali, District Kangra, Himachal Pradesh – 176021, India.
 
 ## 12. Changes to these Terms
 We may update these Terms to reflect changes in law, features or business operations. We will publish the revised version and effective date. If a change materially affects a paid feature or customer rights, we will provide notice where required. Continued use after the effective date constitutes acceptance only to the extent permitted by law; where fresh consent is legally required, we will request it.
@@ -90,4 +91,4 @@ If any provision is held invalid or unenforceable, it will be limited or severed
 
 ---
 
-**Launch checklist — do not publish this draft as final until completed:** fill legal operator name, registered address, appointed Grievance Officer's details, effective date and applicable tax display; verify the support email and phone/WhatsApp are monitored; confirm the final recharge/refund process; and obtain Indian legal review. Confirm actual OTP, AI, payment and data practices match the live app before asking users to accept these Terms.
+**Launch checklist — do not publish this draft as final until completed:** confirm the operator name and postal address, fill the appointed Grievance Officer's details, effective date and applicable tax display; verify the support email and phone/WhatsApp are monitored; confirm the final recharge/refund process; and obtain Indian legal review. Confirm actual OTP, AI, payment and data practices match the live app before asking users to accept these Terms.
