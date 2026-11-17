@@ -8,6 +8,7 @@ Hindi-first Vedic astrology consultation web application.
 - Daily local Panchang endpoint and UI: tithi, paksha, nakshatra/pada, yoga, karana, sunrise/sunset, moonrise/moonset, Rahu Kaal, Yamaganda, Gulika, Abhijit, Bhadra intervals, day/night Choghadiya and 24 horas.
 - Supabase phone OTP authentication using HttpOnly cookies.
 - Optional consent-based saving, browsing and deletion of a user's own saved birth charts.
+- Paid consultation messages are stored per user/session and restored when an active session is reopened.
 - Database-backed wallet and server-side ₹5/minute consultation billing RPCs.
 - Razorpay order creation, Checkout UI, signature verification and raw-body webhook credit.
 - AI consultation endpoint requires an authenticated user and active paid consultation.
