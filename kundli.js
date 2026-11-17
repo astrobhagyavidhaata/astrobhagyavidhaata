@@ -29,7 +29,8 @@
       name: String(data.get("name") || "").trim(),
       date: String(data.get("dob") || ""),
       time: String(data.get("birthTime") || ""),
-      place: String(data.get("birthPlace") || "").trim()
+      place: String(data.get("birthPlace") || "").trim(),
+      saveToAccount: data.get("saveToAccount") === "on"
     };
 
     if (
@@ -125,6 +126,7 @@
       birthDate: details.date,
 
       birthTime: details.time,
+      saveToAccount: details.saveToAccount,
 
       birthPlace: {
         name: location.name,
@@ -256,8 +258,9 @@
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
 
-      showMessage(result.message || "कुंडली गणना पूरी हुई।");
+      showMessage((result.message || "कुंडली गणना पूरी हुई।") + (result.savedKundliId ? " आपकी कुंडली खाते में सुरक्षित हो गई।" : (details.saveToAccount ? " कुंडली सुरक्षित नहीं हो सकी; लॉगिन और सर्वर सेटिंग जाँचें।" : "")));
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
+      if (result.savedKundliId && window.loadKundliHistory) window.loadKundliHistory();
 
     } catch (error) {
       if (error instanceof TypeError) {
