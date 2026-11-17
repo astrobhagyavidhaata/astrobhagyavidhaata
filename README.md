@@ -31,7 +31,8 @@ The current ephemeris adapter uses Astronomy Engine tropical geocentric position
 ## Razorpay setup
 1. Start with Razorpay test mode.
 2. Set the key ID and secret only in server environment variables.
-3. Register \`https://YOUR-DOMAIN/api/payments/webhook\` as the webhook URL.
+3. Enable automatic payment capture in Razorpay, because wallet credit is granted only for captured payments.
+4. Register \`https://YOUR-DOMAIN/api/payments/webhook\` as the webhook URL.
 4. Subscribe to \`payment.captured\` and \`order.paid\`, and set the webhook secret.
 5. Test duplicate webhook delivery, failed payments and wallet crediting before switching to live mode.
 
