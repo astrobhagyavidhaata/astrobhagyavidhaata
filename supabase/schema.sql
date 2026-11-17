@@ -216,15 +216,18 @@ create policy "chat insert own" on public.chat_messages for insert to authentica
 -- No client-side insert/update/delete policies for wallets, payments, transactions or consultations.
 
 
--- Idempotent wallet credit: a verified captured Razorpay payment is credited once.
-create or replace function public.credit_payment(p_order_id text, p_payment_id text)
+-- Idempotent wallet credit: amount must match the stored Razorpay order.
+drop function if exists public.credit_payment(text,text);
+create or replace function public.credit_payment(p_order_id text, p_payment_id text, p_amount_paise bigint)
 returns jsonb language plpgsql security definer set search_path = ''
 as $$
 declare p public.payments%rowtype; w public.wallets%rowtype;
 begin
   select * into p from public.payments where order_id=p_order_id for update;
   if not found then raise exception 'PAYMENT_ORDER_NOT_FOUND'; end if;
+  if p.amount_paise <> p_amount_paise then raise exception 'PAYMENT_AMOUNT_MISMATCH'; end if;
   if p.status='paid' then
+    if p.payment_id <> p_payment_id then raise exception 'PAYMENT_ID_MISMATCH'; end if;
     select * into w from public.wallets where user_id=p.user_id;
     return jsonb_build_object('credited',false,'wallet',to_jsonb(w));
   end if;
@@ -240,5 +243,5 @@ begin
 end;
 $$;
 
-revoke all on function public.credit_payment(text,text) from public, anon, authenticated;
-grant execute on function public.credit_payment(text,text) to service_role;
+revoke all on function public.credit_payment(text,text,bigint) from public, anon, authenticated;
+grant execute on function public.credit_payment(text,text,bigint) to service_role;
