@@ -128,13 +128,41 @@
         })
       });
 
-      if (!order.checkoutUrl) {
-        throw new Error("भुगतान लिंक नहीं मिला।");
+      if (!order.orderId || !order.keyId || !window.Razorpay) {
+        throw new Error("सुरक्षित भुगतान विंडो उपलब्ध नहीं है।");
       }
 
-      // Payment credit only after verified payment webhook.
-      window.location.assign(order.checkoutUrl);
-
+      const checkout = new window.Razorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency || "INR",
+        name: "Astro Bhagya Vidhata",
+        description: "वॉलेट रिचार्ज",
+        order_id: order.orderId,
+        theme: { color: "#e8b957" },
+        handler: async function (payment) {
+          message("भुगतान सत्यापित किया जा रहा है…");
+          try {
+            await request("/api/payments/verify", {
+              method: "POST",
+              body: JSON.stringify(payment)
+            });
+            await loadWallet();
+            message("रिचार्ज सफल। आपका वॉलेट अपडेट हो गया है।");
+          } catch (error) {
+            message("भुगतान प्राप्त हुआ हो सकता है; वॉलेट सत्यापन बाकी है। " + error.message, true);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            message("भुगतान विंडो बंद कर दी गई।");
+          }
+        }
+      });
+      checkout.on("payment.failed", function () {
+        message("भुगतान पूरा नहीं हुआ। कृपया दोबारा प्रयास करें।", true);
+      });
+      checkout.open();
       return true;
 
     } catch (error) {
