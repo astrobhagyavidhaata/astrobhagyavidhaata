@@ -18,7 +18,7 @@ module.exports=async function(req,res){
       const order=event.payload?.order?.entity;
       const orderId=payment?.order_id||order?.id;
       const paymentId=payment?.id;
-      if(orderId&&paymentId)await rpc("credit_payment",{p_order_id:orderId,p_payment_id:paymentId});
+      if(orderId&&paymentId&&Number.isSafeInteger(Number(payment?.amount)))await rpc("credit_payment",{p_order_id:orderId,p_payment_id:paymentId,p_amount_paise:Number(payment.amount)});
     }
     return res.status(200).json({received:true});
   }catch(error){
