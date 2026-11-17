@@ -44,13 +44,12 @@
   }
 
   function getKundliDetails() {
+    if (window.AstroKundli) return window.AstroKundli;
     const element = $("kTxt");
-
     if (!element || !element.textContent.trim()) {
-      throw new Error("पहले जन्म विवरण भरकर कुंडली तैयार करें।");
+      throw new Error("पहले जन्म विवरण भरकर कुंडली तैयार करें या सुरक्षित कुंडली खोलें।");
     }
-
-    return window.AstroKundli || element.textContent.trim();
+    return element.textContent.trim();
   }
 
   async function openChatBox(astroName, rate) {
