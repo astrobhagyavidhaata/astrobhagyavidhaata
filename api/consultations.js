@@ -3,11 +3,17 @@ const {getAuthenticatedUser,rpc,walletFor}=require("../lib/supabase");
 function mapConsultation(c){return c?{id:c.id,status:c.status,ratePaisePerMinute:Number(c.rate_paise_per_minute),billedMinutes:Number(c.billed_minutes),startedAt:c.started_at}:null;}
 function mapWallet(w){return w?{balancePaise:Number(w.balance_paise)}:null;}
 module.exports=async function(req,res){
-  if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
   try{
     const user=await getAuthenticatedUser(req,res);
     if(!user)return res.status(401).json({success:false,message:"परामर्श शुरू करने के लिए पहले लॉगिन करें।"});
     const action=req.params.action,body=req.body||{};
+    if(action==="active"&&req.method==="GET"){
+      const active=await require("../lib/supabase").activeConsultation(user.id);
+      if(!active)return res.json({success:true,consultation:null});
+      const result=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
+      return res.json({success:true,consultation:mapConsultation(result.consultation),wallet:{balancePaise:Number(result.wallet.balance_paise)}});
+    }
+    if(req.method!=="POST"){res.setHeader("Allow","GET, POST");return res.status(405).json({success:false,message:"यह अनुरोध उपलब्ध नहीं है।"});}
     if(action==="start"){
       const result=await rpc("start_consultation",{p_user_id:user.id,p_astrologer_id:String(body.astrologerId||"vedic-astrologer").slice(0,100)});
       return res.json({success:true,consultation:mapConsultation(result.consultation),wallet:{balancePaise:Number(result.wallet.balance_paise)}});
