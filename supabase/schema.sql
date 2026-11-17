@@ -103,10 +103,10 @@ returns jsonb language plpgsql security definer set search_path = ''
 as $$
 declare w public.wallets%rowtype; c public.consultations%rowtype;
 begin
-  select * into w from public.wallets where user_id = p_user_id for update;
-  if not found then raise exception 'WALLET_NOT_FOUND'; end if;
   update public.consultations set status='stopped', ended_at=last_activity_at + interval '45 seconds'
     where user_id=p_user_id and status='active' and last_activity_at < now()-interval '45 seconds';
+  select * into w from public.wallets where user_id = p_user_id for update;
+  if not found then raise exception 'WALLET_NOT_FOUND'; end if;
   if exists(select 1 from public.consultations where user_id=p_user_id and status='active') then
     raise exception 'ACTIVE_CONSULTATION_EXISTS';
   end if;
@@ -168,20 +168,44 @@ $$;
 
 create or replace function public.stop_consultation(p_user_id uuid, p_consultation_id uuid)
 returns jsonb language plpgsql security definer set search_path = ''
-as $$
+as $
 declare c public.consultations%rowtype; w public.wallets%rowtype;
+        due_minutes integer; affordable integer; debit bigint; v_ended_at timestamptz;
 begin
-  update public.consultations set status='stopped', ended_at=now()
-    where id=p_consultation_id and user_id=p_user_id and status='active'
-    returning * into c;
-  if not found then
-    select * into c from public.consultations where id=p_consultation_id and user_id=p_user_id;
+  select * into c from public.consultations
+    where id=p_consultation_id and user_id=p_user_id for update;
+  if not found then raise exception 'CONSULTATION_NOT_FOUND'; end if;
+  select * into w from public.wallets where user_id=p_user_id for update;
+  if c.status='active' then
+    if c.last_activity_at >= now()-interval '45 seconds' then
+      due_minutes := greatest(0,floor(extract(epoch from (now()-c.last_billed_at))/60)::integer);
+      if due_minutes>0 then
+        affordable := least(due_minutes,(w.balance_paise/500)::integer);
+        debit := affordable::bigint*500;
+        if debit>0 then
+          update public.wallets set balance_paise=balance_paise-debit,updated_at=now()
+            where user_id=p_user_id returning * into w;
+          insert into public.wallet_transactions(user_id,kind,amount_paise,reference_id,description)
+            values(p_user_id,'consultation_debit',debit,p_consultation_id::text,
+              'परामर्श शुल्क: '||affordable||' अतिरिक्त मिनट');
+          update public.consultations set billed_minutes=billed_minutes+affordable,
+            last_billed_at=last_billed_at+make_interval(mins=>affordable)
+            where id=p_consultation_id returning * into c;
+        end if;
+        if affordable<due_minutes then v_ended_at:=c.last_billed_at;
+        else v_ended_at:=now(); end if;
+      else
+        v_ended_at:=now();
+      end if;
+    else
+      v_ended_at:=c.last_activity_at+interval '45 seconds';
+    end if;
+    update public.consultations set status='stopped',ended_at=v_ended_at
+      where id=p_consultation_id returning * into c;
   end if;
-  if c.id is null then raise exception 'CONSULTATION_NOT_FOUND'; end if;
-  select * into w from public.wallets where user_id=p_user_id;
   return jsonb_build_object('consultation',to_jsonb(c),'wallet',to_jsonb(w));
 end;
-$$;
+$;
 
 -- Only trusted server-side service-role requests may execute money-changing functions.
 revoke all on function public.start_consultation(uuid,text) from public, anon, authenticated;
