@@ -12,7 +12,8 @@ app.use(express.static(path.join(__dirname)));
 
 const apiHandlers = {
   kundli: require("./api/kundli"),
-  consultation: require("./api/consultation")
+  consultation: require("./api/consultation"),
+  gochar: require("./api/gochar")
 };
 
 app.all("/api/:name", async (req, res) => {
