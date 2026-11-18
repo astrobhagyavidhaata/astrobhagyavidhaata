@@ -17,14 +17,15 @@ function mockResponse() {
   };
 }
 
-test("Gochar API returns nine grahas and both Moon/Lagna house references", async () => {
-  const req = { method: "GET", query: { rashi: "तुला", lagna: "मेष" } };
+test("Gochar API returns nine grahas, both house references and transit drishti", async () => {
+  const req = { method: "GET", query: { rashi: "तुला", lagna: "मेष", date:"2026-11-18" } };
   const res = mockResponse();
 
   await gocharHandler(req, res);
 
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.success, true);
+  assert.equal(res.body.asOf, "2026-11-18T12:00:00.000Z");
   assert.equal(res.body.basisRashi, "तुला");
   assert.equal(res.body.basisLagna, "मेष");
   assert.equal(res.body.planets.length, 9);
@@ -41,10 +42,15 @@ test("Gochar API returns nine grahas and both Moon/Lagna house references", asyn
     assert.ok(typeof planet.nakshatra === "string" && planet.nakshatra.length > 0);
     assert.ok(planet.pada >= 1 && planet.pada <= 4);
   }
+
+  assert.ok(res.body.drishti.fromMoon.houseAspects.length > 0);
+  assert.ok(res.body.drishti.fromMoon.planetAspects.length >= 0);
+  assert.ok(res.body.drishti.fromLagna.houseAspects.length > 0);
+  assert.match(res.body.drishti.scheme, /Parashari/);
 });
 
 test("Gochar API rejects an invalid Moon sign", async () => {
-  const req = { method: "GET", query: { rashi: "गलत", lagna: "मेष" } };
+  const req = { method: "GET", query: { rashi: "गलत", lagna: "मेष", date:"2026-11-18" } };
   const res = mockResponse();
 
   await gocharHandler(req, res);
@@ -54,7 +60,17 @@ test("Gochar API rejects an invalid Moon sign", async () => {
 });
 
 test("Gochar API rejects an invalid ascendant when supplied", async () => {
-  const req = { method: "GET", query: { rashi: "तुला", lagna: "गलत" } };
+  const req = { method: "GET", query: { rashi: "तुला", lagna: "गलत", date:"2026-11-18" } };
+  const res = mockResponse();
+
+  await gocharHandler(req, res);
+
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.body.success, false);
+});
+
+test("Gochar API rejects malformed dates", async () => {
+  const req = { method: "GET", query: { rashi: "तुला", lagna: "मेष", date:"18-11-2026" } };
   const res = mockResponse();
 
   await gocharHandler(req, res);
