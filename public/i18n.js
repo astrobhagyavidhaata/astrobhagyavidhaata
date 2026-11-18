@@ -4,7 +4,7 @@
  const picker=document.getElementById("preferredLanguage");
  if(!picker)return;
  const original=new WeakMap();
- const supported=new Set(["en","hi","pa","fr"]);
+ const supported=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt-BR","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
  const attrNames=["placeholder","title","aria-label","alt"];
  function translateTextNode(node,lang){
    const raw=node.nodeValue;
@@ -35,12 +35,17 @@
  }
  function apply(lang){
    const active=supported.has(lang)?lang:"en";
+   const base=active.split("-")[0];
+   const hasPack=Boolean(dictionaries[base]) || base==="en";
    document.documentElement.lang=active;
-   document.documentElement.dir=active==="ar"||active==="ur"?"rtl":"ltr";
-   document.title=active==="fr"?"Astro Bhagya Vidhata | Astrologie védique":active==="pa"?"Astro Bhagya Vidhata | ਵੈਦਿਕ ਜੋਤਿਸ਼":"Astro Bhagya Vidhata | Vedic Astrology";
-   document.body.childNodes.forEach(node=>translateElement(node,active));
+   document.documentElement.dir=(base==="ar"||base==="ur")?"rtl":"ltr";
+   document.title=base==="fr"?"Astro Bhagya Vidhata | Astrologie védique":base==="pa"?"Astro Bhagya Vidhata | ਵੈਦਿਕ ਜੋਤਿਸ਼":"Astro Bhagya Vidhata | Vedic Astrology";
+   document.body.childNodes.forEach(node=>translateElement(node,hasPack?base:"en"));
    const notice=document.getElementById("languageNotice");
-   if(notice)notice.textContent=active==="fr"?"Langue de l’application : Français":active==="pa"?"ਐਪ ਦੀ ਭਾਸ਼ਾ: ਪੰਜਾਬੀ":"";
+   if(notice){
+     const labels={"en":"Language: English","en-CA":"Language: English (Canada)","hi":"भाषा: हिन्दी","mr":"भाषा: मराठी","pa":"ਐਪ ਦੀ ਭਾਸ਼ਾ: ਪੰਜਾਬੀ","ur":"زبان: اردو","fr":"Langue : Français","fr-CA":"Langue : Français (Canada)","de":"Sprache: Deutsch","es":"Idioma: Español","pt-BR":"Idioma: Português (Brasil)","ar-SA":"اللغة: العربية (السعودية)","bn":"ভাষা: বাংলা","gu":"ભાષા: ગુજરાતી","ta":"மொழி: தமிழ்","te":"భాష: తెలుగు","kn":"ಭಾಷೆ: ಕನ್ನಡ","ml":"ഭാഷ: മലയാളം","or":"ଭାଷା: ଓଡ଼ିଆ","as":"ভাষা: অসমীয়া"};
+     notice.textContent=hasPack?(labels[active]||"Language selected"):(labels[active]+" — complete translation pack is not available yet; English is shown for now.");
+   }
    try{localStorage.setItem("astro_language",active)}catch(_){}
  }
  let current="en";
@@ -53,7 +58,7 @@
    });
    observer.observe(document.body,{subtree:true,childList:true,characterData:true});
  });
- function setLanguage(lang){current=lang;apply(lang)}
+ function setLanguage(lang){current=supported.has(lang)?lang:"en";apply(current)}
  picker.addEventListener("change",()=>setLanguage(picker.value));
  const saved=(()=>{try{return localStorage.getItem("astro_language")||picker.value||"en"}catch(_){return picker.value||"en"}})();
  picker.value=supported.has(saved)?saved:"en";
