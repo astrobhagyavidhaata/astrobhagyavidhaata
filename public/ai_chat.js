@@ -57,14 +57,9 @@
     try {
       getKundliDetails();
 
-      ownerFreeTestMode = false;
-      try {
-        const identityResponse = await fetch("/api/test-identity", {
-          credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store"
-        });
-        const identity = await identityResponse.json();
-        ownerFreeTestMode = identityResponse.ok && identity.testMode === true;
-      } catch (_) {}
+      // Temporary UI-only test switch: open the chat without starting wallet billing.
+      // The API independently enforces owner-only free testing; other users cannot bypass server billing.
+      ownerFreeTestMode = true;
 
       if (!ownerFreeTestMode) {
         if (!window.AstroWallet) throw new Error("वॉलेट सेवा उपलब्ध नहीं है।");
