@@ -70,10 +70,11 @@
       note.style.cssText="margin:0 0 10px;color:#d4c9e5;font-size:12px;line-height:1.5";
       panel.append(heading,note);
       const table=document.createElement("table"),thead=document.createElement("thead"),trh=document.createElement("tr");
-      ["ग्रह","राशि","भाव","अंश","नक्षत्र","चरण","नक्षत्र स्वामी"].forEach(label=>{const th=document.createElement("th");th.textContent=label;trh.appendChild(th);});
+      ["ग्रह","राशि","राशि स्वामी","भाव","अंश","नक्षत्र","चरण","नक्षत्र स्वामी"].forEach(label=>{const th=document.createElement("th");th.textContent=label;trh.appendChild(th);});
       thead.appendChild(trh);table.appendChild(thead);
       const tbody=document.createElement("tbody");
       const nakshatraLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
+      const rashiLords=["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
       const rows=[["लग्न",chart.d1.ascendant||{}],...Object.entries(chart.d1.planets||{})];
       for(const [planet,p] of rows){
         const degree=Number(p.degreeInRashi);
@@ -82,10 +83,12 @@
         const padaText=Number.isInteger(pada)&&pada>=1&&pada<=4?"चरण "+pada:"—";
         const house=Number(p.house);
         const houseText=Number.isInteger(house)&&house>=1&&house<=12?house+"वाँ":"—";
+        const rashiIndex=Number(p.rashiIndex);
+        const rashiLord=Number.isInteger(rashiIndex)&&rashiIndex>=0&&rashiIndex<12?rashiLords[rashiIndex]:"—";
         const nakshatraIndex=Number(p.nakshatraIndex);
         const nakshatraLord=Number.isInteger(nakshatraIndex)&&nakshatraIndex>=0&&nakshatraIndex<27?nakshatraLords[nakshatraIndex%9]:"—";
         const planetText=planet+(p.retrograde?" ℞":"");
-        const values=[planetText,p.rashi||signs[p.rashiIndex]||"—",houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
+        const values=[planetText,p.rashi||signs[p.rashiIndex]||"—",rashiLord,houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
         const tr=document.createElement("tr");
         values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});
         tbody.appendChild(tr);
