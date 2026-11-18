@@ -39,7 +39,9 @@
     title.textContent = 'जन्म कुंडली';
     title.style.cssText = 'text-align:center;color:#70451d;margin:0 0 8px';
     root.appendChild(title);
-    const names = window.AstroRashis || ['मेष','वृषभ','मिथुन','कर्क','सिंह','कन्या','तुला','वृश्चिक','धनु','मकर','कुंभ','मीन'];
+    const names = ['मेष','वृषभ','मिथुन','कर्क','सिंह','कन्या','तुला','वृश्चिक','धनु','मकर','कुंभ','मीन'];
+    const ascIndex = Number.isInteger(chart.d1.ascendant.rashiIndex) ? chart.d1.ascendant.rashiIndex : names.indexOf(chart.d1.ascendant.rashi);
+    if (ascIndex < 0 || ascIndex > 11) throw new Error('लग्न राशि का index सही नहीं है।');
     const occupants = {};
     for (const [planet, p] of Object.entries(chart.d1.planets || {})) {
       (occupants[p.house] ||= []).push(planet + (p.retrograde ? ' ℞' : ''));
@@ -60,9 +62,10 @@
     border.setAttribute('fill','none'); border.setAttribute('stroke','#875b2b'); border.setAttribute('stroke-width','3'); svg.appendChild(border);
     line(2,2,398,398); line(398,2,2,398);
     line(200,2,398,200); line(398,200,200,398); line(200,398,2,200); line(2,200,200,2);
-    const positions=[[200,78],[300,42],[350,120],[300,200],[350,280],[300,358],[200,322],[100,358],[50,280],[100,200],[50,120],[100,42]];
+    // North Indian chart order: houses advance counter-clockwise from the top (Lagna).
+    const positions=[[200,78],[100,78],[50,145],[50,200],[50,255],[100,322],[200,322],[300,322],[350,255],[350,200],[350,145],[300,78]];
     for(let house=1;house<=12;house++){
-      const [x,y]=positions[house-1], signIndex=(chart.d1.ascendant.rashiIndex+house-1)%12;
+      const [x,y]=positions[house-1], signIndex=(ascIndex+house-1)%12;
       const group=document.createElementNS(ns,'g');
       const label=document.createElementNS(ns,'text');
       label.setAttribute('x',x); label.setAttribute('y',y-19); label.setAttribute('text-anchor','middle'); label.setAttribute('font-size','11'); label.setAttribute('fill','#9a6b35'); label.textContent=String(house);
