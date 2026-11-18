@@ -168,7 +168,7 @@
     heading.textContent="षोडश वर्ग कुंडलियाँ — उत्तर भारतीय शैली";
     root.appendChild(heading);
     const charts=chart.vargas||{};
-    const entries=Object.entries(charts).filter(([key])=>key!=="D1"&&key!=="D9");
+    const entries=Object.entries(charts);
     if(!entries.length){
       const p=document.createElement("p");p.className="chat-info";
       p.textContent="इस जन्म विवरण के लिए विभाजित कुंडली डेटा उपलब्ध नहीं है।";
