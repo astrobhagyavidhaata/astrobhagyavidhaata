@@ -166,8 +166,13 @@
 
     <section class="panel">
       <h2>🪐 आज का ग्रह गोचर</h2>
-      <label for="rashiSelect">अपनी चंद्र राशि चुनें</label>
+      <label for="rashiSelect">अपनी जन्म चंद्र राशि चुनें</label>
       <select id="rashiSelect">
+        <option value="मेष">मेष</option><option value="वृषभ">वृषभ</option><option value="मिथुन">मिथुन</option><option value="कर्क">कर्क</option><option value="सिंह">सिंह</option><option value="कन्या">कन्या</option><option value="तुला">तुला</option><option value="वृश्चिक">वृश्चिक</option><option value="धनु">धनु</option><option value="मकर">मकर</option><option value="कुंभ">कुंभ</option><option value="मीन">मीन</option>
+      </select>
+      <label for="lagnaSelect">अपना जन्म लग्न चुनें (वैकल्पिक)</label>
+      <select id="lagnaSelect">
+        <option value="">केवल चंद्र राशि से देखें</option>
         <option value="मेष">मेष</option><option value="वृषभ">वृषभ</option><option value="मिथुन">मिथुन</option><option value="कर्क">कर्क</option><option value="सिंह">सिंह</option><option value="कन्या">कन्या</option><option value="तुला">तुला</option><option value="वृश्चिक">वृश्चिक</option><option value="धनु">धनु</option><option value="मकर">मकर</option><option value="कुंभ">कुंभ</option><option value="मीन">मीन</option>
       </select>
       <div id="rashiGocharOut" class="chat-info" aria-live="polite"></div>
