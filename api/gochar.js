@@ -20,7 +20,8 @@ module.exports = async function handler(req, res) {
   }
 
   const rashi = String(req.query?.rashi || "");
-  if (!RASHIS.includes(rashi)) {
+  const lagna = String(req.query?.lagna || "");
+  if (!RASHIS.includes(rashi) || (lagna && !RASHIS.includes(lagna))) {
     return res.status(400).json({success:false,message:"मान्य राशि चुनें।"});
   }
 
@@ -28,10 +29,12 @@ module.exports = async function handler(req, res) {
     const now = new Date();
     const positions = calculateSiderealPositions(now, 0, 0);
     const baseSignIndex = RASHIS.indexOf(rashi);
+    const lagnaSignIndex = lagna ? RASHIS.indexOf(lagna) : null;
 
     const planets = Object.entries(positions.planets).map(([name, planet]) => {
       const pos = getPosition(planet.longitude);
-      const house = ((pos.rashiIndex - baseSignIndex + 12) % 12) + 1;
+      const moonHouse = ((pos.rashiIndex - baseSignIndex + 12) % 12) + 1;
+      const lagnaHouse = lagnaSignIndex === null ? null : ((pos.rashiIndex - lagnaSignIndex + 12) % 12) + 1;
       return {
         name,
         rashi: pos.rashi,
@@ -40,7 +43,9 @@ module.exports = async function handler(req, res) {
         nakshatra: pos.nakshatra,
         pada: pos.pada,
         navamsa: pos.navamsa,
-        house,
+        house: moonHouse,
+        moonHouse,
+        lagnaHouse,
         retrograde: Boolean(planet.retrograde)
       };
     });
@@ -57,11 +62,12 @@ module.exports = async function handler(req, res) {
       success:true,
       asOf:now.toISOString(),
       basisRashi:rashi,
+      basisLagna:lagna || null,
       ayanamsa:"लाहिड़ी (वर्तमान कोड में अनुमानित)",
       houseSystem:"Whole Sign / राशि आधारित",
       planets,
       transit:lines.join("\n"),
-      note:"यह वर्तमान ग्रह-स्थिति आधारित सामान्य गोचर है। लग्न/चंद्र राशि से भाव बदलते हैं। अयनांश अभी अनुमानित है; व्यावसायिक उपयोग से पहले प्रमाणित पंचांग/एपhemeris से मिलान आवश्यक है।"
+      note:"भाव राशि-आधारित Whole Sign पद्धति से निकाले गए हैं। चंद्र राशि और लग्न दोनों देने पर दोनों से गोचर भाव अलग-अलग दिखते हैं। अयनांश अभी अनुमानित है; व्यावसायिक उपयोग से पहले प्रमाणित पंचांग/ephemeris से मिलान आवश्यक है।"
     });
   } catch (error) {
     console.error("Gochar API failed:", error);
