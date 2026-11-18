@@ -33,7 +33,7 @@
     output.replaceChildren();
 
     const heading = document.createElement("b");
-    heading.textContent = data.basisRashi + " राशि से आज का गोचर";
+    heading.textContent = data.basisRashi + " चंद्र राशि" + (data.basisLagna ? " और " + data.basisLagna + " लग्न" : "") + " से आज का गोचर";
     const stamp = document.createElement("p");
     stamp.textContent = "गणना समय: " + new Date(data.asOf).toLocaleString("hi-IN") +
       " | अयनांश: " + data.ayanamsa;
