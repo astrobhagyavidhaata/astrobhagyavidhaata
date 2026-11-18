@@ -12,6 +12,7 @@
     "https://geocoding-api.open-meteo.com/v1/search";
 
   const API_ENDPOINT = "/api/kundli";
+  const signNames = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
 
   const $ = (id) => document.getElementById(id);
 
@@ -40,7 +41,6 @@
     title.textContent = 'Birth Chart';
     title.style.cssText = 'text-align:center;color:#70451d;font-size:16px;font-weight:600;margin:0 0 8px';
     root.appendChild(title);
-    const signNames = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
     const names = signNames;
     const ascIndex = Number.isInteger(chart.d1.ascendant.rashiIndex) ? chart.d1.ascendant.rashiIndex : names.indexOf(chart.d1.ascendant.rashi);
     if (ascIndex < 0 || ascIndex > 11) throw new Error('Invalid ascendant sign index.');
