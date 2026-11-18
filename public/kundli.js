@@ -98,7 +98,7 @@
       const card=document.createElement("section");
       card.style.cssText="border:1px solid rgba(220,190,130,.35);border-radius:12px;padding:12px;min-width:0;background:rgba(20,16,32,.45)";
       const title=document.createElement("h4");
-      title.textContent=key+" — "+varga.name+" | लग्न "+varga.ascendant.rashi;
+      title.textContent=key+" — "+varga.name+" | Ascendant "+String(varga.ascendant.rashiIndex + 1);
       card.appendChild(title);
       const grid=document.createElement("div");
       grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px";
@@ -111,7 +111,7 @@
         const cell=document.createElement("div");
         cell.style.cssText="min-height:72px;padding:6px;border-radius:7px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);font-size:12px;overflow-wrap:anywhere";
         const houseLabel=document.createElement("strong");
-        houseLabel.textContent="House "+house;
+        houseLabel.textContent=String(house);
         const signLabel=document.createElement("div");
         signLabel.textContent=String(signIndex + 1);
         const planetLabel=document.createElement("div");
@@ -317,13 +317,13 @@
       }
 
       if (!response.ok) {
-        throw new Error("कुंडली सर्वर से संपर्क नहीं हो पाया।");
+        throw new Error("Unable to contact the chart server.");
       }
 
       const result = await response.json();
 
       if (!result || result.success !== true || !result.chart) {
-        throw new Error("सर्वर से सही कुंडली प्राप्त नहीं हुई।");
+        throw new Error("The server did not return a valid birth chart.");
       }
 
       const chart = result.chart;
@@ -337,7 +337,7 @@
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
 
-      showMessage((result.message || "कुंडली गणना पूरी हुई।") + (result.savedKundliId ? " आपकी कुंडली खाते में सुरक्षित हो गई।" : (details.saveToAccount ? " कुंडली सुरक्षित नहीं हो सकी; लॉगिन और सर्वर सेटिंग जाँचें।" : "")));
+      showMessage((result.message || "Birth chart calculation completed.") + (result.savedKundliId ? " Your birth chart has been saved to your account." : (details.saveToAccount ? " The birth chart could not be saved. Check login and server settings." : "")));
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
       if (result.savedKundliId && window.loadKundliHistory) window.loadKundliHistory();
 
@@ -377,7 +377,7 @@
         button.textContent = "जाँच हो रही है...";
       }
 
-      showMessage("जन्मस्थान खोजा जा रहा है...");
+      showMessage("Searching birth place...");
 
       const cached = selectedBirthPlace && selectedBirthPlace.label === details.place
         ? selectedBirthPlace
@@ -404,7 +404,7 @@
 
         showLocationChoices(results, async selected => {
           try {
-            showMessage("जन्मस्थान की पुष्टि हो रही है...");
+            showMessage("Confirming birth place...");
 
             await generateKundli(details, selected);
 
