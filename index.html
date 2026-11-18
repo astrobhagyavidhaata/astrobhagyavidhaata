@@ -97,25 +97,16 @@
   <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
   <main>
     <section class="panel">
-      <h2>📱 मोबाइल OTP लॉगिन</h2>
-      <p id="loginState" class="chat-info">लॉगिन स्थिति जाँची जा रही है…</p>
-      <div id="loginFields">
-        <form id="loginForm">
-          <label for="loginPhone">मोबाइल नंबर</label>
-          <input id="loginPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 अंकों का मोबाइल नंबर" maxlength="16" required>
-          
-          <button id="sendOtpButton" type="button">OTP भेजें</button>
-          <div id="otpRow" style="display:none">
-            <label for="loginOtp">6 अंकों का OTP</label>
-            <input id="loginOtp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="OTP लिखें">
-            <button id="verifyOtpButton" type="submit">लॉगिन करें</button>
-          </div>
-        </form>
+      <h2>👤 बिना OTP गेस्ट लॉगिन</h2>
+      <p id="loginState" class="chat-info">गेस्ट अकाउंट की स्थिति जाँची जा रही है…</p>
+      <div id="guestConsentWrap">
+        <label style="display:flex;align-items:flex-start;gap:9px;line-height:1.6">
+          <input id="guestConsent" type="checkbox" style="width:auto;flex:0 0 auto;margin-top:4px">
+          <span>मैंने <a href="/TERMS.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Terms &amp; Conditions</a> और <a href="/PRIVACY.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Privacy Policy</a> पढ़ ली है और सहमत हूँ। मैं समझता/समझती हूँ कि गेस्ट अकाउंट इस ब्राउज़र/डिवाइस से जुड़ा रहेगा; ब्राउज़र डेटा मिटाने या डिवाइस बदलने पर अकाउंट और वॉलेट वापस पाना संभव न हो।</span>
+        </label>
       </div>
-      <div id="loggedInBox" style="display:none">
-        <p class="chat-info">लॉगिन मोबाइल: <strong id="loggedInPhone"></strong></p>
-        <button id="logoutButton" type="button" class="secondary">लॉगआउट</button>
-      </div>
+      <button id="guestContinueButton" type="button">बिना OTP जारी रखें</button>
+      <p class="chat-info">गेस्ट अकाउंट बनने के बाद लॉगआउट न करें और ऐप का ब्राउज़र डेटा न मिटाएँ। वॉलेट, रिचार्ज और चैट इसी गेस्ट अकाउंट से जुड़े रहेंगे।</p>
       <div id="authMessage" role="status" aria-live="polite"></div>
     </section>
     <section class="panel">
