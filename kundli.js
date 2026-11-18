@@ -130,7 +130,7 @@
       throw new Error("कृपया सभी जन्म विवरण भरें।");
     }
 
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(details.date)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(details.date)) {
       throw new Error("कृपया जन्म तारीख कैलेंडर से चुनें।");
     }
     const [year, month, day] = details.date.split("-").map(Number);
