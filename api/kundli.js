@@ -6,6 +6,7 @@ const { calculateSiderealPositions } = require("../lib/ephemeris");
 const { buildChart } = require("../lib/chart-engine");
 const { getVimshottariDasha, getCompleteTaraChart, getTaraFromMoonLongitudes } = require("../lib/astrology-engine");
 const { getAuthenticatedUser, serviceFetch } = require("../lib/supabase");
+const { calculateAshtakavarga } = require("../lib/ashtakavarga");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
@@ -31,6 +32,7 @@ module.exports = async function handler(req, res) {
 
     const positions = calculateSiderealPositions(birthUtc, lat, lon);
     const chart = buildChart(positions.ascendantLongitude, positions.planets);
+    const ashtakavarga = calculateAshtakavarga(positions.planets, chart.d1.ascendant.rashiIndex);
     const dasha = getVimshottariDasha(birthUtc, positions.planets.चंद्र.longitude);
     const taraChart = getCompleteTaraChart(
       require("../lib/astrology-engine").getNakshatraFromLongitude(positions.planets.चंद्र.longitude).index
@@ -55,6 +57,7 @@ module.exports = async function handler(req, res) {
         accuracyNote:"Uses a linear Lahiri ayanamsa approximation and mean lunar node; this is not a Swiss Ephemeris-certified result."
       },
       ...chart,
+      ashtakavarga,
       dasha,
       taraChart,
       currentTaraBala
