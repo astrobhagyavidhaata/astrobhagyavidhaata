@@ -40,6 +40,19 @@
     .app-folder{display:block;margin:14px 0;border:1px solid #70558e;border-radius:12px;background:#181326;padding:12px}
     .app-folder>summary{cursor:pointer;color:#f5d994;font-weight:bold;font-size:16px;padding:5px;list-style-position:inside}
     .app-folder[open]>summary{margin-bottom:12px}
+    .chart-view-toolbar{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;margin:10px 0 12px;padding-bottom:5px}
+    .chart-view-btn{flex:0 0 auto;width:auto;margin:0;padding:10px 13px;border:1px solid #70558e;border-radius:9px;background:#302342;color:#f5d994;font-size:13px}
+    .chart-view-btn.active{background:#e8b957;color:#211638;border-color:#e8b957}
+    .chart-cards{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 1px 12px;-webkit-overflow-scrolling:touch}
+    .chart-card{flex:0 0 min(78vw,290px);min-width:240px;scroll-snap-align:start;border:1px solid #70558e;border-radius:12px;padding:10px;background:#181326;overflow:hidden}
+    .chart-card h3{margin:2px 0 8px;text-align:center;font-size:15px}
+    .chart-card svg{display:block;width:100%;height:auto;background:#fffaf0;border-radius:7px}
+    .chart-card .chart-asc{margin:8px 0 0;text-align:center;color:#f5d994;font-size:12px}
+    .nakshatra-panel{overflow-x:auto;margin:8px 0 12px;border:1px solid #70558e;border-radius:10px;padding:9px;background:#181326}
+    .nakshatra-panel table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+    .nakshatra-panel th,.nakshatra-panel td{padding:8px 7px;text-align:left;border-bottom:1px solid #493568}
+    .nakshatra-panel th{color:#f5c66b}
+    .nakshatra-panel[hidden]{display:none}
     .chart-item{margin:9px 0;border:1px solid #66547f;border-radius:9px;padding:10px;background:#211a32}
     .chart-item>summary{cursor:pointer;color:#f5d994;font-weight:bold;list-style-position:inside}
     .chart-item[open]>summary{margin-bottom:10px}
@@ -76,7 +89,7 @@
   </style>
 </head>
 <body>
-  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"><details class="app-folder" id="kundliChartsFolder"><summary>📁 Shodashvarga Kundli (16 Charts)</summary><div id="mainChartSlot"></div><div id="kTxt" aria-hidden="true"></div><div id="vargaCharts"></div></details></div></div></div></header>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"><details class="app-folder" id="kundliChartsFolder"><summary>📁 Shodashvarga Kundli (16 Charts)</summary><div id="vargaCharts"></div></details></div></div></div></header>
   <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
   <main>
     <section class="panel">
@@ -112,7 +125,7 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel" hidden></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
     <section class="panel">
