@@ -48,7 +48,7 @@
     .support-link{display:block;text-align:center;text-decoration:none;padding:13px 10px;border-radius:9px;background:#e8b957;color:#211638;font-weight:bold}
     .support-link.whatsapp{background:#1f8f5f;color:#fff}
     .support-note{color:#d4c9e5;font-size:14px;line-height:1.7}
-    .legal-details{margin-top:14px;border:1px solid #66547f;border-radius:10px;padding:12px;background:#181326}
+    #birthPlaceSuggestions button{display:block;width:100%;margin:0;padding:11px 12px;text-align:left;border-radius:0;background:#211a32;color:#fff;border-bottom:1px solid #493568;font-weight:normal}\n    .legal-details{margin-top:14px;border:1px solid #66547f;border-radius:10px;padding:12px;background:#181326}
     .legal-details summary{color:#f5d994;font-weight:bold;cursor:pointer;list-style-position:inside}
     .legal-details[open] summary{margin-bottom:10px}
     .support-topics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
@@ -90,7 +90,7 @@
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="dob">जन्म तारीख</label><input id="dob" name="dob" type="date" required>
         <label for="birthTime">जन्म समय</label><input id="birthTime" name="birthTime" type="time" required>
-        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव का नाम" maxlength="150" required>
+        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
         <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली मेरे लॉगिन खाते में सुरक्षित करें</label>
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
