@@ -145,12 +145,32 @@
       const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
       const header=document.createElement("tr");["महादशा","आरंभ","समाप्ति","अंतर्दशाएँ"].forEach(v=>{const th=document.createElement("th");th.textContent=v;th.style.cssText="text-align:left;padding:7px;color:#f5d994";header.appendChild(th);});table.appendChild(header);
       const fmt=v=>v?new Date(v).toLocaleDateString("hi-IN"):"—";
+      const appendPeriodBar=(host,periods,label)=>{
+        const valid=(periods||[]).map(period=>({...period,startMs:new Date(period.start).getTime(),endMs:new Date(period.end).getTime()}))
+          .filter(period=>Number.isFinite(period.startMs)&&Number.isFinite(period.endMs)&&period.endMs>period.startMs);
+        if(!valid.length)return;
+        const wrap=document.createElement("div");wrap.style.cssText="margin:10px 0 14px;overflow-x:auto";
+        const caption=document.createElement("p");caption.textContent=label;caption.style.cssText="margin:0 0 6px;color:#f5d994;font-size:12px;font-weight:700";wrap.appendChild(caption);
+        const track=document.createElement("div");track.style.cssText="display:flex;gap:3px;min-width:max-content;align-items:stretch";
+        const total=valid[valid.length-1].endMs-valid[0].startMs;
+        valid.forEach(period=>{
+          const segment=document.createElement("div");
+          const share=Math.max(5,((period.endMs-period.startMs)/total)*100);
+          segment.style.cssText="flex:0 0 "+share+"%;min-width:64px;max-width:220px;box-sizing:border-box;padding:7px 5px;border:1px solid #80633d;border-radius:6px;background:#30243e;text-align:center;white-space:normal";
+          const planet=document.createElement("strong");planet.textContent=period.planet||"—";planet.style.cssText="display:block;color:#f5d994;font-size:11px";
+          const dates=document.createElement("small");dates.textContent=fmt(period.start)+" – "+fmt(period.end);dates.style.cssText="display:block;color:#d4c9e5;font-size:9px;margin-top:3px";
+          segment.append(planet,dates);track.appendChild(segment);
+        });
+        wrap.appendChild(track);host.appendChild(wrap);
+      };
+      appendPeriodBar(timeline,dasha.mahadashas||[],"महादशाओं की दृश्य समय-रेखा");
       (dasha.mahadashas||[]).forEach(md=>{
         const row=document.createElement("tr");
         [md.planet,fmt(md.start),fmt(md.end),(md.antardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:7px;border-top:1px solid #493568";row.appendChild(td);});table.appendChild(row);
         const item=document.createElement("details");item.className="chart-item";
         const sum=document.createElement("summary");sum.textContent=md.planet+" महादशा की अंतर्दशा और प्रत्यंतरदशा";item.appendChild(sum);
         const sub=document.createElement("div");sub.style.cssText="overflow-x:auto";
+        appendPeriodBar(sub,md.antardashas||[],"इस महादशा की अंतर्दशाएँ");
         const subTable=document.createElement("table");subTable.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
         const subHead=document.createElement("tr");["अंतर्दशा","आरंभ","समाप्ति","प्रत्यंतरदशाएँ"].forEach(v=>{const th=document.createElement("th");th.textContent=v;th.style.cssText="text-align:left;padding:6px;color:#f5d994";subHead.appendChild(th);});subTable.appendChild(subHead);
         (md.antardashas||[]).forEach(ad=>{const ar=document.createElement("tr");[ad.planet,fmt(ad.start),fmt(ad.end),(ad.pratyantardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:6px;border-top:1px solid #493568";ar.appendChild(td);});subTable.appendChild(ar);
