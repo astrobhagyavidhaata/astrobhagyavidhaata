@@ -22,8 +22,8 @@ These Terms govern access to the Astro Bhagya Vidhata website, application, kund
 4. Features may be added, changed, suspended or discontinued. We will endeavour to communicate material changes that affect paid services or customer balances.
 
 ## 3. Consultation price and minute billing
-1. The advertised consultation price is **₹5 per minute**, unless a different price is clearly shown and accepted before a session starts.
-2. Before starting, the app will show the applicable rate and the amount required to begin. At the current planned rate, the first minute is charged when the session starts. Each further complete minute is charged at ₹5. The exact start time, charge entries and stop time will be recorded in the account ledger.
+1. The advertised consultation price is **₹5 per minute**, unless a different price is clearly shown and accepted before a session starts. Each new eligible account receives only one first-minute free trial; after that, ₹5 per minute is deducted from the prepaid wallet. The app must clearly show the free-trial status and billing rate before the consultation starts.
+2. Before starting, the app will show the applicable rate and the amount required to begin. For a user who has not used the trial, the first minute is free once per account; after that, each billable minute is charged at ₹5. For accounts that have already used the trial, paid billing applies from the start of the next consultation. The exact start time, charge entries and stop time will be recorded in the account ledger.
 3. The app will not start a paid session without the required available wallet balance. A session should stop when the next minute cannot be paid, when either party ends it, or when a technical/security limit requires it to stop.
 4. The browser timer is only a display/request mechanism. The server-side ledger is the source of truth for charges. We will show the customer the session duration and corresponding deductions.
 5. A session must not continue charging after it has ended. If a technical fault causes an incorrect or duplicate debit, contact support with the transaction/session reference so it can be investigated and corrected where appropriate.
@@ -70,10 +70,10 @@ The platform software, branding, design, original written material and compilati
 Our Privacy Policy explains the personal information we collect, why we use it, service providers involved, retention, security and your available rights. It forms part of these Terms. Please read it before registering. Birth details and consultation content can be sensitive in practice; submit only information you are comfortable sharing and only information you are authorised to provide.
 
 ## 10. Third-party services and availability
-OTP delivery, hosting, AI processing and payments may depend on third-party providers. Their services may occasionally be delayed or unavailable. We remain responsible for our own obligations under applicable law and will provide a support route for payment and service issues. Third-party terms may also apply to your use of their services.
+Guest accounts may be created without a phone number or OTP. A guest account is tied to the browser/device session and may not be recoverable if the user clears browser data, loses the device or changes devices. Users should preserve their session and should not log out. OTP delivery (if reintroduced), hosting, AI processing and payments may depend on third-party providers. Their services may occasionally be delayed or unavailable. We remain responsible for our own obligations under applicable law and will provide a support route for payment and service issues. Third-party terms may also apply to your use of their services.
 
 ## 11. Complaints and grievance contact
-Customers may contact support by email at amitdiksha975695@gmail.com or by phone/WhatsApp at +91 82080 91073. A complaint should include the registered mobile number (masked where possible), date/time, and transaction or consultation reference. Do not email OTPs, passwords, full card details or UPI PINs.
+Customers may contact support by email at amitdiksha975695@gmail.com or by phone/WhatsApp at +91 82080 91073. A complaint should include the guest/account reference where available, date/time, and transaction or consultation reference. Do not include passwords or authentication tokens. Do not email OTPs, passwords, full card details or UPI PINs.
 
 **Support email:** amitdiksha975695@gmail.com  
 **Support phone / WhatsApp:** +91 82080 91073  
