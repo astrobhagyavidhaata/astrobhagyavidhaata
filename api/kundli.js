@@ -21,13 +21,13 @@ module.exports = async function handler(req, res) {
         !/^\d{2}:\d{2}$/.test(String(body.birthTime || "")) ||
         !Number.isFinite(lat) || !Number.isFinite(lon) ||
         Math.abs(lat)>90 || Math.abs(lon)>180) {
-      return res.status(400).json({success:false,message:"जन्म तारीख, समय और सही जन्मस्थान आवश्यक हैं।"});
+      return res.status(400).json({success:false,message:"Birth date, time, and a valid birth place are required."});
     }
     const zone = tzLookup(lat, lon);
     const local = DateTime.fromISO(body.birthDate+"T"+body.birthTime, {zone});
-    if (!local.isValid) return res.status(400).json({success:false,message:"जन्म तारीख या समय सही नहीं है।"});
+    if (!local.isValid) return res.status(400).json({success:false,message:"Birth date or time is invalid."});
     const birthUtc = local.toUTC().toJSDate();
-    if (birthUtc.getTime() > Date.now()) return res.status(400).json({success:false,message:"जन्म समय भविष्य का नहीं हो सकता।"});
+    if (birthUtc.getTime() > Date.now()) return res.status(400).json({success:false,message:"Birth time cannot be in the future."});
 
     const positions = calculateSiderealPositions(birthUtc, lat, lon);
     const chart = buildChart(positions.ascendantLongitude, positions.planets);
@@ -47,7 +47,7 @@ module.exports = async function handler(req, res) {
         ayanamsaDegrees:positions.ayanamsa,
         houseSystem:"whole_sign",
         ephemeris:"Astronomy Engine",
-        accuracyNote:"यह Lahiri अयनांश का रैखिक अनुमान और mean lunar node उपयोग करता है; इसे Swiss Ephemeris-प्रमाणित परिणाम न मानें।"
+        accuracyNote:"Uses a linear Lahiri ayanamsa approximation and mean lunar node; this is not a Swiss Ephemeris-certified result."
       },
       ...chart,
       dasha,
@@ -63,7 +63,7 @@ module.exports = async function handler(req, res) {
             headers:{Prefer:"return=representation"},
             body:JSON.stringify({
               user_id:user.id,
-              title:(result.name||"जन्म कुंडली")+" - "+result.birth.localDate,
+              title:(result.name||"Birth Chart")+" - "+result.birth.localDate,
               birth_details:{name:result.name,...result.birth},
               chart_data:result
             })
@@ -76,12 +76,12 @@ module.exports = async function handler(req, res) {
     }
     return res.status(200).json({
       success:true,
-      message:"जन्म विवरण के आधार पर प्रारंभिक कुंडली गणना पूरी हुई।",
+      message:"Initial birth chart calculation completed.",
       savedKundliId,
       chart:result
     });
   } catch (error) {
     console.error("Kundli calculation failed:", error);
-    return res.status(500).json({success:false,message:"कुंडली गणना में समस्या आई। जन्म विवरण जाँचकर दोबारा प्रयास करें।"});
+    return res.status(500).json({success:false,message:"Kundli calculation failed. Check the birth details and try again."});
   }
 };
