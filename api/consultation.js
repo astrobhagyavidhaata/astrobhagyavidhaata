@@ -50,28 +50,41 @@ module.exports=async function(req,res){
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
     const now=Date.now(),last=recentRequests.get(user.id)||0;
     if(now-last<3000)return res.status(429).json({success:false,message:"अगला प्रश्न भेजने से पहले कुछ सेकंड रुकें।"});
-    const active=await activeConsultation(user.id);
-    if(!active)return res.status(402).json({success:false,message:"पहले वॉलेट से ₹5 प्रति मिनट का परामर्श शुरू करें।"});
-    const billing=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
-    if(billing.consultation?.status!=="active")return res.status(402).json({success:false,message:"वॉलेट बैलेंस पूरा हो गया है। परामर्श रोक दिया गया।"});
+
+    // Free testing is restricted to the server-configured, Supabase-authenticated owner email.
+    // Never trust a client-supplied test flag, email, or user ID.
+    const configuredOwnerEmail=String(process.env.AI_FREE_TEST_OWNER_EMAIL||"").trim().toLowerCase();
+    const isOwnerFreeTest=!!configuredOwnerEmail&&String(user.email||"").trim().toLowerCase()===configuredOwnerEmail;
+    let active=null;
+    if(!isOwnerFreeTest){
+      active=await activeConsultation(user.id);
+      if(!active)return res.status(402).json({success:false,message:"पहले वॉलेट से ₹5 प्रति मिनट का परामर्श शुरू करें।"});
+      const billing=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
+      if(billing.consultation?.status!=="active")return res.status(402).json({success:false,message:"वॉलेट बैलेंस पूरा हो गया है। परामर्श रोक दिया गया।"});
+    }
+
     recentRequests.set(user.id,now);
     const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
     const chartContext=compactChartContext(liveChartContext);
     const history=Array.isArray(body.conversationHistory)?body.conversationHistory.slice(-10):[];
-    try{
-      await serviceFetch("/chat_messages",{
-        method:"POST",headers:{Prefer:"return=minimal"},
-        body:JSON.stringify({user_id:user.id,consultation_id:active.id,role:"user",content:question.trim()})
-      });
-    }catch(saveError){console.warn("User message save skipped:",saveError.message);}
+    if(active){
+      try{
+        await serviceFetch("/chat_messages",{
+          method:"POST",headers:{Prefer:"return=minimal"},
+          body:JSON.stringify({user_id:user.id,consultation_id:active.id,role:"user",content:question.trim()})
+        });
+      }catch(saveError){console.warn("User message save skipped:",saveError.message);}
+    }
     const answer=await askGemini({question:question.trim(),chartContext,conversationHistory:history});
-    try{
-      await serviceFetch("/chat_messages",{
-        method:"POST",headers:{Prefer:"return=minimal"},
-        body:JSON.stringify({user_id:user.id,consultation_id:active.id,role:"assistant",content:answer})
-      });
-    }catch(saveError){console.warn("Assistant message save skipped:",saveError.message);}
-    return res.status(200).json({success:true,answer});
+    if(active){
+      try{
+        await serviceFetch("/chat_messages",{
+          method:"POST",headers:{Prefer:"return=minimal"},
+          body:JSON.stringify({user_id:user.id,consultation_id:active.id,role:"assistant",content:answer})
+        });
+      }catch(saveError){console.warn("Assistant message save skipped:",saveError.message);}
+    }
+    return res.status(200).json({success:true,answer,testMode:isOwnerFreeTest});
   }catch(error){
     console.error("Consultation API error:",error.message);
     return res.status(503).json({success:false,message:"परामर्श सेवा अभी कॉन्फ़िगर नहीं है। कृपया बाद में प्रयास करें।"});
