@@ -4,7 +4,7 @@ const { DateTime } = require("luxon");
 const tzLookup = require("tz-lookup");
 const { calculateSiderealPositions } = require("../lib/ephemeris");
 const { buildChart } = require("../lib/chart-engine");
-const { getVimshottariDasha, getCompleteTaraChart } = require("../lib/astrology-engine");
+const { getVimshottariDasha, getCompleteTaraChart, getTaraFromMoonLongitudes } = require("../lib/astrology-engine");
 const { getAuthenticatedUser, serviceFetch } = require("../lib/supabase");
 
 module.exports = async function handler(req, res) {
@@ -35,6 +35,11 @@ module.exports = async function handler(req, res) {
     const taraChart = getCompleteTaraChart(
       require("../lib/astrology-engine").getNakshatraFromLongitude(positions.planets.चंद्र.longitude).index
     );
+    const currentPositions = calculateSiderealPositions(new Date(), lat, lon);
+    const currentTaraBala = getTaraFromMoonLongitudes(
+      positions.planets.चंद्र.longitude,
+      currentPositions.planets.चंद्र.longitude
+    );
     const result = {
       name: String(body.name || "").trim().slice(0,100),
       birth: {
@@ -51,7 +56,8 @@ module.exports = async function handler(req, res) {
       },
       ...chart,
       dasha,
-      taraChart
+      taraChart,
+      currentTaraBala
     };
     let savedKundliId=null;
     if(body.saveToAccount===true){
