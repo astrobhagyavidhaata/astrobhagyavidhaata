@@ -102,6 +102,64 @@
     });
   }
 
+  function renderAstrologyCalculations(chart) {
+    const root=$("jyotishCalculations");
+    if(!root)return;
+    root.replaceChildren();
+    const makeFolder=(title,id)=>{const d=document.createElement("details");d.className="chart-item";const s=document.createElement("summary");s.textContent=title;d.id=id;d.appendChild(s);root.appendChild(d);return d;};
+    const addNote=(host,message)=>{const p=document.createElement("p");p.className="chat-info";p.textContent=message;host.appendChild(p);};
+    const tara=makeFolder("1. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");
+    const current=chart.currentTaraBala;
+    if(current){
+      const p=document.createElement("p");p.className="chat-info";
+      p.textContent="जन्म नक्षत्र: "+current.birthNakshatra+" | वर्तमान चंद्र नक्षत्र: "+current.transitNakshatra+" | गिनती: "+current.countFromBirth+" | "+current.name+" ("+current.nature+")";
+      tara.appendChild(p);
+    } else addNote(tara,"वर्तमान गोचर तारा-बल का डेटा उपलब्ध नहीं है।");
+    const taraRows=Array.isArray(chart.taraChart)?chart.taraChart:[];
+    if(taraRows.length){
+      const table=document.createElement("div");table.className="nakshatra-panel";
+      const t=document.createElement("table");
+      const head=document.createElement("tr");
+      ["नक्षत्र","जन्म से क्रम","तारा","स्वभाव"].forEach(v=>{const th=document.createElement("th");th.textContent=v;head.appendChild(th);});
+      t.appendChild(head);
+      taraRows.forEach(row=>{const tr=document.createElement("tr");[row.nakshatra,row.countFromBirth,row.name,row.nature].forEach(v=>{const td=document.createElement("td");td.textContent=String(v??"—");tr.appendChild(td);});t.appendChild(tr);});
+      table.appendChild(t);tara.appendChild(table);
+    } else addNote(tara,"नवतारा तालिका की गणना उपलब्ध नहीं है।");
+
+    const dashaFolder=makeFolder("2. महादशा – अंतर्दशा – प्रत्यंतरदशा","vimshottariFolder");
+    const dasha=chart.dasha;
+    if(dasha){
+      const active=dasha.current||{};
+      const p=document.createElement("p");p.className="chat-info";
+      p.textContent="वर्तमान दशा: "+(active.mahadasha||"—")+" महादशा / "+(active.antardasha||"—")+" अंतर्दशा / "+(active.pratyantardasha||"—")+" प्रत्यंतरदशा";
+      dashaFolder.appendChild(p);
+      const dates=document.createElement("p");dates.className="chat-info";
+      dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString():"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString():"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString():"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString():"—");
+      dashaFolder.appendChild(dates);
+      (dasha.mahadashas||[]).forEach(md=>{
+        const item=document.createElement("details");item.className="chart-item";
+        const sum=document.createElement("summary");
+        sum.textContent=md.planet+" महादशा — "+new Date(md.start).toLocaleDateString()+" से "+new Date(md.end).toLocaleDateString();
+        item.appendChild(sum);
+        (md.antardashas||[]).forEach(ad=>{
+          const adDetails=document.createElement("details");adDetails.className="chart-item";
+          const adSum=document.createElement("summary");
+          adSum.textContent=ad.planet+" अंतर्दशा — "+new Date(ad.start).toLocaleDateString()+" से "+new Date(ad.end).toLocaleDateString();
+          adDetails.appendChild(adSum);
+          const pd=document.createElement("p");pd.className="chat-info";
+          pd.textContent=(ad.pratyantardashas||[]).map(x=>x.planet+": "+new Date(x.start).toLocaleDateString()+"–"+new Date(x.end).toLocaleDateString()).join(" | ");
+          adDetails.appendChild(pd);item.appendChild(adDetails);
+        });
+        dashaFolder.appendChild(item);
+      });
+    } else addNote(dashaFolder,"विंशोत्तरी दशा डेटा उपलब्ध नहीं है।");
+
+    const ashtak=makeFolder("3. अष्टकवर्ग (भिन्नाष्टकवर्ग / सर्वाष्टकवर्ग)","ashtakavargaFolder");
+    addNote(ashtak,"अष्टकवर्ग के वास्तविक बिंदु अभी गणना इंजन में उपलब्ध नहीं हैं। सही BAV और SAV गणना जुड़ने तक यहाँ कोई काल्पनिक अंक नहीं दिखाए जाएँगे।");
+    const strength=makeFolder("4. षड्बल और भावबल","shadbalaFolder");
+    addNote(strength,"षड्बल और भावबल की शास्त्रीय गणना अभी पूरी तरह लागू नहीं है। सत्यापित गणना जुड़ने के बाद ही ग्रहों और भावों के बल दिखाए जाएँगे।");
+  }
+
   function renderVargaCharts(chart) {
     const root=$("vargaCharts");
     if(!root)return;
@@ -350,6 +408,7 @@
       window.AstroKundli = chart;
       renderMainKundliChart(chart);
       renderVargaCharts(chart);
+      renderAstrologyCalculations(chart);
       const hiddenText = $('kTxt');
       if (hiddenText) hiddenText.textContent = '';
 
