@@ -12,7 +12,7 @@ This Policy describes how Astro Bhagya Vidhata proposes to handle information wh
 
 ## 1. Information we may collect
 Depending on the features you use, information may include:
-- **Account and verification:** mobile number, OTP verification status, account ID and account security events. OTP codes should be used for verification and must not be stored as readable long-term account data.
+- **Account and verification:** a unique guest account ID, session/authentication tokens stored in secure HttpOnly cookies, account security events and, only if a user later links an identity, the relevant email or mobile verification status. The guest flow does not require a phone number or OTP. Authentication tokens must never be exposed in page text or stored as readable long-term records.
 - **Profile and birth details:** name, date of birth, time of birth, birthplace, gender if you choose to provide it, and chart preferences.
 - **Consultation information:** questions, chat messages, session timestamps, duration, astrologer/service identity, and support or complaint correspondence.
 - **Wallet and payment records:** recharge amount, transaction identifiers, payment status, wallet ledger entries, refunds and relevant billing records. Full card numbers, CVV, UPI PIN and banking passwords should not be collected or stored by this platform.
@@ -23,7 +23,7 @@ Please do not submit another person's personal information unless you have an ap
 
 ## 2. Why we use information
 We use information only for specified and legitimate service purposes, including:
-- verifying your mobile number and maintaining your account;
+- creating and maintaining a guest account and its secure session; and, only if a user later chooses to link an identity, verifying that identity;
 - calculating and displaying the kundli and saving charts you request;
 - providing consultations and maintaining conversation continuity;
 - displaying wallet balance, processing payments, preventing duplicate charges and handling refunds;
@@ -58,7 +58,7 @@ We do not make birth charts or private consultation conversations public by defa
 ## 5. Security
 We use or plan to use reasonable technical and organisational safeguards, including HTTPS, role-based access, database row-level security, server-side secrets, restricted administrative access, audit logs, backups and payment-provider signature verification. Wallet changes must be performed server-side and must not rely on values supplied by the browser.
 
-No internet service can guarantee absolute security. Keep your phone and OTP private, report suspected account misuse promptly, and avoid using shared devices for sensitive sessions. We will handle security incidents and notifications in accordance with applicable law.
+No internet service can guarantee absolute security. Keep your device/browser session private and avoid using shared devices for sensitive sessions. Guest accounts cannot reliably be recovered if browser data is cleared, the device is lost or the user signs out. Do not clear site data or sign out while there is a remaining wallet balance unless you have first linked a recoverable login method or contacted support. We will handle security incidents and notifications in accordance with applicable law.
 
 ## 6. Retention
 We retain information only for as long as reasonably necessary for the purposes described above, including providing saved charts and chat history, resolving disputes, preventing fraud, and meeting legal, accounting and tax obligations. Different records may have different retention periods. Before launch, the operator must set and document actual retention periods for OTP/security logs, chats, charts, payment records and support tickets, and securely delete or anonymise information when it is no longer required, subject to legal holds.
@@ -91,3 +91,7 @@ We may revise this Policy when services, providers or legal requirements change.
 ---
 
 **Launch checklist — not ready for publication until completed:** confirm the operator identity and postal address, verify the Grievance Officer contact process, verify that the listed email and phone/WhatsApp are monitored, confirm the actual SMS/OTP, technology, hosting and payment providers; set real retention periods; document consent and account-deletion workflows; verify provider contracts and data locations; and obtain Indian legal review. The published Policy must describe what the deployed product really does, not merely planned features.
+
+
+## 13. Guest account limitations and wallet continuity
+The app may create a guest account without requiring a phone number, email address or OTP. A unique internal account ID is used to associate the guest account with its wallet, consultations and saved information. The account is normally retained through a secure browser session. If you clear browser/site data, lose the device/browser or sign out, you may be unable to access the same guest account or its remaining wallet balance. Do not use a guest account on a shared device. Before a broad public launch, the operator should provide an account-linking or recovery route and a clear process for investigating payment receipts and wallet claims. A guest account does not verify a user's real-world identity or age.
