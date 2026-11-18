@@ -1,6 +1,6 @@
 "use strict";
 const {getAuthenticatedUser,rpc,activeConsultation,serviceFetch}=require("../lib/supabase");
-function mapConsultation(c){return c?{id:c.id,status:c.status,ratePaisePerMinute:Number(c.rate_paise_per_minute),billedMinutes:Number(c.billed_minutes),startedAt:c.started_at}:null;}
+function mapConsultation(c){return c?{id:c.id,status:c.status,ratePaisePerMinute:Number(c.rate_paise_per_minute),billedMinutes:Number(c.billed_minutes),startedAt:c.started_at,isFreeTrial:!!c.is_free_trial}:null;}
 module.exports=async function(req,res){
   try{
     const user=await getAuthenticatedUser(req,res);
