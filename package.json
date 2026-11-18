@@ -11,7 +11,8 @@
     "check": "find . -path './node_modules' -prune -o -name '*.js' -print0 | xargs -0 -n1 node --check",
     "test": "node --test",
     "build:worker": "node scripts/build-worker-assets.js",
-    "deploy:worker": "npm run build:worker && npx wrangler deploy"
+    "deploy:worker": "npm run build:worker && npx wrangler deploy",
+    "postinstall": "node scripts/patch-cloudflare-iconv.js"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",
