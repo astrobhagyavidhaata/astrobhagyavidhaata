@@ -54,7 +54,8 @@ module.exports = async function handler(req, res) {
       p.name + " — " + p.rashi + " " + p.degree.text +
       " | नक्षत्र: " + p.nakshatra + " (चरण " + p.pada + ")" +
       " | नवांश: " + p.navamsa +
-      " | " + p.house + "वाँ भाव" +
+      " | चंद्र से " + p.moonHouse + "वाँ भाव" +
+      (p.lagnaHouse ? " | लग्न से " + p.lagnaHouse + "वाँ भाव" : "") +
       (p.retrograde ? " | वक्री" : " | मार्गी")
     );
 
