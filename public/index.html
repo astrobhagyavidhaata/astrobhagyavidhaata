@@ -58,6 +58,12 @@
     .calculation-page.active{display:block}
     .calculation-page h3{margin:0 0 12px}
 
+
+    .app-page-tabs{display:flex;gap:7px;overflow-x:auto;white-space:nowrap;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding:8px 2px 12px;margin:0 0 14px;border-bottom:1px solid #66547f;position:sticky;top:0;background:#100d1c;z-index:30}
+    .app-page-tabs button{flex:0 0 auto;width:auto;margin:0;padding:11px 15px;border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:#d4c9e5;font-size:14px}
+    .app-page-tabs button[aria-selected="true"]{color:#f5c66b;border-bottom-color:#f5c66b}
+    .app-page-panel{display:none}
+    .app-page-panel.active{display:block}
     .dasha-current-card{margin:12px 0;padding:13px;border:1px solid #8a6b37;border-radius:12px;background:linear-gradient(135deg,#30243b,#1b1728)}
     .dasha-current-card h4{margin:0 0 10px;color:#f5d994}
     .dasha-current-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -143,7 +149,15 @@
     })();
   </script>
   <main>
-    <section class="panel">
+    <nav id="appPageTabs" class="app-page-tabs" role="tablist" aria-label="मुख्य ऐप पेज">
+      <button type="button" role="tab" aria-selected="true" data-app-tab="kundli">जन्म कुंडली</button>
+      <button type="button" role="tab" aria-selected="false" data-app-tab="saved">मेरी कुंडलियाँ</button>
+      <button type="button" role="tab" aria-selected="false" data-app-tab="panchang">पंचांग</button>
+      <button type="button" role="tab" aria-selected="false" data-app-tab="gochar">गोचर</button>
+      <button type="button" role="tab" aria-selected="false" data-app-tab="consult">परामर्श</button>
+      <button type="button" role="tab" aria-selected="false" data-app-tab="help">सहायता</button>
+    </nav>
+    <section class="panel app-page-panel active" data-app-page="kundli">
       <h2>👤 गेस्ट लॉगिन</h2>
       <p id="loginState" class="chat-info">गेस्ट अकाउंट की स्थिति जाँची जा रही है…</p>
       <div id="guestConsentWrap">
@@ -155,7 +169,7 @@
       <button id="guestContinueButton" type="button">बिना OTP जारी रखें</button>
       <div id="authMessage" role="status" aria-live="polite"></div>
     </section>
-    <section class="panel">
+    <section class="panel app-page-panel active" data-app-page="kundli">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
@@ -169,7 +183,7 @@
       <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><p class="chat-info">हर वर्ग कुंडली को अलग पेज में देखने के लिए टैब को साइड में स्लाइड करें।</p><div id="vargaCharts"></div></section></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
-    <section class="panel">
+    <section class="panel app-page-panel" data-app-page="saved">
       <h2>📚 मेरी सुरक्षित कुंडलियाँ</h2>
       <p class="chat-info">केवल वे कुंडलियाँ दिखेंगी जिन्हें बनाते समय आपने खाते में सुरक्षित करने की अनुमति दी थी।</p>
       <button type="button" id="loadKundliHistory" class="secondary">मेरी कुंडलियाँ देखें</button>
@@ -177,7 +191,7 @@
       <div id="savedKundliPreview" class="chat-info"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel app-page-panel" data-app-page="panchang">
       <h2>📅 दैनिक पंचांग और शुभ-अशुभ काल</h2>
       <p class="chat-info">तिथि, नक्षत्र, योग, करण, सूर्योदय-सूर्यास्त, राहुकाल, यमगण्ड, गुलिक काल, अभिजित और 24 होरा की गणना।</p>
       <form id="panchangForm">
@@ -193,7 +207,7 @@
       <div id="panchangOutput" aria-live="polite"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel app-page-panel" data-app-page="gochar">
       <h2>🪐 आज का ग्रह गोचर</h2>
       <label for="rashiSelect">अपनी चंद्र राशि चुनें</label>
       <select id="rashiSelect">
@@ -202,14 +216,14 @@
       <div id="rashiGocharOut" class="chat-info" aria-live="polite"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel app-page-panel" data-app-page="consult">
       <h2>💬 AI ज्योतिष परामर्श</h2>
       <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न AI ज्योतिष सहायक से पूछें। हर अकाउंट को पहली बार केवल 1 मिनट मुफ्त मिलेगा। उसके बाद ₹5 प्रति मिनट वॉलेट से कटेंगे।</p>
       <button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">चैट शुरू करें</button>
       <div id="walletMessage" role="status" aria-live="polite"></div>
     </section>
 
-    <section class="panel" id="customerCare"><details class="app-folder" id="customerCareFolder"><summary>📁 Customer Care / Help Centre</summary>
+    <section class="panel app-page-panel" data-app-page="help" id="customerCare"><details class="app-folder" id="customerCareFolder"><summary>📁 Customer Care / Help Centre</summary>
       <p class="support-note">Contact us for payment deductions, wallet balance, login, birth chart, chat, or any app-related issue. You can also share your suggestions.</p>
       <p class="support-note"><strong>Support:</strong> <a href="tel:8208091073" style="color:#f5c66b;text-decoration:none">8208091073</a> (Call and WhatsApp)</p>
       <p class="support-note"><strong>Email:</strong> <a href="mailto:amitdiksha975695@gmail.com" style="color:#f5c66b;text-decoration:none">amitdiksha975695@gmail.com</a></p>
@@ -281,6 +295,25 @@
         });
         chatInput.addEventListener('blur',()=>chatModal.classList.remove('keyboard-lift'));
       }
+    })();
+  </script>
+
+  <script>
+    (function(){
+      const tabs=document.getElementById("appPageTabs");
+      if(!tabs)return;
+      const pages=[...document.querySelectorAll("[data-app-page]")];
+      const buttons=[...tabs.querySelectorAll("[data-app-tab]")];
+      function activate(name){
+        pages.forEach(page=>page.classList.toggle("active",page.dataset.appPage===name));
+        buttons.forEach(button=>button.setAttribute("aria-selected",String(button.dataset.appTab===name)));
+      }
+      buttons.forEach(button=>button.addEventListener("click",()=>{
+        activate(button.dataset.appTab);
+        button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+        window.scrollTo({top:0,behavior:"smooth"});
+      }));
+      activate("kundli");
     })();
   </script>
   <script src="kundli.js"></script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="wallet.js"></script><script src="auth.js"></script><script src="kundli-history.js"></script><script src="ai_chat.js"></script><script src="panchang.js"></script><script src="gochar.js"></script>
