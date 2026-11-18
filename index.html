@@ -10,6 +10,17 @@
     body{margin:0;font-family:Arial,sans-serif;background:#100d1c;color:#fff}
     header{background:#211638;border-bottom:1px solid #493568;padding:18px 14px;text-align:center}
     header h1{color:#f5c66b;margin:0;font-size:24px}
+    .app-header{position:relative;display:flex;align-items:center;justify-content:center;min-height:86px;padding:14px 56px}
+    .header-title{text-align:center}
+    .header-menu{position:absolute;right:12px;top:12px}
+    .header-menu>button{width:42px;height:42px;margin:0;padding:0;border:1px solid #70558e;border-radius:10px;background:#2c2140;color:#f5d994;font-size:28px;line-height:1}
+    .header-menu-panel{position:absolute;right:0;top:49px;width:min(290px,calc(100vw - 24px));z-index:500;background:#181326;border:1px solid #70558e;border-radius:12px;padding:10px;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+    .header-menu-panel[hidden]{display:none}
+    #menuChartFolderHost .app-folder{margin:0}
+    #menuChartFolderHost .app-folder>summary{list-style:none}
+    #menuChartFolderHost .app-folder>summary::-webkit-details-marker{display:none}
+    #menuChartFolderHost .app-folder>summary:before{content:"▸ ";color:#f5c66b}
+    #menuChartFolderHost .app-folder[open]>summary:before{content:"▾ "}
     header p{color:#d4c9e5;margin:8px 0 0;font-size:14px}
     .wallet-bar{max-width:650px;margin:14px auto 0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
     .wallet{background:#2c2140;border:1px solid #70558e;border-radius:10px;padding:11px 14px;color:#f5c66b;font-weight:bold}
@@ -65,7 +76,7 @@
   </style>
 </head>
 <body>
-  <header><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></header>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"></div><details class="app-folder" id="kundliChartsFolder"><summary>📁 Birth &amp; Divisional Charts (D1–D60)</summary><div id="mainChartSlot"></div><div id="kTxt" aria-hidden="true"></div><div id="vargaCharts"></div></details></div></div></header>
   <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
   <main>
     <section class="panel">
@@ -101,7 +112,7 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><details class="app-folder" id="kundliChartsFolder"><summary>📁 Birth &amp; Divisional Charts (D1–D60)</summary><div id="mainChartSlot"></div><div id="kTxt" aria-hidden="true"></div><div id="vargaCharts"></div></details><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
     <section class="panel">
@@ -190,6 +201,28 @@
     <div class="chat-actions"><button type="button" onclick="sendUserMsg()">संदेश भेजें</button></div>
   </div></div>
   <footer>© 2026 Astro Bhagya Vidhata<br>AI Vedic Astrology Consultation<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।</footer>
+  <script>
+    (function(){
+      const btn=document.getElementById('appMenuButton');
+      const panel=document.getElementById('appMenuPanel');
+      const folder=document.getElementById('kundliChartsFolder');
+      const host=document.getElementById('menuChartFolderHost');
+      if(folder && host) host.appendChild(folder);
+      if(btn && panel){
+        btn.addEventListener('click',function(){
+          const opening=panel.hidden;
+          panel.hidden=!opening;
+          btn.setAttribute('aria-expanded',String(opening));
+        });
+        document.addEventListener('click',function(event){
+          if(!event.target.closest('.header-menu')){
+            panel.hidden=true;
+            btn.setAttribute('aria-expanded','false');
+          }
+        });
+      }
+    })();
+  </script>
   <script src="kundli.js"></script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="wallet.js"></script><script src="auth.js"></script><script src="kundli-history.js"></script><script src="ai_chat.js"></script><script src="panchang.js"></script><script src="gochar.js"></script>
 </body>
 </html>
