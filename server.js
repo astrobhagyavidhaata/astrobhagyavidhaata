@@ -54,8 +54,11 @@ app.use((req,res,next)=>{
   next();
 });
 
-app.use(express.static(path.join(__dirname),{dotfiles:"deny",index:false}));
-app.get("*",(req,res)=>res.sendFile(path.join(__dirname,"index.html")));
+// Static files are served by Node locally and by the Workers ASSETS binding on Cloudflare.
+if (typeof __dirname !== "undefined") {
+  app.use(express.static(path.join(__dirname),{dotfiles:"deny",index:false}));
+  app.get("*",(req,res)=>res.sendFile(path.join(__dirname,"index.html")));
+}
 if (require.main === module) {
   app.listen(port,()=>console.log("Astro Bhagya Vidhata running on http://localhost:"+port));
 }
