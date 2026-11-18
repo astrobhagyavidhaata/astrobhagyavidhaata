@@ -75,7 +75,26 @@
       const sign=document.createElementNS(ns,'text');
       sign.setAttribute('x',x); sign.setAttribute('y',y-4); sign.setAttribute('text-anchor','middle'); sign.setAttribute('font-size','13'); sign.setAttribute('font-weight','bold'); sign.setAttribute('fill','#4b2d16'); sign.textContent=String(signIndex + 1);
       const planet=document.createElementNS(ns,'text');
-      planet.setAttribute('x',x); planet.setAttribute('y',y+14); planet.setAttribute('text-anchor','middle'); planet.setAttribute('font-size','12'); planet.setAttribute('font-weight','bold'); planet.setAttribute('fill','#9a421d'); planet.textContent=(occupants[house]||[]).join(' ');
+      planet.setAttribute('x',x);
+      planet.setAttribute('y',y+12);
+      planet.setAttribute('text-anchor','middle');
+      planet.setAttribute('font-size','10');
+      planet.setAttribute('font-weight','bold');
+      planet.setAttribute('fill','#9a421d');
+      // Keep every planet abbreviation inside its own house cell.
+      // Wrap crowded houses into short centered rows instead of one long line.
+      const codes=occupants[house]||[];
+      const rows=[];
+      for(let i=0;i<codes.length;i+=3) rows.push(codes.slice(i,i+3).join(' '));
+      rows.slice(0,4).forEach((row,index)=>{
+        const tspan=document.createElementNS(ns,'tspan');
+        tspan.setAttribute('x',x);
+        tspan.setAttribute('dy',index===0?'0':'11');
+        tspan.setAttribute('textLength','66');
+        tspan.setAttribute('lengthAdjust','spacingAndGlyphs');
+        tspan.textContent=row;
+        planet.appendChild(tspan);
+      });
       group.append(label,sign,planet); svg.appendChild(group);
     }
     root.appendChild(svg);
