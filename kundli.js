@@ -120,13 +120,18 @@
       const table=document.createElement("div");table.className="nakshatra-panel";
       const title=document.createElement("h4");title.textContent="27 नक्षत्रों का नवतारा चक्र";title.style.cssText="margin:4px 0 10px;color:#f5c66b";table.appendChild(title);
       const grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px";
-      taraRows.forEach(row=>{
-        const cell=document.createElement("div");cell.style.cssText="padding:9px 5px;border:1px solid #66547f;border-radius:8px;background:#181326;text-align:center;min-width:0";
-        const n=document.createElement("strong");n.textContent=row.nakshatra||"—";n.style.cssText="display:block;color:#f5d994;font-size:12px;overflow-wrap:anywhere";
-        const name=document.createElement("span");name.textContent=row.name||"—";name.style.cssText="display:block;color:#f5c66b;font-size:11px;margin-top:4px";
-        const nature=document.createElement("small");nature.textContent=(row.countFromBirth||"—")+"वाँ स्थान · "+(row.nature||"—");nature.style.cssText="display:block;color:#d4c9e5;font-size:10px;margin-top:3px";
-        cell.append(n,name,nature);grid.appendChild(cell);
-      });
+      const groups=new Map();
+      taraRows.forEach(row=>{const key=row.name||"अन्य";if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);});
+      for(const [name,rows] of groups){
+        rows.sort((a,b)=>Number(a.countFromBirth)-Number(b.countFromBirth));
+        const active=current?.name===name;
+        const cell=document.createElement("div");
+        cell.style.cssText="padding:9px 6px;border:1px solid "+(active?"#e7b84e":"#66547f")+";border-radius:8px;background:"+(active?"#49351d":"#181326")+";text-align:center;min-width:0";
+        const heading=document.createElement("strong");heading.textContent=name;heading.style.cssText="display:block;color:#f5d994;font-size:12px";
+        const nature=document.createElement("small");nature.textContent=rows[0]?.nature||"—";nature.style.cssText="display:block;color:#f5c66b;font-size:10px;margin:4px 0";
+        const nak=document.createElement("span");nak.textContent=rows.map(row=>row.nakshatra).join(" · ");nak.style.cssText="display:block;color:#d4c9e5;font-size:10px;line-height:1.5;overflow-wrap:anywhere";
+        cell.append(heading,nature,nak);grid.appendChild(cell);
+      }
       table.appendChild(grid);tara.appendChild(table);
     } else addNote(tara,"नवतारा तालिका की गणना उपलब्ध नहीं है।");
 
