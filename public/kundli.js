@@ -65,31 +65,31 @@
     border.setAttribute('fill','none'); border.setAttribute('stroke','#875b2b'); border.setAttribute('stroke-width','3'); svg.appendChild(border);
     line(2,2,398,398); line(398,2,2,398);
     line(200,2,398,200); line(398,200,200,398); line(200,398,2,200); line(2,200,200,2);
-    // North Indian chart order: houses advance counter-clockwise from the top (Lagna).
-    const positions=[[200,78],[100,78],[50,145],[100,200],[50,255],[100,322],[200,322],[300,322],[350,255],[300,200],[350,145],[300,78]];
+    // Cell-safe anchor points: centers of the 12 actual North-Indian chart regions.
+    // Corner-triangle houses use their own inner centroids, not the square's outer edge.
+    const positions=[[200,82],[134,68],[68,134],[82,200],[68,266],[134,332],[200,318],[266,332],[332,266],[318,200],[332,134],[266,68]];
     for(let house=1;house<=12;house++){
       const [x,y]=positions[house-1], signIndex=(ascIndex+house-1)%12;
       const group=document.createElementNS(ns,'g');
       const label=document.createElementNS(ns,'text');
-      label.setAttribute('x',x); label.setAttribute('y',y-19); label.setAttribute('text-anchor','middle'); label.setAttribute('font-size','11'); label.setAttribute('fill','#9a6b35'); label.textContent=String(house);
+      label.setAttribute('x',x); label.setAttribute('y',y-20); label.setAttribute('text-anchor','middle'); label.setAttribute('font-size','10'); label.setAttribute('fill','#9a6b35'); label.textContent=String(house);
       const sign=document.createElementNS(ns,'text');
-      sign.setAttribute('x',x); sign.setAttribute('y',y-4); sign.setAttribute('text-anchor','middle'); sign.setAttribute('font-size','13'); sign.setAttribute('font-weight','bold'); sign.setAttribute('fill','#4b2d16'); sign.textContent=String(signIndex + 1);
+      sign.setAttribute('x',x); sign.setAttribute('y',y-7); sign.setAttribute('text-anchor','middle'); sign.setAttribute('font-size','12'); sign.setAttribute('font-weight','bold'); sign.setAttribute('fill','#4b2d16'); sign.textContent=String(signIndex + 1);
       const planet=document.createElementNS(ns,'text');
       planet.setAttribute('x',x);
-      planet.setAttribute('y',y+12);
+      planet.setAttribute('y',y+7);
       planet.setAttribute('text-anchor','middle');
-      planet.setAttribute('font-size','11');
-      planet.setAttribute('font-weight','bold');
+      planet.setAttribute('font-size','9');
+      planet.setAttribute('font-weight','600');
       planet.setAttribute('fill','#9a421d');
-      // Keep every planet abbreviation inside its own house cell.
-      // Wrap crowded houses into short centered rows instead of one long line.
+      // Two short abbreviations per row keep even crowded houses within their own cell.
       const codes=occupants[house]||[];
       const rows=[];
-      for(let i=0;i<codes.length;i+=3) rows.push(codes.slice(i,i+3).join(' '));
-      rows.slice(0,4).forEach((row,index)=>{
+      for(let i=0;i<codes.length;i+=2) rows.push(codes.slice(i,i+2).join('  '));
+      rows.forEach((row,index)=>{
         const tspan=document.createElementNS(ns,'tspan');
         tspan.setAttribute('x',x);
-        tspan.setAttribute('dy',index===0?'0':'11');
+        tspan.setAttribute('dy',index===0?'0':'10');
         tspan.textContent=row;
         planet.appendChild(tspan);
       });
