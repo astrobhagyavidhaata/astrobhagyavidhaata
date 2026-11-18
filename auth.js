@@ -1,63 +1,57 @@
 "use strict";
 (function(){
   const $=id=>document.getElementById(id);
-  const form=$("loginForm");
-  if(!form)return;
-  const status=$("authMessage"),otpRow=$("otpRow"),phoneInput=$("loginPhone");
-  let otpSent=false,currentUser=null;
-  function show(text,error){status.textContent=text;status.style.display="block";status.style.color=error?"#ffb4ab":"#f5d994";}
+  const status=$("authMessage");
+  const consent=$("guestConsent");
+  const button=$("guestContinueButton");
+  let currentUser=null,starting=false;
+  function show(text,error){
+    if(!status)return;
+    status.textContent=text;
+    status.style.display="block";
+    status.style.color=error?"#ffb4ab":"#f5d994";
+  }
   function render(){
-    $("loginFields").style.display=currentUser?"none":"block";
-    $("loggedInBox").style.display=currentUser?"block":"none";
-    $("loginState").textContent=currentUser?"लॉगिन है: "+(currentUser.phone||"मोबाइल उपयोगकर्ता"):"लॉगिन नहीं है";
-    if(currentUser)$("loggedInPhone").textContent=currentUser.phone||"";
+    $("loginState").textContent=currentUser
+      ? (currentUser.isAnonymous?"गेस्ट अकाउंट सक्रिय है। आपका वॉलेट इसी डिवाइस के ब्राउज़र से जुड़ा है।":"आपका पुराना लॉगिन अकाउंट सक्रिय है।")
+      : "गेस्ट अकाउंट बनाने के लिए नीचे सहमति देकर जारी रखें।";
+    $("guestContinueButton").style.display=currentUser?"none":"block";
+    $("guestConsentWrap").style.display=currentUser?"none":"block";
   }
   async function call(action,body){
-    const response=await fetch("/api/auth/"+action,{method:body?"POST":"GET",credentials:"same-origin",headers:{"Accept":"application/json",...(body?{"Content-Type":"application/json"}:{})},...(body?{body:JSON.stringify(body)}:{})});
+    const response=await fetch("/api/auth/"+action,{
+      method:body?"POST":"GET",credentials:"same-origin",cache:"no-store",
+      headers:{"Accept":"application/json",...(body?{"Content-Type":"application/json"}:{})},
+      ...(body?{body:JSON.stringify(body)}:{})
+    });
     const data=await response.json();
     if(!response.ok)throw new Error(data.message||"लॉगिन अनुरोध पूरा नहीं हुआ।");
     return data;
   }
   async function loadUser(){
-    try{const data=await call("me");currentUser=data.user;render();return currentUser;}
-    catch(_){currentUser=null;render();return null;}
+    try{
+      const data=await call("me");
+      currentUser=data.user;render();return currentUser;
+    }catch(_){currentUser=null;render();return null;}
   }
-  $("sendOtpButton").addEventListener("click",async()=>{
-    const phone=phoneInput.value.trim();
-    if(!$("termsConsent").checked){show("आगे बढ़ने के लिए नियम और प्राइवेसी पॉलिसी से सहमत हों।",true);return;}
-    if(!phone){show("मोबाइल नंबर भरें।",true);return;}
-    $("sendOtpButton").disabled=true;
+  async function continueAsGuest(){
+    if(starting)return;
+    if(!consent?.checked){
+      show("आगे बढ़ने से पहले Terms और Privacy Policy पढ़कर सहमति दें।",true);
+      return;
+    }
+    starting=true;button.disabled=true;show("आपका सुरक्षित गेस्ट अकाउंट बनाया जा रहा है…");
     try{
-      const data=await call("send-otp",{phone,termsAccepted:true});
-      otpSent=true;otpRow.style.display="block";show(data.message||"OTP भेज दिया गया है।");
-      $("loginOtp").focus();
-    }catch(error){show(error.message,true);}
-    finally{$("sendOtpButton").disabled=false;}
-  });
-  form.addEventListener("submit",async e=>{
-    e.preventDefault();
-    if(!$("termsConsent").checked){show("आगे बढ़ने के लिए नियम और प्राइवेसी पॉलिसी से सहमत हों।",true);return;}
-    if(!otpSent){show("पहले OTP भेजें।",true);return;}
-    $("verifyOtpButton").disabled=true;
-    try{
-      const data=await call("verify-otp",{phone:phoneInput.value.trim(),token:$("loginOtp").value.trim(),termsAccepted:true});
-      currentUser=data.user;otpSent=false;$("loginOtp").value="";render();
-      show("लॉगिन सफल। आपका वॉलेट लोड किया जा रहा है।");
+      const data=await call("guest",{termsAccepted:true});
+      currentUser=data.user;render();
+      show("गेस्ट अकाउंट तैयार है। आपका वॉलेट लोड किया जा रहा है।");
       if(window.AstroWallet)await window.AstroWallet.loadWallet();
       document.dispatchEvent(new CustomEvent("astro:auth-changed",{detail:currentUser}));
-    }catch(error){show(error.message,true);}
-    finally{$("verifyOtpButton").disabled=false;}
-  });
-  $("logoutButton").addEventListener("click",async()=>{
-    try{
-      if(window.AstroWallet)await window.AstroWallet.stopConsultation();
-      await call("logout",{});
-      currentUser=null;otpSent=false;otpRow.style.display="none";render();
-      show("आप लॉगआउट हो गए हैं।");
-      if($("bal"))$("bal").textContent="0.00";
-      document.dispatchEvent(new CustomEvent("astro:auth-changed",{detail:null}));
-    }catch(error){show(error.message,true);}
-  });
+    }catch(error){
+      show(error.message+" यदि यह संदेश आए, तो Supabase में Anonymous Sign-Ins चालू करना होगा।",true);
+    }finally{starting=false;button.disabled=false;}
+  }
+  button.addEventListener("click",continueAsGuest);
   window.AstroAuth=Object.freeze({loadUser,getUser:()=>currentUser});
   loadUser().then(user=>{
     if(user){
