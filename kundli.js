@@ -170,6 +170,7 @@
       const savTitle=document.createElement("h4");savTitle.textContent="सर्वाष्टकवर्ग (SAV) — कुल "+av.sarva.total+" बिंदु";savTitle.style.cssText="margin:10px 0;color:#f5c66b";ashtak.appendChild(savTitle);
       const makeSignGrid=(host,rows)=>{
         const asc=Number(chart.d1?.ascendant?.rashiIndex);
+        const rashis=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
         if(!Number.isInteger(asc)||asc<0||asc>11){addNote(host,"लग्न राशि उपलब्ध नहीं है, इसलिए उत्तर भारतीय अष्टकवर्ग चार्ट नहीं बन सका।");return;}
         const bySign=new Map(rows.map(item=>[Number(item.rashiIndex),item]));
         const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
@@ -186,7 +187,7 @@
           const signIndex=(asc+house-1)%12,item=bySign.get(signIndex),[x,y]=pos[house-1];
           const sign=document.createElementNS(ns,"text");sign.setAttribute("x",x);sign.setAttribute("y",y-10);
           sign.setAttribute("text-anchor","middle");sign.setAttribute("font-size","12");sign.setAttribute("font-weight","bold");
-          sign.setAttribute("fill","#4b2d16");sign.textContent=signs[signIndex];
+          sign.setAttribute("fill","#4b2d16");sign.textContent=rashis[signIndex];
           const score=document.createElementNS(ns,"text");score.setAttribute("x",x);score.setAttribute("y",y+13);
           score.setAttribute("text-anchor","middle");score.setAttribute("font-size","14");score.setAttribute("font-weight","700");
           score.setAttribute("fill","#9a421d");score.textContent=item?String(item.bindus)+" बिंदु":"—";
