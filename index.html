@@ -69,7 +69,7 @@
         <form id="loginForm">
           <label for="loginPhone">मोबाइल नंबर</label>
           <input id="loginPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 अंकों का मोबाइल नंबर" maxlength="16" required>
-          <label style="display:flex;align-items:flex-start;gap:9px"><input id="termsConsent" type="checkbox" style="width:auto;margin-top:3px"> मैं <a href="/TERMS.md" style="color:#f5c66b">नियम और शर्तें</a> तथा <a href="/PRIVACY.md" style="color:#f5c66b">प्राइवेसी पॉलिसी</a> पढ़कर सहमत हूँ।</label>
+          <label style="display:flex;align-items:flex-start;gap:9px"><input id="termsConsent" type="checkbox" style="width:auto;margin-top:3px"> मैं <a href="#legalPolicies" style="color:#f5c66b">Terms &amp; Conditions</a> तथा <a href="#legalPolicies" style="color:#f5c66b">Privacy Policy</a> पढ़कर सहमत हूँ।</label>
           <button id="sendOtpButton" type="button">OTP भेजें</button>
           <div id="otpRow" style="display:none">
             <label for="loginOtp">6 अंकों का OTP</label>
@@ -154,6 +154,25 @@
         <a href="https://wa.me/918208091073?text=Namaste%2C%20mujhe%20wallet%20balance%20ke%20baare%20mein%20sahayata%20chahiye." target="_blank" rel="noopener noreferrer">वॉलेट बैलेंस</a>
       </div>
     </section>
+
+    <section class="panel" id="legalPolicies">
+      <h2>📁 Legal &amp; Policies</h2>
+      <p class="support-note">Important service policies and customer rights.</p>
+      <div class="legal-details">
+        <details>
+          <summary>Terms &amp; Conditions</summary>
+          <p class="support-note">Read the rules for account use, consultations, wallet payments, cancellations and refunds.</p>
+          <a href="/TERMS.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Open Terms &amp; Conditions</a>
+        </details>
+      </div>
+      <div class="legal-details">
+        <details>
+          <summary>Privacy Policy</summary>
+          <p class="support-note">Read how account, birth, consultation and payment information is handled.</p>
+          <a href="/PRIVACY.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Open Privacy Policy</a>
+        </details>
+      </div>
+    </section>
   </main>
   <div id="chatModal" class="modal"><div class="modal-box">
     <div class="modal-head"><h2 id="chatTitle">AI वैदिक ज्योतिष परामर्श</h2><button type="button" class="close-button" onclick="closeChatBox()">बंद करें</button></div>
@@ -162,7 +181,7 @@
     <label for="userMsgInput">अपना प्रश्न लिखें</label><textarea id="userMsgInput" placeholder="अपना ज्योतिष संबंधी प्रश्न लिखें..." maxlength="4000" rows="3"></textarea>
     <div class="chat-actions"><button type="button" onclick="sendUserMsg()">संदेश भेजें</button></div>
   </div></div>
-  <footer>© 2026 Astro Bhagya Vidhata<br>AI वैदिक ज्योतिष परामर्श<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।<br><a href="/TERMS.md" style="color:#f5c66b;">नियम और शर्तें</a> &nbsp;|&nbsp; <a href="/PRIVACY.md" style="color:#f5c66b;">प्राइवेसी पॉलिसी</a></footer>
+  <footer>© 2026 Astro Bhagya Vidhata<br>AI वैदिक ज्योतिष परामर्श<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।</footer>
   <script src="kundli.js"></script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="wallet.js"></script><script src="auth.js"></script><script src="kundli-history.js"></script><script src="ai_chat.js"></script><script src="panchang.js"></script><script src="gochar.js"></script>
 </body>
 </html>
