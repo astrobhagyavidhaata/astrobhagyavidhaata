@@ -41,10 +41,10 @@
 
     const table = document.createElement("div");
     table.style.overflowX = "auto";
-    const rows = [["ग्रह","राशि और अंश","नक्षत्र / चरण","नवांश","भाव","गति"]];
+    const rows = [["ग्रह","राशि और अंश","नक्षत्र / चरण","नवांश","चंद्र से भाव","लग्न से भाव","गति"]];
     for (const p of data.planets || []) {
       rows.push([p.name, p.rashi + " " + p.degree.text, p.nakshatra + " / " + p.pada,
-        p.navamsa, String(p.house), p.retrograde ? "वक्री" : "मार्गी"]);
+        p.navamsa, String(p.moonHouse ?? p.house), p.lagnaHouse == null ? "—" : String(p.lagnaHouse), p.retrograde ? "वक्री" : "मार्गी"]);
     }
     const t = document.createElement("table");
     t.style.cssText = "width:100%;border-collapse:collapse;min-width:540px;font-size:13px";
@@ -69,10 +69,12 @@
     const select = $("rashiSelect");
     if (!select) return;
     const rashi = select.value;
-    if (!rashis.includes(rashi)) return showMessage("त्रुटि","कृपया सही राशि चुनें।",true);
+    const lagnaSelect = $("lagnaSelect");
+    const lagna = lagnaSelect ? lagnaSelect.value : "";
+    if (!rashis.includes(rashi) || (lagna && !rashis.includes(lagna))) return showMessage("त्रुटि","कृपया सही चंद्र राशि और लग्न चुनें।",true);
     showMessage("आज का गोचर","ग्रहों की स्थिति निकाली जा रही है...");
     try {
-      const data = await request(API + "?rashi=" + encodeURIComponent(rashi));
+      const data = await request(API + "?rashi=" + encodeURIComponent(rashi) + (lagna ? "&lagna=" + encodeURIComponent(lagna) : ""));
       if (!Array.isArray(data.planets)) throw new Error("सर्वर से ग्रहों की पूरी सूची नहीं मिली।");
       render(data);
     } catch (error) {
@@ -82,8 +84,10 @@
 
   function initialize() {
     const select = $("rashiSelect");
+    const lagnaSelect = $("lagnaSelect");
     if (select) {
       select.addEventListener("change",loadRashiGochar);
+      if (lagnaSelect) lagnaSelect.addEventListener("change",loadRashiGochar);
       loadRashiGochar();
     }
   }
