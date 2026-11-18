@@ -161,8 +161,36 @@
       timeline.appendChild(table);dashaFolder.appendChild(timeline);
     } else addNote(dashaFolder,"विंशोत्तरी दशा डेटा उपलब्ध नहीं है।");
 
-    const ashtak=makeFolder("3. अष्टकवर्ग (भिन्नाष्टकवर्ग / सर्वाष्टकवर्ग)","ashtakavargaFolder");
-    addNote(ashtak,"अष्टकवर्ग के वास्तविक बिंदु अभी गणना इंजन में उपलब्ध नहीं हैं। सही BAV और SAV गणना जुड़ने तक यहाँ कोई काल्पनिक अंक नहीं दिखाए जाएँगे।");
+    const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
+    const av=chart.ashtakavarga;
+    if(av?.validation?.passed && av.bhinna && av.sarva){
+      const method=document.createElement("p");method.className="chat-info";
+      method.textContent="पराशरी अष्टकवर्ग | सात ग्रहों के BAV और उनका 337-बिंदु SAV योग। राहु-केतु शामिल नहीं हैं।";
+      ashtak.appendChild(method);
+      const savTitle=document.createElement("h4");savTitle.textContent="सर्वाष्टकवर्ग (SAV) — कुल "+av.sarva.total+" बिंदु";savTitle.style.cssText="margin:10px 0;color:#f5c66b";ashtak.appendChild(savTitle);
+      const makeSignGrid=(host,rows)=>{
+        const grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:8px 0 14px";
+        rows.forEach(item=>{
+          const cell=document.createElement("div");cell.style.cssText="padding:9px 4px;border:1px solid #66547f;border-radius:8px;background:#181326;text-align:center;min-width:0";
+          const sign=document.createElement("strong");sign.textContent=item.rashi;sign.style.cssText="display:block;color:#f5d994;font-size:12px";
+          const score=document.createElement("span");score.textContent=String(item.bindus)+" बिंदु";score.style.cssText="display:block;color:#fff;font-size:15px;font-weight:700;margin-top:4px";
+          cell.append(sign,score);grid.appendChild(cell);
+        });
+        host.appendChild(grid);
+      };
+      makeSignGrid(ashtak,av.sarva.signs);
+      const bavTitle=document.createElement("h4");bavTitle.textContent="सात ग्रहों का भिन्नाष्टकवर्ग (BAV)";bavTitle.style.cssText="margin:14px 0 8px;color:#f5c66b";ashtak.appendChild(bavTitle);
+      ["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि"].forEach(planet=>{
+        const data=av.bhinna[planet];if(!data)return;
+        const folder=document.createElement("details");folder.className="chart-item";
+        const summary=document.createElement("summary");summary.textContent=planet+" BAV — "+data.total+" बिंदु";folder.appendChild(summary);
+        makeSignGrid(folder,data.signs);ashtak.appendChild(folder);
+      });
+      const check=document.createElement("p");check.className="chat-info";
+      check.textContent="गणना जाँच सफल: सूर्य 48, चंद्र 49, मंगल 39, बुध 54, गुरु 56, शुक्र 52, शनि 39; SAV 337।";
+      ashtak.appendChild(check);
+      (av.notes||[]).forEach(note=>addNote(ashtak,note));
+    } else addNote(ashtak,"इस जन्म-कुंडली के लिए सत्यापित अष्टकवर्ग डेटा उपलब्ध नहीं है।");
     const strength=makeFolder("4. षड्बल और भावबल","shadbalaFolder");
     addNote(strength,"षड्बल और भावबल की शास्त्रीय गणना अभी पूरी तरह लागू नहीं है। सत्यापित गणना जुड़ने के बाद ही ग्रहों और भावों के बल दिखाए जाएँगे।");
   }
