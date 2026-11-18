@@ -77,7 +77,7 @@ module.exports=async function(req,res){
         });
       }catch(saveError){console.warn("Assistant message save skipped:",saveError.message);}
     }
-    return res.status(200).json({success:true,answer,testMode:isOwnerFreeTest});
+    return res.status(200).json({success:true,answer});
   }catch(error){
     console.error("Consultation API error:",error.message);
     return res.status(503).json({success:false,message:"परामर्श सेवा अभी कॉन्फ़िगर नहीं है। कृपया बाद में प्रयास करें।"});
