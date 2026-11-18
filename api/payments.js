@@ -28,7 +28,7 @@ module.exports=async function(req,res){
   const action=req.params.action;
   try{
     const user=await getAuthenticatedUser(req,res);
-    if(!user)return res.status(401).json({success:false,message:"रिचार्ज के लिए पहले मोबाइल OTP से लॉगिन करें।"});
+    if(!user)return res.status(401).json({success:false,message:"रिचार्ज के लिए पहले गेस्ट अकाउंट बनाएं।"});
     if(action==="create-order"&&req.method==="POST"){
       const amount=Number(req.body?.amountPaise);
       if(!Number.isSafeInteger(amount)||amount<1000||amount>5000000)
