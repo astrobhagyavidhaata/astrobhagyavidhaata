@@ -70,6 +70,48 @@
     root.appendChild(wrap);
   }
 
+  let selectedBirthPlace = null;
+  let placeSearchSequence = 0;
+
+  function placeLabel(place) {
+    return [place.name, place.admin1, place.country].filter(Boolean).join(", ");
+  }
+
+  async function updateBirthPlaceSuggestions(query) {
+    const box = $("birthPlaceSuggestions");
+    if (!box) return;
+    const sequence = ++placeSearchSequence;
+    if (query.trim().length < 2) {
+      box.replaceChildren();
+      box.style.display = "none";
+      return;
+    }
+    try {
+      const results = await findBirthPlace(query.trim());
+      if (sequence !== placeSearchSequence) return;
+      box.replaceChildren();
+      results.forEach(place => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("role", "option");
+        button.textContent = placeLabel(place);
+        button.addEventListener("click", () => {
+          selectedBirthPlace = { ...place, label: placeLabel(place) };
+          $("birthPlace").value = selectedBirthPlace.label;
+          box.replaceChildren();
+          box.style.display = "none";
+        });
+        box.appendChild(button);
+      });
+      box.style.display = results.length ? "block" : "none";
+    } catch (error) {
+      if (sequence === placeSearchSequence) {
+        box.replaceChildren();
+        box.style.display = "none";
+      }
+    }
+  }
+
   function validateBirthDetails(data) {
     const details = {
       name: String(data.get("name") || "").trim(),
@@ -88,13 +130,17 @@
       throw new Error("कृपया सभी जन्म विवरण भरें।");
     }
 
-    const birthDate = new Date(details.date + "T00:00:00");
-
-    if (Number.isNaN(birthDate.getTime())) {
+    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(details.date)) {
+      throw new Error("कृपया जन्म तारीख कैलेंडर से चुनें।");
+    }
+    const [year, month, day] = details.date.split("-").map(Number);
+    const birthDate = new Date(Date.UTC(year, month - 1, day));
+    if (birthDate.getUTCFullYear() !== year || birthDate.getUTCMonth() !== month - 1 || birthDate.getUTCDate() !== day) {
       throw new Error("जन्म तारीख सही भरें।");
     }
-
-    if (birthDate > new Date()) {
+    const today = new Date();
+    const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+    if (birthDate.getTime() > todayUtc) {
       throw new Error("जन्म तारीख भविष्य की नहीं हो सकती।");
     }
 
@@ -393,7 +439,10 @@
 
       showMessage("जन्मस्थान खोजा जा रहा है...");
 
-      const results = await findBirthPlace(details.place);
+      const cached = selectedBirthPlace && selectedBirthPlace.label === details.place
+        ? selectedBirthPlace
+        : null;
+      const results = cached ? [cached] : await findBirthPlace(details.place);
 
       if (!results.length) {
         throw new Error(
@@ -458,6 +507,24 @@
     }
 
     form.addEventListener("submit", handleSubmit);
+    const placeInput = $("birthPlace");
+    if (placeInput) {
+      placeInput.addEventListener("input", () => {
+        selectedBirthPlace = null;
+        updateBirthPlaceSuggestions(placeInput.value);
+      });
+      placeInput.addEventListener("focus", () => {
+        if (placeInput.value.trim().length >= 2 && !selectedBirthPlace) {
+          updateBirthPlaceSuggestions(placeInput.value);
+        }
+      });
+      document.addEventListener("click", event => {
+        const box = $("birthPlaceSuggestions");
+        if (box && !box.contains(event.target) && event.target !== placeInput) {
+          box.style.display = "none";
+        }
+      });
+    }
   }
 
   if (document.readyState === "loading") {
