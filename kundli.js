@@ -43,14 +43,17 @@
     const ascIndex = Number.isInteger(chart.d1.ascendant.rashiIndex) ? chart.d1.ascendant.rashiIndex : names.indexOf(chart.d1.ascendant.rashi);
     if (ascIndex < 0 || ascIndex > 11) throw new Error('Invalid ascendant sign index.');
     const occupants = {};
+    const planetCodes = {सूर्य:'SU',चंद्र:'MO',मंगल:'MA',बुध:'ME',गुरु:'JU',शुक्र:'VE',शनि:'SA',राहु:'RA',केतु:'KE'};
     for (const [planet, p] of Object.entries(chart.d1.planets || {})) {
-      (occupants[p.house] ||= []).push((({सूर्य:'Sun',चंद्र:'Moon',मंगल:'Mars',बुध:'Mercury',गुरु:'Jupiter',शुक्र:'Venus',शनि:'Saturn',राहु:'Rahu',केतु:'Ketu'})[planet] || planet) + (p.retrograde ? ' ℞' : ''));
+      const house = Number(p.house);
+      if (!Number.isInteger(house) || house < 1 || house > 12) continue;
+      (occupants[house] ||= []).push((planetCodes[planet] || String(planet).slice(0, 2).toUpperCase()) + (p.retrograde ? '℞' : ''));
     }
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('viewBox','0 0 400 400');
     svg.setAttribute('role','img');
-    svg.setAttribute('aria-label','उत्तर भारतीय शैली की बारह भावों वाली Birth Chart');
+    svg.setAttribute('aria-label','North Indian style twelve-house birth chart');
     svg.style.cssText = 'display:block;width:100%;height:auto;max-width:460px;margin:auto;background:#fffaf0';
     const line = (x1,y1,x2,y2) => {
       const el=document.createElementNS(ns,'line');
@@ -63,7 +66,7 @@
     line(2,2,398,398); line(398,2,2,398);
     line(200,2,398,200); line(398,200,200,398); line(200,398,2,200); line(2,200,200,2);
     // North Indian chart order: houses advance counter-clockwise from the top (Lagna).
-    const positions=[[200,78],[100,78],[50,145],[50,200],[50,255],[100,322],[200,322],[300,322],[350,255],[350,200],[350,145],[300,78]];
+    const positions=[[200,78],[100,78],[50,145],[100,200],[50,255],[100,322],[200,322],[300,322],[350,255],[300,200],[350,145],[300,78]];
     for(let house=1;house<=12;house++){
       const [x,y]=positions[house-1], signIndex=(ascIndex+house-1)%12;
       const group=document.createElementNS(ns,'g');
