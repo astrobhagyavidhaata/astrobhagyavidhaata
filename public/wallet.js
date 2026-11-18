@@ -65,7 +65,7 @@
     const el=$("consultationBillingStatus");
     if(!el)return;
     if(!consultation){
-      el.textContent="पहला मिनट शुरू होते ही ₹5 और हर पूरा अतिरिक्त मिनट ₹5 है।";
+      el.textContent="पहली बार 1 मिनट मुफ्त। उसके बाद ₹5 प्रति मिनट।";
       return;
     }
     const minutes=Number(consultation.billedMinutes||0);
@@ -241,7 +241,7 @@
 
       timer = window.setInterval(heartbeat, 15000);
 
-      message("परामर्श शुरू हो गया। शुल्क ₹5 प्रति मिनट।");
+      message(data.consultation.isFreeTrial ? "आपका पहला 1 मिनट मुफ्त शुरू हो गया है। उसके बाद ₹5 प्रति मिनट लगेंगे।" : "परामर्श शुरू हो गया। शुल्क ₹5 प्रति मिनट।");
 
       document.dispatchEvent(
         new CustomEvent("astro:consultation-started", {
