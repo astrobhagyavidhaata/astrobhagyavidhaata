@@ -48,6 +48,9 @@
     .support-link{display:block;text-align:center;text-decoration:none;padding:13px 10px;border-radius:9px;background:#e8b957;color:#211638;font-weight:bold}
     .support-link.whatsapp{background:#1f8f5f;color:#fff}
     .support-note{color:#d4c9e5;font-size:14px;line-height:1.7}
+    .legal-details{margin-top:14px;border:1px solid #66547f;border-radius:10px;padding:12px;background:#181326}
+    .legal-details summary{color:#f5d994;font-weight:bold;cursor:pointer;list-style-position:inside}
+    .legal-details[open] summary{margin-bottom:10px}
     .support-topics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
     .support-topics a{display:block;text-align:center;text-decoration:none;padding:11px 8px;border:1px solid #66547f;border-radius:8px;color:#f5d994;font-size:13px}
     @media(max-width:360px){.support-actions,.support-topics{grid-template-columns:1fr}}
@@ -150,11 +153,18 @@
         <a href="https://wa.me/918208091073?text=Namaste%2C%20main%20app%20ke%20baare%20mein%20sujhav%20dena%20chahta%2Fchahti%20hoon." target="_blank" rel="noopener noreferrer">सुझाव / Feedback</a>
         <a href="https://wa.me/918208091073?text=Namaste%2C%20mujhe%20wallet%20balance%20ke%20baare%20mein%20sahayata%20chahiye." target="_blank" rel="noopener noreferrer">वॉलेट बैलेंस</a>
       </div>
-      <div style="margin-top:14px;padding:12px;border:1px solid #9b7540;border-radius:9px;background:#181326;color:#f4dfb5;font-size:13px;line-height:1.7">
-        <strong>⚠️ भुगतान और रिफंड संबंधी महत्वपूर्ण सूचना</strong><br>
-        भुगतान करने से पहले सेवा और शुल्क अच्छी तरह समझ लें। Astro Bhagya Vidhata का कार्य ज्योतिषीय गणना एवं मार्गदर्शन देना है; किसी सलाह, भविष्यवाणी या मनचाहे परिणाम की गारंटी नहीं दी जाती। केवल सलाह पसंद न आने या अपेक्षित परिणाम न मिलने के आधार पर भुगतान वापस नहीं किया जाएगा। डिजिटल परामर्श शुरू होने या सेवा उपयोग हो जाने के बाद सामान्यतः रिफंड उपलब्ध नहीं होगा। हालांकि, दोहरी कटौती, असफल भुगतान में राशि कटने या भुगतान के बावजूद सेवा न मिलने जैसी वास्तविक तकनीकी/भुगतान समस्या की जाँच करके लागू नियमों और कानून के अनुसार समाधान किया जाएगा। भुगतान अपनी समझ और जिम्मेदारी से करें।
-      </div>
-      <p class="support-note" style="margin-bottom:0">पेमेंट की शिकायत करते समय Transaction ID और भुगतान का समय लिखें। OTP, पासवर्ड या बैंक PIN कभी साझा न करें।</p>
+      <details class="legal-details">
+        <summary>📄 नीतियाँ और भुगतान संबंधी नियम</summary>
+        <div style="margin-top:12px;padding:12px;border:1px solid #9b7540;border-radius:9px;background:#181326;color:#f4dfb5;font-size:13px;line-height:1.7">
+          <strong>भुगतान, रद्दीकरण और रिफंड</strong><br>
+          भुगतान से पहले सेवा, शुल्क और लागू शर्तें पढ़ें। ज्योतिषीय गणना एवं परामर्श मार्गदर्शन के लिए हैं; किसी भविष्यवाणी या परिणाम की गारंटी नहीं है। केवल भविष्यवाणी से असहमत होने या अपेक्षित परिणाम न मिलने से अपने-आप रिफंड देय नहीं होता। ग्राहक किसी भी समय लाइव परामर्श समाप्त कर सकता है; सही तरीके से दी गई सेवा का उपयोग किया गया शुल्क लागू रहेगा। सेवा न मिलने, तकनीकी विफलता, दोहरी कटौती या गलत डेबिट की शिकायत की जाँच की जाएगी। अप्रयुक्त वॉलेट राशि के रिफंड अनुरोध लागू कानून और भुगतान प्रदाता के नियमों के अनुसार देखे जाएँगे। किसी भी वैधानिक ग्राहक अधिकार को ये शर्तें सीमित नहीं करतीं।
+        </div>
+        <p class="support-note" style="margin-bottom:10px">पेमेंट की शिकायत करते समय Transaction ID और भुगतान का समय लिखें। OTP, पासवर्ड या बैंक PIN कभी साझा न करें।</p>
+        <div class="support-topics">
+          <a href="/TERMS.md">नियम और शर्तें पढ़ें</a>
+          <a href="/PRIVACY.md">गोपनीयता नीति पढ़ें</a>
+        </div>
+      </details>
     </section>
   </main>
   <div id="chatModal" class="modal"><div class="modal-box">
