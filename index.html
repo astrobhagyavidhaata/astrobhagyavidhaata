@@ -25,7 +25,7 @@
     .secondary{background:#493568;color:white}
     #message,#walletMessage,#panchangMessage{display:none;padding:12px;margin-top:14px;border-radius:8px;background:#151020;color:#f5d994;line-height:1.6;overflow-wrap:anywhere}
     #kBox{display:none;margin-top:18px}
-    #kTxt{background:#151020;border:1px solid #66547f;border-radius:9px;padding:13px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;color:#eee}
+    #kTxt,#vargaCharts{display:none!important}
     .chat-info{color:#d4c9e5;font-size:14px;line-height:1.6}
     .modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.82);padding:12px;overflow-y:auto}
     .modal-box{max-width:520px;margin:25px auto;padding:17px;border-radius:14px;background:#211a32;border:1px solid #70558e}
@@ -95,7 +95,7 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>📜 आपकी जन्म कुंडली</h2><div id="kTxt"></div><div id="vargaCharts"></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+      <div id="kBox"><h2>🪷 आपकी उत्तर भारतीय जन्म कुंडली</h2><div id="kTxt" aria-hidden="true"></div><div id="vargaCharts" aria-hidden="true"></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
     <section class="panel">
