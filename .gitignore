@@ -3,3 +3,8 @@ node_modules/
 .env.local
 .vercel/
 .DS_Store
+
+# Cloudflare Workers build output and local secrets
+worker-assets/
+.wrangler/
+.dev.vars*
