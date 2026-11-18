@@ -61,12 +61,31 @@
     }
     const panel=$("planetNakshatra");
     if(panel){
-      panel.replaceChildren();const table=document.createElement("table"),thead=document.createElement("thead"),trh=document.createElement("tr");
-      ["ग्रह","राशि","अंश","नक्षत्र","चरण"].forEach(label=>{const th=document.createElement("th");th.textContent=label;trh.appendChild(th);});thead.appendChild(trh);table.appendChild(thead);
+      panel.replaceChildren();
+      const heading=document.createElement("h3");
+      heading.textContent="ग्रहों का नक्षत्र एवं भाव विवरण";
+      heading.style.cssText="margin:2px 0 6px;color:#f5c66b;font-size:16px";
+      const note=document.createElement("p");
+      note.textContent="D1 जन्म कुंडली के अनुसार ग्रह किस राशि, भाव, नक्षत्र और चरण में स्थित हैं।";
+      note.style.cssText="margin:0 0 10px;color:#d4c9e5;font-size:12px;line-height:1.5";
+      panel.append(heading,note);
+      const table=document.createElement("table"),thead=document.createElement("thead"),trh=document.createElement("tr");
+      ["ग्रह","राशि","भाव","अंश","नक्षत्र","चरण"].forEach(label=>{const th=document.createElement("th");th.textContent=label;trh.appendChild(th);});
+      thead.appendChild(trh);table.appendChild(thead);
       const tbody=document.createElement("tbody");
-      for(const [planet,p] of Object.entries(chart.d1.planets||{})){
-        const tr=document.createElement("tr"),values=[planet,p.rashi||signs[p.rashiIndex]||"—",Number(p.degreeInRashi||0).toFixed(2)+"°",p.nakshatra||"—",p.pada||"—"];
-        values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});tbody.appendChild(tr);
+      const rows=[["लग्न",chart.d1.ascendant||{}],...Object.entries(chart.d1.planets||{})];
+      for(const [planet,p] of rows){
+        const degree=Number(p.degreeInRashi);
+        const degreeText=Number.isFinite(degree)?degree.toFixed(2)+"°":"—";
+        const pada=Number(p.pada);
+        const padaText=Number.isInteger(pada)&&pada>=1&&pada<=4?"चरण "+pada:"—";
+        const house=Number(p.house);
+        const houseText=Number.isInteger(house)&&house>=1&&house<=12?house+"वाँ":"—";
+        const planetText=planet+(p.retrograde?" ℞":"");
+        const values=[planetText,p.rashi||signs[p.rashiIndex]||"—",houseText,degreeText,p.nakshatra||"—",padaText];
+        const tr=document.createElement("tr");
+        values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});
+        tbody.appendChild(tr);
       }
       table.appendChild(tbody);panel.appendChild(table);
     }
