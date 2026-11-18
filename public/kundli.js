@@ -115,7 +115,7 @@
       d.id=id;
       const heading=document.createElement("h3");heading.textContent=title;d.appendChild(heading);
       if(tabs){
-        const button=document.createElement("button");button.type="button";button.textContent=title.replace(/^[0-9]+[.]\\s*/,"");
+        const button=document.createElement("button");button.type="button";button.textContent=title.replace(/^[0-9]+[.]/,"").trim();
         button.setAttribute("role","tab");button.setAttribute("aria-selected",String(firstPage));
         button.addEventListener("click",()=>{
           root.querySelectorAll(".calculation-page").forEach(page=>page.classList.toggle("active",page===d));
