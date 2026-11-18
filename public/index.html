@@ -126,6 +126,42 @@
     footer{text-align:center;padding:20px 14px;color:#a99bbd;font-size:12px;line-height:1.7}
     .language-picker{display:flex;align-items:center;gap:8px;margin:8px 0}.language-picker label{color:#f5c66b;font-size:13px}.language-picker select{max-width:190px;padding:8px 10px;border:1px solid #806b9b;border-radius:8px;background:#151020;color:#fff;font-size:14px}
     @media(max-width:420px){header h1{font-size:21px}.panel{padding:15px}#chatMessages{height:300px}}
+
+    :root{color-scheme:light;--app-orange:#f36b12;--app-orange-dark:#dc5705;--app-ink:#252525;--app-muted:#666;--app-line:#dedede;--app-soft:#f4f4f4}
+    body{background:#fff!important;color:var(--app-ink)!important;overflow-x:hidden}
+    header,.app-header{background:#fff!important;color:var(--app-ink)!important;border-bottom:1px solid var(--app-line)!important;box-shadow:0 2px 7px rgba(0,0,0,.06)}
+    header h1,h2,h3,.app-header h1{color:var(--app-orange-dark)!important}
+    header p,.chat-info,label{color:var(--app-muted)!important}
+    .wallet-bar{background:#fff}
+    .wallet{background:#fff4eb!important;border:1px solid #f3b17e!important;color:var(--app-orange-dark)!important}
+    button,.support-link{background:var(--app-orange)!important;color:#fff!important;border-radius:8px!important}
+    button.secondary{background:#777!important;color:#fff!important}
+    input,select,textarea{background:#fff!important;color:#222!important;border:1px solid #cfcfcf!important}
+    main{max-width:none;width:100%;margin:0 auto;padding:0 0 12px!important}
+    .app-page-tabs{position:relative!important;top:auto!important;display:flex;gap:0;overflow-x:auto;white-space:nowrap;background:#fff!important;border-bottom:1px solid var(--app-line)!important;padding:0 8px!important;margin:0!important;scrollbar-width:none}
+    .app-page-tabs::-webkit-scrollbar{display:none}
+    .app-page-tabs button{flex:0 0 auto!important;width:auto!important;margin:0!important;padding:15px 16px!important;background:#fff!important;color:#777!important;border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;font-size:14px!important}
+    .app-page-tabs button[aria-current="page"]{color:var(--app-orange-dark)!important;border-bottom-color:var(--app-orange)!important}
+    .app-swipe-deck{display:flex;width:100%;height:calc(100dvh - 210px);min-height:480px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none}
+    .app-swipe-deck::-webkit-scrollbar{display:none}
+    .app-page-panel{display:block!important;visibility:visible!important;flex:0 0 100%;width:100%;height:100%;min-width:100%;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start;scroll-snap-stop:always;margin:0!important;padding:22px 18px 28px!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
+    .app-page-panel h2{font-size:21px;color:var(--app-orange-dark)!important;border-bottom:1px solid #f2d0b8;padding-bottom:12px}
+    .app-folder,.chart-card,.chart-item,.calculation-page,.dasha-period,.dasha-subperiod,.dasha-current-card,.nakshatra-panel{background:#fff!important;color:#252525!important;border:1px solid #e2e2e2!important;border-radius:8px!important;box-shadow:none!important}
+    .chart-card svg{background:#fffaf0!important}
+    .calculation-tabs,.chart-view-toolbar{background:#fff!important;border-color:#e4e4e4!important}
+    .calculation-tabs button,.chart-view-btn{background:#fff!important;color:#555!important;border:1px solid #ddd!important}
+    .calculation-tabs button[aria-selected="true"],.chart-view-btn.active{background:#fff0e5!important;color:var(--app-orange-dark)!important;border-bottom-color:var(--app-orange)!important}
+    .dasha-current-item{background:#fff4eb!important;color:#333!important}
+    .dasha-current-item strong,.dasha-current-item span,.dasha-current-item small{color:#333!important}
+    .dasha-period>summary,.dasha-subperiod>summary,.app-folder>summary,.chart-item>summary{color:var(--app-orange-dark)!important}
+    .dasha-date-table th,.nakshatra-panel th{color:var(--app-orange-dark)!important}
+    .dasha-date-table th,.dasha-date-table td,.nakshatra-panel th,.nakshatra-panel td{border-color:#e5e5e5!important}
+    #message,#walletMessage,#panchangMessage{background:#fff4eb!important;color:#333!important}
+    #chatMessages{background:#f7f7f7!important;color:#222!important}
+    .msg-bot{background:#fff0e5!important;color:#222!important}.msg-user{background:#f0f0f0!important;color:#222!important}
+    footer{background:#fff!important;color:#777!important}
+    @media(max-width:600px){.app-swipe-deck{height:calc(100dvh - 195px);min-height:430px}.app-page-panel{padding:18px 14px 24px!important}.app-page-tabs button{padding:14px 13px!important}}
+
   </style>
 </head>
 <body>
@@ -149,15 +185,17 @@
     })();
   </script>
   <main>
-    <nav id="appPageTabs" class="app-page-tabs" role="tablist" aria-label="मुख्य ऐप पेज">
-      <button type="button" role="tab" aria-selected="true" data-app-tab="kundli">जन्म कुंडली</button>
-      <button type="button" role="tab" aria-selected="false" data-app-tab="saved">मेरी कुंडलियाँ</button>
-      <button type="button" role="tab" aria-selected="false" data-app-tab="panchang">पंचांग</button>
-      <button type="button" role="tab" aria-selected="false" data-app-tab="gochar">गोचर</button>
-      <button type="button" role="tab" aria-selected="false" data-app-tab="consult">परामर्श</button>
-      <button type="button" role="tab" aria-selected="false" data-app-tab="help">सहायता</button>
+    <nav id="appPageTabs" class="app-page-tabs" aria-label="ऐप के पेज">
+      <button type="button" data-app-tab="login" aria-current="page">शुरुआत</button>
+      <button type="button" data-app-tab="kundli">जन्म कुंडली</button>
+      <button type="button" data-app-tab="saved">मेरी कुंडलियाँ</button>
+      <button type="button" data-app-tab="panchang">पंचांग</button>
+      <button type="button" data-app-tab="gochar">गोचर</button>
+      <button type="button" data-app-tab="consult">परामर्श</button>
+      <button type="button" data-app-tab="help">सहायता</button>
     </nav>
-    <section class="panel app-page-panel active" data-app-page="kundli">
+    <div id="appSwipeDeck" class="app-swipe-deck">
+
       <h2>👤 गेस्ट लॉगिन</h2>
       <p id="loginState" class="chat-info">गेस्ट अकाउंट की स्थिति जाँची जा रही है…</p>
       <div id="guestConsentWrap">
@@ -169,7 +207,7 @@
       <button id="guestContinueButton" type="button">बिना OTP जारी रखें</button>
       <div id="authMessage" role="status" aria-live="polite"></div>
     </section>
-    <section class="panel app-page-panel active" data-app-page="kundli">
+    <section class="panel app-page-panel active" data-app-page="login">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
@@ -260,6 +298,7 @@
     </section>
 
 
+    </div>
   </main>
   <div id="chatModal" class="modal"><div class="modal-box">
     <div class="modal-head"><h2 id="chatTitle">AI वैदिक ज्योतिष परामर्श</h2><button type="button" class="close-button" onclick="closeChatBox()">बंद करें</button></div>
@@ -300,20 +339,21 @@
 
   <script>
     (function(){
-      const tabs=document.getElementById("appPageTabs");
-      if(!tabs)return;
-      const pages=[...document.querySelectorAll("[data-app-page]")];
-      const buttons=[...tabs.querySelectorAll("[data-app-tab]")];
-      function activate(name){
-        pages.forEach(page=>page.classList.toggle("active",page.dataset.appPage===name));
-        buttons.forEach(button=>button.setAttribute("aria-selected",String(button.dataset.appTab===name)));
+      const deck=document.getElementById("appSwipeDeck"),tabs=document.getElementById("appPageTabs");
+      if(!deck||!tabs)return;
+      const pages=[...deck.querySelectorAll("[data-app-page]")],buttons=[...tabs.querySelectorAll("[data-app-tab]")];
+      const names=pages.map(page=>page.dataset.appPage);
+      function activate(index){
+        const name=names[index];
+        buttons.forEach(button=>{const active=button.dataset.appTab===name;button.setAttribute("aria-current",active?"page":"false");if(active)button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});});
       }
       buttons.forEach(button=>button.addEventListener("click",()=>{
-        activate(button.dataset.appTab);
-        button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
-        window.scrollTo({top:0,behavior:"smooth"});
+        const index=names.indexOf(button.dataset.appTab);
+        if(index>=0)deck.scrollTo({left:deck.clientWidth*index,behavior:"smooth"});
       }));
-      activate("kundli");
+      let scrollTimer;
+      deck.addEventListener("scroll",()=>{clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>activate(Math.max(0,Math.min(pages.length-1,Math.round(deck.scrollLeft/deck.clientWidth)))),70);},{passive:true});
+      activate(0);
     })();
   </script>
   <script src="kundli.js"></script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="wallet.js"></script><script src="auth.js"></script><script src="kundli-history.js"></script><script src="ai_chat.js"></script><script src="panchang.js"></script><script src="gochar.js"></script>
