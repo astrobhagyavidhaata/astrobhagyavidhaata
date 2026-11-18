@@ -62,7 +62,54 @@
     const note = document.createElement("p");
     note.style.cssText = "font-size:12px;line-height:1.6;color:#d4c9e5";
     note.textContent = data.note || "";
-    output.append(table,note);
+    output.append(table);
+
+    function appendDrishti(title, details) {
+      if (!details) return;
+      const folder = document.createElement("details");
+      folder.className = "chart-item";
+      const summary = document.createElement("summary");
+      summary.textContent = title;
+      folder.appendChild(summary);
+
+      const houseHeading = document.createElement("p");
+      houseHeading.className = "chat-info";
+      houseHeading.textContent = "भावों पर दृष्टि";
+      folder.appendChild(houseHeading);
+      const houseList = document.createElement("ul");
+      for (const aspect of details.houseAspects || []) {
+        const item = document.createElement("li");
+        item.textContent = aspect.from + " की " + (aspect.full ? "पूर्ण" : aspect.aspectStrength + "%") +
+          " दृष्टि — " + aspect.targetHouse + "वाँ भाव (" + aspect.targetSign + ")";
+        houseList.appendChild(item);
+      }
+      folder.appendChild(houseList);
+
+      const planetHeading = document.createElement("p");
+      planetHeading.className = "chat-info";
+      planetHeading.textContent = "दूसरे गोचर ग्रहों पर दृष्टि";
+      folder.appendChild(planetHeading);
+      const planetList = document.createElement("ul");
+      for (const aspect of details.planetAspects || []) {
+        const item = document.createElement("li");
+        item.textContent = aspect.from + " की " + (aspect.full ? "पूर्ण" : aspect.aspectStrength + "%") +
+          " दृष्टि " + aspect.to + " पर";
+        planetList.appendChild(item);
+      }
+      if (!planetList.children.length) {
+        const item = document.createElement("li");
+        item.textContent = "इस दृष्टि-योजना के अनुसार कोई ग्रह-दृष्टि दर्ज नहीं हुई।";
+        planetList.appendChild(item);
+      }
+      folder.appendChild(planetList);
+      output.appendChild(folder);
+    }
+
+    if (data.drishti) {
+      appendDrishti("चंद्र राशि से गोचर ग्रहों की दृष्टि", data.drishti.fromMoon);
+      appendDrishti("लग्न से गोचर ग्रहों की दृष्टि", data.drishti.fromLagna);
+    }
+    output.appendChild(note);
   }
 
   async function loadRashiGochar() {
