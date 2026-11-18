@@ -51,17 +51,10 @@ module.exports=async function(req,res){
     const now=Date.now(),last=recentRequests.get(user.id)||0;
     if(now-last<3000)return res.status(429).json({success:false,message:"अगला प्रश्न भेजने से पहले कुछ सेकंड रुकें।"});
 
-    // Free testing is restricted to the server-configured, Supabase-authenticated owner email.
-    // Never trust a client-supplied test flag, email, or user ID.
-    const configuredOwnerEmail=String(process.env.AI_FREE_TEST_OWNER_EMAIL||"").trim().toLowerCase();
-    const isOwnerFreeTest=!!configuredOwnerEmail&&String(user.email||"").trim().toLowerCase()===configuredOwnerEmail;
-    let active=null;
-    if(!isOwnerFreeTest){
-      active=await activeConsultation(user.id);
-      if(!active)return res.status(402).json({success:false,message:"पहले वॉलेट से ₹5 प्रति मिनट का परामर्श शुरू करें।"});
-      const billing=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
-      if(billing.consultation?.status!=="active")return res.status(402).json({success:false,message:"वॉलेट बैलेंस पूरा हो गया है। परामर्श रोक दिया गया।"});
-    }
+    let active=await activeConsultation(user.id);
+    if(!active)return res.status(402).json({success:false,message:"पहले मुफ्त मिनट शुरू करें या वॉलेट रिचार्ज करके परामर्श शुरू करें।"});
+    const billing=await rpc("heartbeat_consultation",{p_user_id:user.id,p_consultation_id:active.id});
+    if(billing.consultation?.status!=="active")return res.status(402).json({success:false,message:"वॉलेट बैलेंस पूरा हो गया है। परामर्श रोक दिया गया।"});
 
     recentRequests.set(user.id,now);
     const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
