@@ -57,17 +57,20 @@
     .chart-item>summary{cursor:pointer;color:#f5d994;font-weight:bold;list-style-position:inside}
     .chart-item[open]>summary{margin-bottom:10px}
     .chat-info{color:#d4c9e5;font-size:14px;line-height:1.6}
-    .modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.82);padding:12px;overflow-y:auto}
-    .modal-box{max-width:520px;margin:25px auto;padding:17px;border-radius:14px;background:#211a32;border:1px solid #70558e}
-    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .modal{display:none;position:fixed;left:0;right:0;top:var(--chat-vtop,0px);height:var(--chat-vh,100dvh);z-index:1000;background:rgba(0,0,0,.82);padding:10px;overflow:hidden;box-sizing:border-box}
+    .modal-box{display:flex;flex-direction:column;width:100%;max-width:520px;height:100%;max-height:100%;min-height:0;margin:0 auto;padding:12px;border-radius:14px;background:#211a32;border:1px solid #70558e;box-sizing:border-box;overflow:hidden}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:0 0 auto}
     .modal-head h2{font-size:17px;margin:0}
     .close-button{width:auto;margin:0;padding:8px 13px;background:#493568;color:white}
-    #chatMessages{height:330px;overflow-y:auto;background:#151020;border:1px solid #66547f;border-radius:10px;padding:12px;margin-top:15px}
+    #consultationBillingStatus{flex:0 0 auto;margin:8px 0}
+    #chatMessages{flex:1 1 auto;height:auto;min-height:70px;min-width:0;overflow-y:auto;background:#151020;border:1px solid #66547f;border-radius:10px;padding:12px;margin-top:8px}
     .msg-bot{background:#302342;padding:11px;border-radius:9px;margin-bottom:10px;line-height:1.6;overflow-wrap:anywhere}
     .msg-user{background:#17483f;padding:11px;border-radius:9px;margin-bottom:10px;text-align:right;line-height:1.6;overflow-wrap:anywhere}
-    #userMsgInput{margin-top:12px;min-height:48px}
-    .chat-actions{display:flex;gap:9px}
+    #userMsgInput{flex:0 0 auto;width:100%;box-sizing:border-box;margin-top:6px;min-height:48px;max-height:110px;resize:vertical}
+    .modal-box>label[for="userMsgInput"]{flex:0 0 auto;margin-top:8px}
+    .chat-actions{display:flex;gap:9px;flex:0 0 auto;padding-bottom:env(safe-area-inset-bottom,0px)}
     .chat-actions button{flex:1}
+    @media(max-height:520px){.modal-box{padding:8px}.modal-head h2{font-size:15px}#consultationBillingStatus{font-size:12px}.modal-box>label[for="userMsgInput"]{font-size:13px}}
     #panchangOutput{display:none;margin-top:18px;line-height:1.6}
     #panchangOutput p{margin:8px 0}
     #panchangOutput table{color:#eee}
@@ -215,6 +218,28 @@
   </div></div>
   <footer>© 2026 Astro Bhagya Vidhata<br>AI Vedic Astrology Consultation<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।</footer>
   <script>
+    (function(){
+      const chatModal=document.getElementById('chatModal');
+      function fitChatToKeyboard(){
+        if(!chatModal) return;
+        const viewport=window.visualViewport;
+        const height=viewport ? viewport.height : window.innerHeight;
+        const top=viewport ? viewport.offsetTop : 0;
+        chatModal.style.setProperty('--chat-vh',Math.max(220,height)+'px');
+        chatModal.style.setProperty('--chat-vtop',Math.max(0,top)+'px');
+      }
+      fitChatToKeyboard();
+      if(window.visualViewport){
+        window.visualViewport.addEventListener('resize',fitChatToKeyboard);
+        window.visualViewport.addEventListener('scroll',fitChatToKeyboard);
+      }
+      window.addEventListener('resize',fitChatToKeyboard);
+      const chatInput=document.getElementById('userMsgInput');
+      if(chatInput) chatInput.addEventListener('focus',()=>{
+        fitChatToKeyboard();
+        setTimeout(()=>chatInput.scrollIntoView({block:'nearest'}),80);
+      });
+    })();
     (function(){
       const btn=document.getElementById('appMenuButton');
       const panel=document.getElementById('appMenuPanel');
