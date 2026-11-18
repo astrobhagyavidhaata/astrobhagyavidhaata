@@ -106,7 +106,26 @@
     const root=$("jyotishCalculations");
     if(!root)return;
     root.replaceChildren();
-    const makeFolder=(title,id)=>{const d=document.createElement("details");d.className="chart-item";const s=document.createElement("summary");s.textContent=title;d.id=id;d.appendChild(s);root.appendChild(d);return d;};
+    const tabs=$("kundliDetailTabs");
+    if(tabs)tabs.replaceChildren();
+    let firstPage=true;
+    const makeFolder=(title,id)=>{
+      const d=document.createElement("section");
+      d.className="calculation-page"+(firstPage?" active":"");
+      d.id=id;
+      const heading=document.createElement("h3");heading.textContent=title;d.appendChild(heading);
+      if(tabs){
+        const button=document.createElement("button");button.type="button";button.textContent=title.replace(/^\\d+\\. /,"");
+        button.setAttribute("role","tab");button.setAttribute("aria-selected",String(firstPage));
+        button.addEventListener("click",()=>{
+          root.querySelectorAll(".calculation-page").forEach(page=>page.classList.toggle("active",page===d));
+          tabs.querySelectorAll("button").forEach(tab=>tab.setAttribute("aria-selected",String(tab===button)));
+          button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+        });
+        tabs.appendChild(button);
+      }
+      root.appendChild(d);firstPage=false;return d;
+    };
     const addNote=(host,message)=>{const p=document.createElement("p");p.className="chat-info";p.textContent=message;host.appendChild(p);};
     const tara=makeFolder("1. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");
     tara.open=true;
