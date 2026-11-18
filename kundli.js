@@ -34,10 +34,10 @@
       output.parentNode.insertBefore(root, output);
     }
     root.replaceChildren();
-    root.style.cssText = 'margin:18px auto;padding:12px;max-width:520px;background:#fffaf0;color:#3b2615;border:1px solid #b78b45;border-radius:12px';
+    root.style.cssText = 'margin:16px auto;padding:8px;max-width:480px;background:#fffaf0;color:#3b2615;border:1px solid #b78b45;border-radius:10px';
     const title = document.createElement('h3');
     title.textContent = 'Birth Chart';
-    title.style.cssText = 'text-align:center;color:#70451d;margin:0 0 8px';
+    title.style.cssText = 'text-align:center;color:#70451d;font-size:16px;font-weight:600;margin:0 0 8px';
     root.appendChild(title);
     const names = Array.from({length:12}, (_, i) => String(i + 1));
     const ascIndex = Number.isInteger(chart.d1.ascendant.rashiIndex) ? chart.d1.ascendant.rashiIndex : names.indexOf(chart.d1.ascendant.rashi);
@@ -54,7 +54,7 @@
     svg.setAttribute('viewBox','0 0 400 400');
     svg.setAttribute('role','img');
     svg.setAttribute('aria-label','North Indian style twelve-house birth chart');
-    svg.style.cssText = 'display:block;width:100%;height:auto;max-width:460px;margin:auto;background:#fffaf0';
+    svg.style.cssText = 'display:block;width:100%;height:auto;max-width:420px;margin:auto;background:#fffaf0';
     const line = (x1,y1,x2,y2) => {
       const el=document.createElementNS(ns,'line');
       for (const [k,v] of Object.entries({x1,y1,x2,y2})) el.setAttribute(k,v);
@@ -78,7 +78,7 @@
       planet.setAttribute('x',x);
       planet.setAttribute('y',y+12);
       planet.setAttribute('text-anchor','middle');
-      planet.setAttribute('font-size','10');
+      planet.setAttribute('font-size','11');
       planet.setAttribute('font-weight','bold');
       planet.setAttribute('fill','#9a421d');
       // Keep every planet abbreviation inside its own house cell.
@@ -90,8 +90,6 @@
         const tspan=document.createElementNS(ns,'tspan');
         tspan.setAttribute('x',x);
         tspan.setAttribute('dy',index===0?'0':'11');
-        tspan.setAttribute('textLength','66');
-        tspan.setAttribute('lengthAdjust','spacingAndGlyphs');
         tspan.textContent=row;
         planet.appendChild(tspan);
       });
