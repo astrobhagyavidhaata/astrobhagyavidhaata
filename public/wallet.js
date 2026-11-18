@@ -71,6 +71,7 @@
     const minutes=Number(consultation.billedMinutes||0);
     const amount=(minutes*RATE).toFixed(2);
     el.textContent=(consultation.status==="active"?"परामर्श सक्रिय":"परामर्श समाप्त")+
+      (consultation.isFreeTrial?" · पहला 1 मिनट मुफ्त":"")+
       " · बिल किए गए मिनट: "+minutes+" · कुल शुल्क: ₹"+amount;
   }
 
