@@ -57,6 +57,17 @@
     .chart-item>summary{cursor:pointer;color:#f5d994;font-weight:bold;list-style-position:inside}
     .chart-item[open]>summary{margin-bottom:10px}
     .chat-info{color:#d4c9e5;font-size:14px;line-height:1.6}
+
+    .kundli-detail-deck{margin-top:16px}
+    .calculation-tabs{display:flex;gap:7px;overflow-x:auto;white-space:nowrap;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding:8px 2px 12px;border-bottom:1px solid #66547f;position:sticky;top:0;background:#100d1c;z-index:20}
+    .calculation-tabs button{flex:0 0 auto;width:auto;margin:0;padding:11px 15px;border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:#d4c9e5;font-size:14px}
+    .calculation-tabs button[aria-selected="true"]{color:#f5c66b;border-bottom-color:#f5c66b}
+    .calculation-page{display:none;margin:14px 0;border:1px solid #66547f;border-radius:12px;padding:14px;background:#181326}
+    .calculation-page.active{display:block}
+    .calculation-page h3{margin:0 0 12px}
+    #kundliChartsFolder{margin-top:16px}
+    @media(max-width:420px){.calculation-tabs button{padding:10px 12px;font-size:13px}}
+
     .modal{display:none;position:fixed;left:0;right:0;top:var(--chat-vtop,0px);height:calc(var(--chat-vh,100dvh) - var(--chat-lift,0px));z-index:1000;background:rgba(0,0,0,.82);padding:10px;overflow:hidden;box-sizing:border-box}
     .modal.keyboard-lift{--chat-lift:120px}
     .modal-box{display:flex;flex-direction:column;width:100%;max-width:520px;height:100%;max-height:100%;min-height:0;margin:0 auto;padding:12px;border-radius:14px;background:#211a32;border:1px solid #70558e;box-sizing:border-box;overflow:hidden}
@@ -94,7 +105,7 @@
   </style>
 </head>
 <body>
-  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt">Português</option><option value="ar">العربية</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option></select></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"><details class="app-folder" id="kundliChartsFolder"><summary>📁 Shodashvarga Kundli (16 Charts)</summary><div id="vargaCharts"></div></details><details class="app-folder" id="jyotishCalculationsFolder" open><summary>📁 ज्योतिषीय गणनाएँ</summary><div id="jyotishCalculations"><p class="chat-info">पहले जन्म विवरण भरकर कुंडली बनाएँ। उसके बाद नवतारा, दशा और उपलब्ध गणनाएँ यहाँ खुलेंगी।</p></div></details></div></div></div></header>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt">Português</option><option value="ar">العربية</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option></select></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden></div></div></header>
   <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
   <script>
     (function(){
@@ -137,7 +148,7 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><details class="app-folder" id="kundliChartsFolder"><summary>षोडश वर्ग कुंडलियाँ (D2–D60)</summary><div id="vargaCharts"></div></details></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
     <section class="panel">
@@ -256,9 +267,6 @@
     (function(){
       const btn=document.getElementById('appMenuButton');
       const panel=document.getElementById('appMenuPanel');
-      const folder=document.getElementById('kundliChartsFolder');
-      const host=document.getElementById('menuChartFolderHost');
-      if(folder && host) host.appendChild(folder);
       if(btn && panel){
         btn.addEventListener('click',function(){
           const opening=panel.hidden;
