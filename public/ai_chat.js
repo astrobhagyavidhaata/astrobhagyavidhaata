@@ -12,6 +12,7 @@
   let activeAstro = "";
   let chatBusy = false;
   let chatHistory = [];
+  let ownerFreeTestMode = false;
 
   const $ = id => document.getElementById(id);
 
@@ -56,20 +57,24 @@
     try {
       getKundliDetails();
 
-      if (!window.AstroWallet) {
-        throw new Error("वॉलेट सेवा उपलब्ध नहीं है।");
+      ownerFreeTestMode = false;
+      try {
+        const identityResponse = await fetch("/api/test-identity", {
+          credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store"
+        });
+        const identity = await identityResponse.json();
+        ownerFreeTestMode = identityResponse.ok && identity.testMode === true;
+      } catch (_) {}
+
+      if (!ownerFreeTestMode) {
+        if (!window.AstroWallet) throw new Error("वॉलेट सेवा उपलब्ध नहीं है।");
+        if (Number(rate) !== 5) throw new Error("परामर्श शुल्क ₹5 प्रति मिनट है।");
+        await window.AstroWallet.ready;
+        const started = await window.AstroWallet.startConsultation(
+          astroName || "AI वैदिक ज्योतिष सहायक"
+        );
+        if (!started) return false;
       }
-
-      if (Number(rate) !== 5) {
-        throw new Error("परामर्श शुल्क ₹5 प्रति मिनट है।");
-      }
-
-      await window.AstroWallet.ready;
-      const started = await window.AstroWallet.startConsultation(
-        astroName || "AI वैदिक ज्योतिष सहायक"
-      );
-
-      if (!started) return false;
 
       activeAstro = astroName || "AI वैदिक ज्योतिष सहायक";
       chatHistory = [];
@@ -85,7 +90,7 @@
       const box = $("chatMessages");
       if (box) box.replaceChildren();
 
-      const consultationId=window.AstroWallet.getConsultationId();
+      const consultationId=ownerFreeTestMode ? null : window.AstroWallet.getConsultationId();
       let restored=false;
       if(consultationId){
         try{
@@ -198,7 +203,7 @@
   }
 
   async function closeChatBox() {
-    if (window.AstroWallet) {
+    if (!ownerFreeTestMode && window.AstroWallet) {
       await window.AstroWallet.stopConsultation();
     }
 
