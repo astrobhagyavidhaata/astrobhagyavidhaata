@@ -1,6 +1,18 @@
 "use strict";
 
-const {authFetch,getAuthenticatedUser,setAuthCookies}=require("../lib/supabase");
+const {authFetch,getAuthenticatedUser,setAuthCookies,serviceFetch}=require("../lib/supabase");
+const PRIVACY_POLICY_VERSION="2026-11-18";
+
+async function recordConsent(userId){
+  await serviceFetch("/profiles?id=eq."+encodeURIComponent(userId),{
+    method:"PATCH",
+    headers:{Prefer:"return=minimal"},
+    body:JSON.stringify({
+      terms_accepted_at:new Date().toISOString(),
+      privacy_policy_version:PRIVACY_POLICY_VERSION
+    })
+  });
+}
 
 module.exports=async function(req,res) {
   const action=req.params?.action || req.query?.action;
@@ -11,8 +23,14 @@ module.exports=async function(req,res) {
       return res.json({success:true,user:{id:user.id,isAnonymous:!!user.is_anonymous,phone:user.phone||""}});
     }
     if(action==="guest"&&req.method==="POST") {
+      if(req.body?.termsAccepted!==true) {
+        return res.status(400).json({success:false,message:"गेस्ट अकाउंट बनाने के लिए Terms और Privacy Policy की सहमति जरूरी है।"});
+      }
       const existing=await getAuthenticatedUser(req,res);
-      if(existing) return res.json({success:true,user:{id:existing.id,isAnonymous:!!existing.is_anonymous,phone:existing.phone||""}});
+      if(existing) {
+        await recordConsent(existing.id);
+        return res.json({success:true,user:{id:existing.id,isAnonymous:!!existing.is_anonymous,phone:existing.phone||""}});
+      }
       const response=await authFetch("/signup",{method:"POST",body:JSON.stringify({data:{account_type:"guest"}})});
       const data=await response.json();
       if(!response.ok||!data.access_token||!data.refresh_token||!data.user?.id) {
@@ -21,6 +39,7 @@ module.exports=async function(req,res) {
       }
       if(data.user.is_anonymous===false) return res.status(500).json({success:false,message:"सुरक्षित गेस्ट अकाउंट नहीं बन पाया।"});
       setAuthCookies(req,res,data.access_token,data.refresh_token);
+      await recordConsent(data.user.id);
       return res.json({success:true,user:{id:data.user.id,isAnonymous:true,phone:""}});
     }
     if(action==="send-otp"||action==="verify-otp") {
