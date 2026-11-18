@@ -108,7 +108,8 @@
     root.replaceChildren();
     const makeFolder=(title,id)=>{const d=document.createElement("details");d.className="chart-item";const s=document.createElement("summary");s.textContent=title;d.id=id;d.appendChild(s);root.appendChild(d);return d;};
     const addNote=(host,message)=>{const p=document.createElement("p");p.className="chat-info";p.textContent=message;host.appendChild(p);};
-    const tara=makeFolder("1. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");\n    tara.open=true;
+    const tara=makeFolder("1. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");
+    tara.open=true;
     const current=chart.currentTaraBala;
     if(current){
       const p=document.createElement("p");p.className="chat-info";
@@ -271,7 +272,8 @@
       }
       const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
       svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");
-      svg.setAttribute("aria-label",key+" उत्तर भारतीय शैली की 12 भाव वाली कुंडली");\n      svg.setAttribute("data-chart-layout","north-indian");
+      svg.setAttribute("aria-label",key+" उत्तर भारतीय शैली की 12 भाव वाली कुंडली");
+      svg.setAttribute("data-chart-layout","north-indian");
       svg.style.cssText="display:block;width:100%;max-width:400px;height:auto;aspect-ratio:1/1;margin:12px auto 0;background:#f7e9c9;border-radius:8px";
       const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
       const border=document.createElementNS(ns,"rect");
