@@ -165,6 +165,41 @@
       const dates=document.createElement("p");dates.className="chat-info";
       dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString():"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString():"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString():"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString():"—");
       dashaFolder.appendChild(dates);
+      const nakNames=["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वाभाद्रपद","उत्तराभाद्रपद","रेवती"];
+      const nakLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
+      const houseThemes=["स्वभाव, शरीर और जीवन-दिशा","धन, वाणी और परिवार","साहस, प्रयास और छोटे भाई-बहन","माता, घर, सुख और संपत्ति","संतान, शिक्षा, बुद्धि और रचनात्मकता","ऋण, रोग, प्रतियोगिता और सेवा","विवाह, साझेदारी और सार्वजनिक संबंध","परिवर्तन, शोध, गोपनीयता और साझा संसाधन","भाग्य, धर्म, गुरु और उच्च शिक्षा","कर्म, पेशा, प्रतिष्ठा और जिम्मेदारी","लाभ, आय, मित्र और इच्छापूर्ति","व्यय, विदेश, एकांत और आध्यात्मिकता"];
+      const planetThemes={सूर्य:"आत्मविश्वास, पिता, नेतृत्व और अधिकार",चंद्र:"मन, माता, भावनाएँ और जनसंपर्क",मंगल:"ऊर्जा, साहस, भूमि और प्रतिस्पर्धा",बुध:"बुद्धि, संवाद, व्यापार और विश्लेषण",गुरु:"ज्ञान, गुरु, संतान, विस्तार और मार्गदर्शन",शुक्र:"प्रेम, विवाह, कला, सुख और सुविधा",शनि:"अनुशासन, श्रम, देरी, जिम्मेदारी और स्थायित्व",राहु:"महत्वाकांक्षा, असामान्य अनुभव, तकनीक और विदेशी संपर्क",केतु:"वैराग्य, शोध, आध्यात्मिकता और अलगाव"};
+      const planetData=chart.d1?.planets||{};
+      const describeLord=(planet)=>{
+        const p=planetData[planet]||{};
+        const ni=Number.isInteger(Number(p.nakshatraIndex))?Number(p.nakshatraIndex):nakNames.indexOf(p.nakshatra);
+        const lord=ni>=0?nakLords[ni%9]:"—";
+        const house=Number(p.house);
+        return {planet,sign:p.rashi||signNames[Number(p.rashiIndex)]||"—",house:Number.isInteger(house)&&house>=1&&house<=12?house:null,nak:p.nakshatra||"—",pada:p.pada||"—",nakLord:lord,retrograde:!!p.retrograde};
+      };
+      const currentLords=[describeLord(active.mahadasha),describeLord(active.antardasha),describeLord(active.pratyantardasha)].filter(x=>x.planet&&x.planet!=="null");
+      if(currentLords.length){
+        const info=document.createElement("div");info.className="nakshatra-panel";
+        const infoTitle=document.createElement("h4");infoTitle.textContent="वर्तमान दशा-स्वामियों की जन्म-कुंडली स्थिति";info.appendChild(infoTitle);
+        const infoTable=document.createElement("table");
+        const infoHead=document.createElement("tr");["दशा स्वामी","राशि","भाव","नक्षत्र","चरण","नक्षत्र स्वामी"].forEach(v=>{const th=document.createElement("th");th.textContent=v;infoHead.appendChild(th);});infoTable.appendChild(infoHead);
+        currentLords.forEach(x=>{const tr=document.createElement("tr");[x.planet+(x.retrograde?" ℞":""),x.sign,x.house?x.house+"वाँ":"—",x.nak,x.pada,x.nakLord].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);tr.appendChild(td);});infoTable.appendChild(tr);});
+        info.appendChild(infoTable);dashaFolder.appendChild(info);
+        const md= currentLords[0], ad=currentLords[1];
+        if(md&&ad){
+          const result=document.createElement("div");result.className="nakshatra-panel";
+          const title=document.createElement("h4");title.textContent="महादशा–अंतरदशा का पारंपरिक फल-संकेत";result.appendChild(title);
+          const p=document.createElement("p");p.className="chat-info";
+          const mdTheme=planetThemes[md.planet]||"ग्रह के कारकत्व";
+          const adTheme=planetThemes[ad.planet]||"ग्रह के कारकत्व";
+          const mdHouse=md.house?houseThemes[md.house-1]:"भाव स्थिति उपलब्ध नहीं";
+          const adHouse=ad.house?houseThemes[ad.house-1]:"भाव स्थिति उपलब्ध नहीं";
+          p.textContent=md.planet+" महादशा में "+mdTheme+" प्रमुख विषय रहेंगे। इसका आधार जन्म-कुंडली में "+md.planet+" का "+md.sign+" राशि तथा "+mdHouse+" से संबंध है। "+ad.planet+" अंतरदशा इस अवधि में "+adTheme+" और "+adHouse+" के विषय सक्रिय करेगी। "+(md.nakLord!=="—"?"महादशा स्वामी "+md.nak+" नक्षत्र में है, जिसका स्वामी "+md.nakLord+" है। ":"")+(ad.nakLord!=="—"?"अंतरदशा स्वामी "+ad.nak+" नक्षत्र में है, जिसका स्वामी "+ad.nakLord+" है। ":"");
+          result.appendChild(p);
+          const caution=document.createElement("p");caution.className="chat-info";caution.textContent="यह प्रारंभिक कारकत्व-आधारित संकेत है। अंतिम फलादेश में लग्नानुसार भावेशत्व, ग्रह-दृष्टि, युति, अवस्था, बल, वर्ग कुंडली और नक्षत्र-स्वामी की स्थिति का संयुक्त विचार आवश्यक है।";result.appendChild(caution);
+          dashaFolder.appendChild(result);
+        }
+      }
       const timeline=document.createElement("div");timeline.className="nakshatra-panel";
       const timelineTitle=document.createElement("h4");timelineTitle.textContent="विंशोत्तरी महादशा समय-रेखा";timelineTitle.style.cssText="color:#f5c66b;margin:4px 0 8px";timeline.appendChild(timelineTitle);
       const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
