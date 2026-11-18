@@ -10,7 +10,7 @@ const { getAuthenticatedUser, serviceFetch } = require("../lib/supabase");
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
-    return res.status(405).json({ success:false, message:"केवल POST अनुरोध स्वीकार है।" });
+    return res.status(405).json({ success:false, message:"Only POST requests are accepted." });
   }
   try {
     const body = req.body || {};
