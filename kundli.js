@@ -223,9 +223,21 @@
         const info=document.createElement("div");info.className="nakshatra-panel";
         const infoTitle=document.createElement("h4");infoTitle.textContent="वर्तमान दशा-स्वामियों की जन्म-कुंडली स्थिति";info.appendChild(infoTitle);
         const infoTable=document.createElement("table");
-        const infoHead=document.createElement("tr");["दशा स्वामी","राशि","भाव","नक्षत्र","चरण","नक्षत्र स्वामी"].forEach(v=>{const th=document.createElement("th");th.textContent=v;infoHead.appendChild(th);});infoTable.appendChild(infoHead);
-        currentLords.forEach(x=>{const tr=document.createElement("tr");[x.planet+(x.retrograde?" ℞":""),x.sign,x.house?x.house+"वाँ":"—",x.nak,x.pada,x.nakLord].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);tr.appendChild(td);});infoTable.appendChild(tr);});
-        info.appendChild(infoTable);dashaFolder.appendChild(info);
+        const infoHead=document.createElement("tr");["दशा स्तर","ग्रह","राशि / भाव","नक्षत्र / चरण","नक्षत्र स्वामी","स्वामी की स्थिति"].forEach(v=>{const th=document.createElement("th");th.textContent=v;infoHead.appendChild(th);});infoTable.appendChild(infoHead);
+        const lordPlacement=(name)=>{
+          const q=planetData[name]||{};
+          const qHouse=Number(q.house);
+          return {sign:q.rashi||signNames[Number(q.rashiIndex)]||"—",house:Number.isInteger(qHouse)&&qHouse>=1&&qHouse<=12?qHouse:null,nak:q.nakshatra||"—",pada:q.pada||"—"};
+        };
+        currentLords.forEach((x,index)=>{
+          const nakLordInfo=lordPlacement(x.nakLord);
+          const tr=document.createElement("tr");
+          const vals=[["महादशा","अंतरदशा","प्रत्यंतरदशा"][index]||"दशा",x.planet+(x.retrograde?" ℞":""),x.sign+(x.house?" / "+x.house+"वाँ भाव":""),x.nak+" / "+(x.pada||"—"),x.nakLord,nakLordInfo.sign+(nakLordInfo.house?" / "+nakLordInfo.house+"वाँ भाव":"")+" • "+nakLordInfo.nak+" "+nakLordInfo.pada];
+          vals.forEach(v=>{const td=document.createElement("td");td.textContent=String(v);tr.appendChild(td);});infoTable.appendChild(tr);
+        });
+        info.appendChild(infoTable);
+        const chainNote=document.createElement("p");chainNote.className="chat-info";chainNote.textContent="ऊपर प्रत्येक दशा-स्वामी के जन्म नक्षत्र के स्वामी की राशि, भाव और नक्षत्र भी दिखाए गए हैं।";info.appendChild(chainNote);
+        dashaFolder.appendChild(info);
         const md= currentLords[0], ad=currentLords[1];
         if(md&&ad){
           const result=document.createElement("div");result.className="nakshatra-panel";
@@ -363,64 +375,44 @@
     const root=$("vargaCharts");
     if(!root)return;
     root.replaceChildren();
-    const heading=document.createElement("h3");
-    heading.textContent="षोडश वर्ग कुंडलियाँ — उत्तर भारतीय शैली";
-    root.appendChild(heading);
     const charts=chart.vargas||{};
-    const entries=Object.entries(charts);
+    const entries=Object.entries(charts).filter(([,v])=>v?.ascendant&&Number.isInteger(Number(v.ascendant.rashiIndex)));
     if(!entries.length){
       const p=document.createElement("p");p.className="chat-info";
       p.textContent="इस जन्म विवरण के लिए विभाजित कुंडली डेटा उपलब्ध नहीं है।";
       root.appendChild(p);return;
     }
-    for(const [key,varga] of entries){
-      if(!varga?.ascendant||!Number.isInteger(Number(varga.ascendant.rashiIndex)))continue;
-      const card=document.createElement("details");
-      card.className="chart-card";
-      card.style.cssText="margin:12px 0;padding:12px";
-      const title=document.createElement("summary");
-      title.textContent=key+" — "+(varga.name||"वर्ग कुंडली")+" | लग्न "+(signNames[varga.ascendant.rashiIndex]||"—");
-      card.appendChild(title);
+    const toolbar=document.createElement("div");toolbar.className="calculation-tabs varga-tabs";toolbar.setAttribute("role","tablist");toolbar.setAttribute("aria-label","विभाजित कुंडलियाँ");
+    const pages=document.createElement("div");pages.className="varga-pages";
+    entries.forEach(([key,varga],index)=>{
+      const button=document.createElement("button");button.type="button";button.textContent=key;button.setAttribute("role","tab");button.setAttribute("aria-selected",String(index===0));
+      const card=document.createElement("section");card.className="chart-card varga-page"+(index===0?" active":"");card.setAttribute("role","tabpanel");card.setAttribute("aria-label",key+" "+(varga.name||"वर्ग कुंडली"));
+      const title=document.createElement("h4");title.textContent=key+" — "+(varga.name||"वर्ग कुंडली");card.appendChild(title);
       const occupants={};
       for(const [planetName,position] of Object.entries(varga.planets||{})){
         const house=Number(position.house);
-        if(Number.isInteger(house)&&house>=1&&house<=12){
-          (occupants[house]||(occupants[house]=[])).push(planetName+(position.retrograde?" ℞":""));
-        }
+        if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||(occupants[house]=[])).push(planetName+(position.retrograde?" ℞":""));
       }
       const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
-      svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");
-      svg.setAttribute("aria-label",key+" उत्तर भारतीय शैली की 12 भाव वाली कुंडली");
-      svg.setAttribute("data-chart-layout","north-indian");
+      svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");svg.setAttribute("aria-label",key+" उत्तर भारतीय शैली की 12 भाव वाली कुंडली");svg.setAttribute("data-chart-layout","north-indian");
       svg.style.cssText="display:block;width:100%;max-width:400px;height:auto;aspect-ratio:1/1;margin:12px auto 0;background:#f7e9c9;border-radius:8px";
-      const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
-      const border=document.createElementNS(ns,"rect");
-      for(const [k,v] of Object.entries({x:2,y:2,width:396,height:396,fill:"none",stroke:"#875b2b","stroke-width":3}))border.setAttribute(k,v);
-      svg.appendChild(border);
+      const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,val] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,val);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
+      const border=document.createElementNS(ns,"rect");for(const [k,val] of Object.entries({x:2,y:2,width:396,height:396,fill:"none",stroke:"#875b2b","stroke-width":3}))border.setAttribute(k,val);svg.appendChild(border);
       line(2,2,398,398);line(398,2,2,398);line(200,2,398,200);line(398,200,200,398);line(200,398,2,200);line(2,200,200,2);
       const pos=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
       for(let house=1;house<=12;house++){
-        const [x,y]=pos[house-1],sign=(Number(varga.ascendant.rashiIndex)+house-1)%12;
-        const group=document.createElementNS(ns,"g");
-        const signText=document.createElementNS(ns,"text");
-        signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");
-        signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");
-        signText.textContent=signNames[sign];
-        const planetText=document.createElementNS(ns,"text");
-        planetText.setAttribute("x",x);planetText.setAttribute("y",y+9);planetText.setAttribute("text-anchor","middle");
-        planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
-        const names=occupants[house]||[];
-        for(let i=0;i<names.length;i+=2){
-          const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");
-          span.textContent=names.slice(i,i+2).join(" ");planetText.appendChild(span);
-        }
+        const [x,y]=pos[house-1],sign=(Number(varga.ascendant.rashiIndex)+house-1)%12,group=document.createElementNS(ns,"g");
+        const signText=document.createElementNS(ns,"text");signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");signText.textContent=signNames[sign];
+        const planetText=document.createElementNS(ns,"text");planetText.setAttribute("x",x);planetText.setAttribute("y",y+9);planetText.setAttribute("text-anchor","middle");planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
+        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=names.slice(i,i+2).join(" ");planetText.appendChild(span);}
         group.append(signText,planetText);svg.appendChild(group);
       }
       card.appendChild(svg);
-      const caption=document.createElement("p");caption.className="chart-asc";
-      caption.textContent="लग्न: "+signNames[Number(varga.ascendant.rashiIndex)];
-      card.appendChild(caption);root.appendChild(card);
-    }
+      const caption=document.createElement("p");caption.className="chart-asc";caption.textContent="लग्न: "+signNames[Number(varga.ascendant.rashiIndex)];card.appendChild(caption);
+      button.addEventListener("click",()=>{pages.querySelectorAll(".varga-page").forEach(page=>page.classList.toggle("active",page===card));toolbar.querySelectorAll("button").forEach(tab=>tab.setAttribute("aria-selected",String(tab===button)));button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});});
+      toolbar.appendChild(button);pages.appendChild(card);
+    });
+    root.append(toolbar,pages);
   }
 
   let selectedBirthPlace = null;
