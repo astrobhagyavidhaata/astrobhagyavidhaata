@@ -223,9 +223,21 @@
         const info=document.createElement("div");info.className="nakshatra-panel";
         const infoTitle=document.createElement("h4");infoTitle.textContent="वर्तमान दशा-स्वामियों की जन्म-कुंडली स्थिति";info.appendChild(infoTitle);
         const infoTable=document.createElement("table");
-        const infoHead=document.createElement("tr");["दशा स्वामी","राशि","भाव","नक्षत्र","चरण","नक्षत्र स्वामी"].forEach(v=>{const th=document.createElement("th");th.textContent=v;infoHead.appendChild(th);});infoTable.appendChild(infoHead);
-        currentLords.forEach(x=>{const tr=document.createElement("tr");[x.planet+(x.retrograde?" ℞":""),x.sign,x.house?x.house+"वाँ":"—",x.nak,x.pada,x.nakLord].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);tr.appendChild(td);});infoTable.appendChild(tr);});
-        info.appendChild(infoTable);dashaFolder.appendChild(info);
+        const infoHead=document.createElement("tr");["दशा स्तर","ग्रह","राशि / भाव","नक्षत्र / चरण","नक्षत्र स्वामी","स्वामी की स्थिति"].forEach(v=>{const th=document.createElement("th");th.textContent=v;infoHead.appendChild(th);});infoTable.appendChild(infoHead);
+        const lordPlacement=(name)=>{
+          const q=planetData[name]||{};
+          const qHouse=Number(q.house);
+          return {sign:q.rashi||signNames[Number(q.rashiIndex)]||"—",house:Number.isInteger(qHouse)&&qHouse>=1&&qHouse<=12?qHouse:null,nak:q.nakshatra||"—",pada:q.pada||"—"};
+        };
+        currentLords.forEach((x,index)=>{
+          const nakLordInfo=lordPlacement(x.nakLord);
+          const tr=document.createElement("tr");
+          const vals=[["महादशा","अंतरदशा","प्रत्यंतरदशा"][index]||"दशा",x.planet+(x.retrograde?" ℞":""),x.sign+(x.house?" / "+x.house+"वाँ भाव":""),x.nak+" / "+(x.pada||"—"),x.nakLord,nakLordInfo.sign+(nakLordInfo.house?" / "+nakLordInfo.house+"वाँ भाव":"")+" • "+nakLordInfo.nak+" "+nakLordInfo.pada];
+          vals.forEach(v=>{const td=document.createElement("td");td.textContent=String(v);tr.appendChild(td);});infoTable.appendChild(tr);
+        });
+        info.appendChild(infoTable);
+        const chainNote=document.createElement("p");chainNote.className="chat-info";chainNote.textContent="ऊपर प्रत्येक दशा-स्वामी के जन्म नक्षत्र के स्वामी की राशि, भाव और नक्षत्र भी दिखाए गए हैं।";info.appendChild(chainNote);
+        dashaFolder.appendChild(info);
         const md= currentLords[0], ad=currentLords[1];
         if(md&&ad){
           const result=document.createElement("div");result.className="nakshatra-panel";
