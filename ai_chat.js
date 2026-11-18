@@ -158,7 +158,8 @@
         body: JSON.stringify({
           question,
           chartContext,
-          conversationHistory: chatHistory.slice(-12)
+          conversationHistory: chatHistory.slice(-12),
+          language: document.getElementById("preferredLanguage")?.value || "en"
         })
       });
 
