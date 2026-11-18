@@ -2,13 +2,14 @@
 
 const {authFetch,getAuthenticatedUser,setAuthCookies,clearAuthCookies,serviceFetch}=require("../lib/supabase");
 function normalizePhone(value) {
-  let phone=String(value||"").replace(/[\s()-]/g,"");
-  if(/^\d{10}$/.test(phone)) phone="+91"+phone;
-  if(!/^\+[1-9]\d{7,14}$/.test(phone)) return null;
+  let phone=String(value||"").replace(/[\\s()-]/g,"");
+  if(/^\\d{10}$/.test(phone)) phone="+91"+phone;
+  if(!/^\\+[1-9]\\d{7,14}$/.test(phone)) return null;
   return phone;
 }
 module.exports=async function(req,res) {
-  const action=req.params.action;
+  // Express uses params; Vercel's single-file function uses query parameters.
+  const action=req.params?.action || req.query?.action;
   try {
     if(action==="me"&&req.method==="GET") {
       const user=await getAuthenticatedUser(req,res);
@@ -27,7 +28,7 @@ module.exports=async function(req,res) {
     if(action==="verify-otp"&&req.method==="POST") {
       if(req.body?.termsAccepted!==true) return res.status(400).json({success:false,message:"लॉगिन से पहले नियम और प्राइवेसी पॉलिसी की सहमति आवश्यक है।"});
       const phone=normalizePhone(req.body?.phone),token=String(req.body?.token||"").trim();
-      if(!phone||!/^\d{6}$/.test(token)) return res.status(400).json({success:false,message:"मोबाइल नंबर और 6 अंकों का OTP भरें।"});
+      if(!phone||!/^\\d{6}$/.test(token)) return res.status(400).json({success:false,message:"मोबाइल नंबर और 6 अंकों का OTP भरें।"});
       const response=await authFetch("/verify",{method:"POST",body:JSON.stringify({phone,token,type:"sms"})});
       const data=await response.json();
       if(!response.ok||!data.access_token||!data.refresh_token) return res.status(401).json({success:false,message:data.msg||data.message||"OTP सही नहीं है।"});
