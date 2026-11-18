@@ -105,7 +105,7 @@
   </style>
 </head>
 <body>
-  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt">Português</option><option value="ar">العربية</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option></select></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden></div></div></header>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt">Português</option><option value="ar">العربية</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option></select></div></header>
   <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
   <script>
     (function(){
@@ -262,23 +262,6 @@
           setTimeout(()=>chatInput.scrollIntoView({block:'nearest'}),80);
         });
         chatInput.addEventListener('blur',()=>chatModal.classList.remove('keyboard-lift'));
-      }
-    })();
-    (function(){
-      const btn=document.getElementById('appMenuButton');
-      const panel=document.getElementById('appMenuPanel');
-      if(btn && panel){
-        btn.addEventListener('click',function(){
-          const opening=panel.hidden;
-          panel.hidden=!opening;
-          btn.setAttribute('aria-expanded',String(opening));
-        });
-        document.addEventListener('click',function(event){
-          if(!event.target.closest('.header-menu')){
-            panel.hidden=true;
-            btn.setAttribute('aria-expanded','false');
-          }
-        });
       }
     })();
   </script>
