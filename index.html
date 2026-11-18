@@ -12,15 +12,7 @@
     header h1{color:#f5c66b;margin:0;font-size:24px}
     .app-header{position:relative;display:flex;align-items:center;justify-content:center;min-height:86px;padding:14px 56px}
     .header-title{text-align:center}
-    .header-menu{position:absolute;right:12px;top:12px}
-    .header-menu>button{width:42px;height:42px;margin:0;padding:0;border:1px solid #70558e;border-radius:10px;background:#2c2140;color:#f5d994;font-size:28px;line-height:1}
-    .header-menu-panel{position:absolute;right:0;top:49px;width:min(290px,calc(100vw - 24px));z-index:500;background:#181326;border:1px solid #70558e;border-radius:12px;padding:10px;box-shadow:0 12px 28px rgba(0,0,0,.45)}
-    .header-menu-panel[hidden]{display:none}
-    #menuChartFolderHost .app-folder{margin:0}
-    #menuChartFolderHost .app-folder>summary{list-style:none}
-    #menuChartFolderHost .app-folder>summary::-webkit-details-marker{display:none}
-    #menuChartFolderHost .app-folder>summary:before{content:"▸ ";color:#f5c66b}
-    #menuChartFolderHost .app-folder[open]>summary:before{content:"▾ "}
+
     header p{color:#d4c9e5;margin:8px 0 0;font-size:14px}
     .wallet-bar{max-width:650px;margin:14px auto 0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
     .wallet{background:#2c2140;border:1px solid #70558e;border-radius:10px;padding:11px 14px;color:#f5c66b;font-weight:bold}
@@ -65,6 +57,26 @@
     .calculation-page{display:none;margin:14px 0;border:1px solid #66547f;border-radius:12px;padding:14px;background:#181326}
     .calculation-page.active{display:block}
     .calculation-page h3{margin:0 0 12px}
+
+    .dasha-current-card{margin:12px 0;padding:13px;border:1px solid #8a6b37;border-radius:12px;background:linear-gradient(135deg,#30243b,#1b1728)}
+    .dasha-current-card h4{margin:0 0 10px;color:#f5d994}
+    .dasha-current-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .dasha-current-item{min-width:0;padding:10px 7px;border-radius:9px;background:#211a32;text-align:center}
+    .dasha-current-item strong,.dasha-current-item span,.dasha-current-item small{display:block}
+    .dasha-current-item strong{font-size:12px;color:#c8b8df}
+    .dasha-current-item span{font-size:17px;font-weight:700;color:#f5c66b;margin:5px 0}
+    .dasha-current-item small{font-size:10px;color:#d4c9e5;line-height:1.4}
+    .dasha-period,.dasha-subperiod{margin:8px 0;border:1px solid #59476f;border-radius:9px;background:#211a32}
+    .dasha-period>summary,.dasha-subperiod>summary{padding:11px;color:#f5d994;font-weight:600;cursor:pointer;line-height:1.5}
+    .dasha-subperiod-list{padding:0 9px 9px}
+    .dasha-date-table{width:100%;border-collapse:collapse;font-size:12px}
+    .dasha-date-table th,.dasha-date-table td{padding:8px 5px;border-bottom:1px solid #493568;text-align:left}
+    .dasha-date-table th{color:#f5c66b}
+    .dasha-active-row{background:#49351d;color:#ffe3a3;font-weight:700}
+    .calculation-tabs{position:sticky;top:0;z-index:20}
+    #kundliDetailDeck{scroll-margin-top:12px}
+    @media(max-width:380px){.dasha-current-grid{grid-template-columns:1fr}.dasha-current-item{display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:left}.dasha-current-item small{grid-column:1/-1}}
+
     #kundliChartsFolder{margin-top:16px}
     @media(max-width:420px){.calculation-tabs button{padding:10px 12px;font-size:13px}}
 
