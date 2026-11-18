@@ -57,7 +57,8 @@
     .chart-item>summary{cursor:pointer;color:#f5d994;font-weight:bold;list-style-position:inside}
     .chart-item[open]>summary{margin-bottom:10px}
     .chat-info{color:#d4c9e5;font-size:14px;line-height:1.6}
-    .modal{display:none;position:fixed;left:0;right:0;top:var(--chat-vtop,0px);height:var(--chat-vh,100dvh);z-index:1000;background:rgba(0,0,0,.82);padding:10px;overflow:hidden;box-sizing:border-box}
+    .modal{display:none;position:fixed;left:0;right:0;top:var(--chat-vtop,0px);height:calc(var(--chat-vh,100dvh) - var(--chat-lift,0px));z-index:1000;background:rgba(0,0,0,.82);padding:10px;overflow:hidden;box-sizing:border-box}
+    .modal.keyboard-lift{--chat-lift:120px}
     .modal-box{display:flex;flex-direction:column;width:100%;max-width:520px;height:100%;max-height:100%;min-height:0;margin:0 auto;padding:12px;border-radius:14px;background:#211a32;border:1px solid #70558e;box-sizing:border-box;overflow:hidden}
     .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:0 0 auto}
     .modal-head h2{font-size:17px;margin:0}
@@ -235,10 +236,14 @@
       }
       window.addEventListener('resize',fitChatToKeyboard);
       const chatInput=document.getElementById('userMsgInput');
-      if(chatInput) chatInput.addEventListener('focus',()=>{
-        fitChatToKeyboard();
-        setTimeout(()=>chatInput.scrollIntoView({block:'nearest'}),80);
-      });
+      if(chatInput){
+        chatInput.addEventListener('focus',()=>{
+          chatModal.classList.add('keyboard-lift');
+          fitChatToKeyboard();
+          setTimeout(()=>chatInput.scrollIntoView({block:'nearest'}),80);
+        });
+        chatInput.addEventListener('blur',()=>chatModal.classList.remove('keyboard-lift'));
+      }
     })();
     (function(){
       const btn=document.getElementById('appMenuButton');
