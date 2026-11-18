@@ -68,7 +68,9 @@ module.exports=async function(req,res){
         });
       }catch(saveError){console.warn("User message save skipped:",saveError.message);}
     }
-    const answer=await askGemini({question:question.trim(),chartContext,conversationHistory:history});
+    const supportedLanguages=new Set(["en","hi","mr","pa","ur","fr","de","es","pt","ar","bn","gu","ta","te"]);
+    const language=supportedLanguages.has(body.language)?body.language:"en";
+    const answer=await askGemini({question:question.trim(),chartContext,conversationHistory:history,language});
     if(active){
       try{
         await serviceFetch("/chat_messages",{
