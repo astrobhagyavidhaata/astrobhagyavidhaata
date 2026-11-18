@@ -67,7 +67,7 @@
     line(200,2,398,200); line(398,200,200,398); line(200,398,2,200); line(2,200,200,2);
     // Cell-safe anchor points: centers of the 12 actual North-Indian chart regions.
     // Corner-triangle houses use their own inner centroids, not the square's outer edge.
-    const positions=[[200,82],[134,68],[68,134],[82,200],[68,266],[134,332],[200,318],[266,332],[332,266],[318,200],[332,134],[266,68]];
+    const positions=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
     for(let house=1;house<=12;house++){
       const [x,y]=positions[house-1], signIndex=(ascIndex+house-1)%12;
       const group=document.createElementNS(ns,'g');
