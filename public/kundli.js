@@ -31,7 +31,8 @@
     if (!root) {
       root = document.createElement('section');
       root.id = 'mainKundliChart';
-      output.parentNode.insertBefore(root, output);
+      const slot = $('mainChartSlot') || output.parentNode;
+      slot.appendChild(root);
     }
     root.replaceChildren();
     root.style.cssText = 'margin:16px auto;padding:8px;max-width:480px;background:#fffaf0;color:#3b2615;border:1px solid #b78b45;border-radius:10px';
@@ -105,20 +106,21 @@
     if(!root)return;
     root.replaceChildren();
     const heading=document.createElement("h3");
-    heading.textContent="Shodashvarga — 16 Divisional Charts";
+    heading.textContent="Other Divisional Charts — D2 to D60";
     root.appendChild(heading);
     const note=document.createElement("p");
-    note.textContent="Each chart displays the twelve houses, sign numbers, and planetary placements.";
+    note.textContent="Open any divisional chart to view its twelve signs and planetary placements. D1 (Rashi) is shown above.";
     root.appendChild(note);
     const wrap=document.createElement("div");
     wrap.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px";
     const charts=chart.vargas||{};
     for(const [key,varga] of Object.entries(charts)){
-      const card=document.createElement("section");
+      if(key==="D1") continue;
+      const card=document.createElement("details");
+      card.className="chart-item";
       card.style.cssText="border:1px solid rgba(220,190,130,.35);border-radius:12px;padding:12px;min-width:0;background:rgba(20,16,32,.45)";
-      const title=document.createElement("h4");
+      const title=document.createElement("summary");
       title.textContent=key+" — "+varga.name+" | Ascendant "+signNames[varga.ascendant.rashiIndex];
-      card.appendChild(title);
       const grid=document.createElement("div");
       grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px";
       const occupants={};
@@ -346,10 +348,9 @@
       const chart = result.chart;
       window.AstroKundli = chart;
       renderMainKundliChart(chart);
+      renderVargaCharts(chart);
       const hiddenText = $('kTxt');
       if (hiddenText) hiddenText.textContent = '';
-      const oldVargas = $('vargaCharts');
-      if (oldVargas) oldVargas.replaceChildren();
 
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
