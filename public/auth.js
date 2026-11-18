@@ -13,7 +13,7 @@
     if(currentUser)$("loggedInPhone").textContent=currentUser.phone||"";
   }
   async function call(action,body){
-    const response=await fetch("/api/auth/"+action,{method:body?"POST":"GET",credentials:"same-origin",headers:{"Accept":"application/json",...(body?{"Content-Type":"application/json"}:{})},...(body?{body:JSON.stringify(body)}:{})});
+    const response=await fetch("/api/auth?action="+encodeURIComponent(action),{method:body?"POST":"GET",credentials:"same-origin",headers:{"Accept":"application/json",...(body?{"Content-Type":"application/json"}:{})},...(body?{body:JSON.stringify(body)}:{})});
     const data=await response.json();
     if(!response.ok)throw new Error(data.message||"लॉगिन अनुरोध पूरा नहीं हुआ।");
     return data;
