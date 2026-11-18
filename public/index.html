@@ -78,6 +78,12 @@
     @media(max-width:380px){.dasha-current-grid{grid-template-columns:1fr}.dasha-current-item{display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:left}.dasha-current-item small{grid-column:1/-1}}
 
     #kundliChartsFolder{margin-top:16px}
+.varga-tabs{margin:8px 0 12px}
+    .varga-pages{min-width:0}
+    .varga-page{display:none;width:100%;max-width:100%;min-width:0;flex:none;scroll-snap-align:none}
+    .varga-page.active{display:block}
+    .varga-page h4{margin:2px 0 8px;text-align:center;color:#f5c66b}
+    .varga-page svg{max-width:min(100%,420px)}
     @media(max-width:420px){.calculation-tabs button{padding:10px 12px;font-size:13px}}
 
     .modal{display:none;position:fixed;left:0;right:0;top:var(--chat-vtop,0px);height:calc(var(--chat-vh,100dvh) - var(--chat-lift,0px));z-index:1000;background:rgba(0,0,0,.82);padding:10px;overflow:hidden;box-sizing:border-box}
@@ -160,7 +166,7 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><details class="app-folder" id="kundliChartsFolder"><summary>षोडश वर्ग कुंडलियाँ (D2–D60)</summary><div id="vargaCharts"></div></details></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><p class="chat-info">हर वर्ग कुंडली को अलग पेज में देखने के लिए टैब को साइड में स्लाइड करें।</p><div id="vargaCharts"></div></section></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
     <section class="panel">
