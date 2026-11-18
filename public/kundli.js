@@ -24,6 +24,74 @@
     box.textContent = message;
   }
 
+  function renderMainKundliChart(chart) {
+    const output = $("kTxt");
+    if (!output) return;
+    let root = $("mainKundliChart");
+    if (!root) {
+      root = document.createElement("section");
+      root.id = "mainKundliChart";
+      output.parentNode.insertBefore(root, output);
+    }
+    root.replaceChildren();
+    root.style.cssText = "margin:18px 0;padding:14px;border:1px solid #b78b45;border-radius:14px;background:#fffaf0;color:#332516";
+    const title = document.createElement("h3");
+    title.textContent = "D1 — जन्म कुंडली";
+    title.style.cssText = "text-align:center;color:#70451d;margin:0 0 12px";
+    root.appendChild(title);
+
+    const names = window.AstroRashis || ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+    const planets = chart.d1.planets || {};
+    const occupants = {};
+    for (const [planet, p] of Object.entries(planets)) {
+      (occupants[p.house] ||= []).push(planet + (p.retrograde ? " ℞" : ""));
+    }
+    const layout = [
+      [1,2,3,4],
+      [12,0,0,5],
+      [11,0,0,6],
+      [10,9,8,7]
+    ];
+    const grid = document.createElement("div");
+    grid.style.cssText = "display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(88px,auto));border-top:1px solid #9b7542;border-left:1px solid #9b7542";
+    for (const row of layout) for (const house of row) {
+      const cell = document.createElement("div");
+      cell.style.cssText = "min-width:0;min-height:88px;padding:7px 4px;border-right:1px solid #9b7542;border-bottom:1px solid #9b7542;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow-wrap:anywhere";
+      if (!house) {
+        cell.style.background = "#f4ead7";
+        cell.style.gridColumn = "span 1";
+        cell.style.gridRow = "span 1";
+      } else {
+        const signIndex = (chart.d1.ascendant.rashiIndex + house - 1) % 12;
+        const h = document.createElement("div");
+        h.textContent = "भाव " + house;
+        h.style.cssText = "font-size:11px;color:#87633c";
+        const sign = document.createElement("strong");
+        sign.textContent = names[signIndex] || "";
+        sign.style.cssText = "font-size:14px;color:#442b16;margin:3px 0";
+        const occupantsLabel = document.createElement("div");
+        occupantsLabel.textContent = (occupants[house] || []).join(" · ") || "—";
+        occupantsLabel.style.cssText = "font-size:12px;color:#7a451a;line-height:1.35";
+        cell.append(h, sign, occupantsLabel);
+        if (house === 1) {
+          cell.style.background = "#f5dfb8";
+          cell.style.outline = "2px solid #b77b2d";
+          cell.style.outlineOffset = "-2px";
+        }
+      }
+      grid.appendChild(cell);
+    }
+    root.appendChild(grid);
+    const asc = document.createElement("p");
+    asc.textContent = "लग्न: " + chart.d1.ascendant.rashi + " " + Number(chart.d1.ascendant.degreeInRashi).toFixed(2) + "°";
+    asc.style.cssText = "text-align:center;font-weight:bold;color:#70451d;margin:12px 0 0";
+    root.appendChild(asc);
+    const note = document.createElement("p");
+    note.textContent = "ग्रहों की विस्तृत डिग्री, नक्षत्र और दशा नीचे दी गई है।";
+    note.style.cssText = "font-size:12px;color:#705b45;text-align:center;margin:6px 0 0";
+    root.appendChild(note);
+  }
+
   function renderVargaCharts(chart) {
     const root=$("vargaCharts");
     if(!root)return;
@@ -271,6 +339,7 @@
 
       const chart = result.chart;
       window.AstroKundli = chart;
+      renderMainKundliChart(chart);
       renderVargaCharts(chart);
 
       const lines = [];
