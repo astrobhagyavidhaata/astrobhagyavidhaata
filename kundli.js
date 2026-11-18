@@ -39,7 +39,8 @@
     title.textContent = 'Birth Chart';
     title.style.cssText = 'text-align:center;color:#70451d;font-size:16px;font-weight:600;margin:0 0 8px';
     root.appendChild(title);
-    const names = Array.from({length:12}, (_, i) => String(i + 1));
+    const signNames = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+    const names = signNames;
     const ascIndex = Number.isInteger(chart.d1.ascendant.rashiIndex) ? chart.d1.ascendant.rashiIndex : names.indexOf(chart.d1.ascendant.rashi);
     if (ascIndex < 0 || ascIndex > 11) throw new Error('Invalid ascendant sign index.');
     const occupants = {};
@@ -71,10 +72,8 @@
     for(let house=1;house<=12;house++){
       const [x,y]=positions[house-1], signIndex=(ascIndex+house-1)%12;
       const group=document.createElementNS(ns,'g');
-      const label=document.createElementNS(ns,'text');
-      label.setAttribute('x',x); label.setAttribute('y',y-20); label.setAttribute('text-anchor','middle'); label.setAttribute('font-size','10'); label.setAttribute('fill','#9a6b35'); label.textContent=String(house);
       const sign=document.createElementNS(ns,'text');
-      sign.setAttribute('x',x); sign.setAttribute('y',y-7); sign.setAttribute('text-anchor','middle'); sign.setAttribute('font-size','12'); sign.setAttribute('font-weight','bold'); sign.setAttribute('fill','#4b2d16'); sign.textContent=String(signIndex + 1);
+      sign.setAttribute('x',x); sign.setAttribute('y',y-7); sign.setAttribute('text-anchor','middle'); sign.setAttribute('font-size','12'); sign.setAttribute('font-weight','bold'); sign.setAttribute('fill','#4b2d16'); sign.textContent=signNames[signIndex];
       const planet=document.createElementNS(ns,'text');
       planet.setAttribute('x',x);
       planet.setAttribute('y',y+7);
@@ -93,7 +92,7 @@
         tspan.textContent=row;
         planet.appendChild(tspan);
       });
-      group.append(label,sign,planet); svg.appendChild(group);
+      group.append(sign,planet); svg.appendChild(group);
     }
     root.appendChild(svg);
     const asc=document.createElement('p');
@@ -118,7 +117,7 @@
       const card=document.createElement("section");
       card.style.cssText="border:1px solid rgba(220,190,130,.35);border-radius:12px;padding:12px;min-width:0;background:rgba(20,16,32,.45)";
       const title=document.createElement("h4");
-      title.textContent=key+" — "+varga.name+" | Ascendant "+String(varga.ascendant.rashiIndex + 1);
+      title.textContent=key+" — "+varga.name+" | Ascendant "+signNames[varga.ascendant.rashiIndex];
       card.appendChild(title);
       const grid=document.createElement("div");
       grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px";
@@ -130,15 +129,13 @@
         const signIndex=(varga.ascendant.rashiIndex+house-1)%12;
         const cell=document.createElement("div");
         cell.style.cssText="min-height:72px;padding:6px;border-radius:7px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);font-size:12px;overflow-wrap:anywhere";
-        const houseLabel=document.createElement("strong");
-        houseLabel.textContent=String(house);
         const signLabel=document.createElement("div");
-        signLabel.textContent=String(signIndex + 1);
+        signLabel.textContent=signNames[signIndex];
         const planetLabel=document.createElement("div");
         planetLabel.style.cssText="margin-top:4px;color:#f5d994";
         planetLabel.textContent=(occupants[house]||[]).join(", ")||"—";
         if(house===1)cell.style.borderColor="rgba(245,217,148,.75)";
-        cell.append(houseLabel,signLabel,planetLabel);
+        cell.append(signLabel,planetLabel);
         grid.appendChild(cell);
       }
       card.append(title,grid);
