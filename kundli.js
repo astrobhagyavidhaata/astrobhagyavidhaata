@@ -118,12 +118,16 @@
     const taraRows=Array.isArray(chart.taraChart)?chart.taraChart:[];
     if(taraRows.length){
       const table=document.createElement("div");table.className="nakshatra-panel";
-      const t=document.createElement("table");
-      const head=document.createElement("tr");
-      ["नक्षत्र","जन्म से क्रम","तारा","स्वभाव"].forEach(v=>{const th=document.createElement("th");th.textContent=v;head.appendChild(th);});
-      t.appendChild(head);
-      taraRows.forEach(row=>{const tr=document.createElement("tr");[row.nakshatra,row.countFromBirth,row.name,row.nature].forEach(v=>{const td=document.createElement("td");td.textContent=String(v??"—");tr.appendChild(td);});t.appendChild(tr);});
-      table.appendChild(t);tara.appendChild(table);
+      const title=document.createElement("h4");title.textContent="27 नक्षत्रों का नवतारा चक्र";title.style.cssText="margin:4px 0 10px;color:#f5c66b";table.appendChild(title);
+      const grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px";
+      taraRows.forEach(row=>{
+        const cell=document.createElement("div");cell.style.cssText="padding:9px 5px;border:1px solid #66547f;border-radius:8px;background:#181326;text-align:center;min-width:0";
+        const n=document.createElement("strong");n.textContent=row.nakshatra||"—";n.style.cssText="display:block;color:#f5d994;font-size:12px;overflow-wrap:anywhere";
+        const name=document.createElement("span");name.textContent=row.name||"—";name.style.cssText="display:block;color:#f5c66b;font-size:11px;margin-top:4px";
+        const nature=document.createElement("small");nature.textContent=(row.countFromBirth||"—")+"वाँ स्थान · "+(row.nature||"—");nature.style.cssText="display:block;color:#d4c9e5;font-size:10px;margin-top:3px";
+        cell.append(n,name,nature);grid.appendChild(cell);
+      });
+      table.appendChild(grid);tara.appendChild(table);
     } else addNote(tara,"नवतारा तालिका की गणना उपलब्ध नहीं है।");
 
     const dashaFolder=makeFolder("2. महादशा – अंतर्दशा – प्रत्यंतरदशा","vimshottariFolder");
@@ -136,22 +140,25 @@
       const dates=document.createElement("p");dates.className="chat-info";
       dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString():"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString():"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString():"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString():"—");
       dashaFolder.appendChild(dates);
+      const timeline=document.createElement("div");timeline.className="nakshatra-panel";
+      const timelineTitle=document.createElement("h4");timelineTitle.textContent="विंशोत्तरी महादशा समय-रेखा";timelineTitle.style.cssText="color:#f5c66b;margin:4px 0 8px";timeline.appendChild(timelineTitle);
+      const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
+      const header=document.createElement("tr");["महादशा","आरंभ","समाप्ति","अंतर्दशाएँ"].forEach(v=>{const th=document.createElement("th");th.textContent=v;th.style.cssText="text-align:left;padding:7px;color:#f5d994";header.appendChild(th);});table.appendChild(header);
+      const fmt=v=>v?new Date(v).toLocaleDateString("hi-IN"):"—";
       (dasha.mahadashas||[]).forEach(md=>{
+        const row=document.createElement("tr");
+        [md.planet,fmt(md.start),fmt(md.end),(md.antardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:7px;border-top:1px solid #493568";row.appendChild(td);});table.appendChild(row);
         const item=document.createElement("details");item.className="chart-item";
-        const sum=document.createElement("summary");
-        sum.textContent=md.planet+" महादशा — "+new Date(md.start).toLocaleDateString()+" से "+new Date(md.end).toLocaleDateString();
-        item.appendChild(sum);
-        (md.antardashas||[]).forEach(ad=>{
-          const adDetails=document.createElement("details");adDetails.className="chart-item";
-          const adSum=document.createElement("summary");
-          adSum.textContent=ad.planet+" अंतर्दशा — "+new Date(ad.start).toLocaleDateString()+" से "+new Date(ad.end).toLocaleDateString();
-          adDetails.appendChild(adSum);
-          const pd=document.createElement("p");pd.className="chat-info";
-          pd.textContent=(ad.pratyantardashas||[]).map(x=>x.planet+": "+new Date(x.start).toLocaleDateString()+"–"+new Date(x.end).toLocaleDateString()).join(" | ");
-          adDetails.appendChild(pd);item.appendChild(adDetails);
+        const sum=document.createElement("summary");sum.textContent=md.planet+" महादशा की अंतर्दशा और प्रत्यंतरदशा";item.appendChild(sum);
+        const sub=document.createElement("div");sub.style.cssText="overflow-x:auto";
+        const subTable=document.createElement("table");subTable.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
+        const subHead=document.createElement("tr");["अंतर्दशा","आरंभ","समाप्ति","प्रत्यंतरदशाएँ"].forEach(v=>{const th=document.createElement("th");th.textContent=v;th.style.cssText="text-align:left;padding:6px;color:#f5d994";subHead.appendChild(th);});subTable.appendChild(subHead);
+        (md.antardashas||[]).forEach(ad=>{const ar=document.createElement("tr");[ad.planet,fmt(ad.start),fmt(ad.end),(ad.pratyantardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:6px;border-top:1px solid #493568";ar.appendChild(td);});subTable.appendChild(ar);
+          const pd=document.createElement("tr");const cell=document.createElement("td");cell.colSpan=4;cell.style.cssText="padding:6px 10px;color:#d4c9e5;white-space:normal";cell.textContent="प्रत्यंतर: "+(ad.pratyantardashas||[]).map(x=>x.planet+" ("+fmt(x.start)+"–"+fmt(x.end)+")").join(" · ");pd.appendChild(cell);subTable.appendChild(pd);
         });
-        dashaFolder.appendChild(item);
+        sub.appendChild(subTable);item.appendChild(sub);dashaFolder.appendChild(item);
       });
+      timeline.appendChild(table);dashaFolder.appendChild(timeline);
     } else addNote(dashaFolder,"विंशोत्तरी दशा डेटा उपलब्ध नहीं है।");
 
     const ashtak=makeFolder("3. अष्टकवर्ग (भिन्नाष्टकवर्ग / सर्वाष्टकवर्ग)","ashtakavargaFolder");
