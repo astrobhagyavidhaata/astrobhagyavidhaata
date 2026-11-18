@@ -24,11 +24,10 @@
   }
   $("sendOtpButton").addEventListener("click",async()=>{
     const phone=phoneInput.value.trim();
-    if(!$("termsConsent").checked){show("आगे बढ़ने के लिए नियम और प्राइवेसी पॉलिसी से सहमत हों।",true);return;}
     if(!phone){show("मोबाइल नंबर भरें।",true);return;}
     $("sendOtpButton").disabled=true;
     try{
-      const data=await call("send-otp",{phone,termsAccepted:true});
+      const data=await call("send-otp",{phone});
       otpSent=true;otpRow.style.display="block";show(data.message||"OTP भेज दिया गया है।");
       $("loginOtp").focus();
     }catch(error){show(error.message,true);}
@@ -36,11 +35,10 @@
   });
   form.addEventListener("submit",async e=>{
     e.preventDefault();
-    if(!$("termsConsent").checked){show("आगे बढ़ने के लिए नियम और प्राइवेसी पॉलिसी से सहमत हों।",true);return;}
     if(!otpSent){show("पहले OTP भेजें।",true);return;}
     $("verifyOtpButton").disabled=true;
     try{
-      const data=await call("verify-otp",{phone:phoneInput.value.trim(),token:$("loginOtp").value.trim(),termsAccepted:true});
+      const data=await call("verify-otp",{phone:phoneInput.value.trim(),token:$("loginOtp").value.trim()});
       currentUser=data.user;otpSent=false;$("loginOtp").value="";render();
       show("लॉगिन सफल। आपका वॉलेट लोड किया जा रहा है।");
       if(window.AstroWallet)await window.AstroWallet.loadWallet();
