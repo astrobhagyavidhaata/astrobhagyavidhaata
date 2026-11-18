@@ -237,8 +237,31 @@
       ashtak.appendChild(check);
       (av.notes||[]).forEach(note=>addNote(ashtak,note));
     } else addNote(ashtak,"इस जन्म-कुंडली के लिए सत्यापित अष्टकवर्ग डेटा उपलब्ध नहीं है।");
-    const strength=makeFolder("4. षड्बल और भावबल","shadbalaFolder");
-    addNote(strength,"षड्बल और भावबल की शास्त्रीय गणना अभी पूरी तरह लागू नहीं है। सत्यापित गणना जुड़ने के बाद ही ग्रहों और भावों के बल दिखाए जाएँगे।");
+    const strength=makeFolder("4. षड्बल और भावबल — खोलने के लिए स्पर्श करें","shadbalaFolder");
+    strength.open=true;
+    const strengthIntro=document.createElement("p");
+    strengthIntro.className="chat-info";
+    strengthIntro.textContent="यहाँ ग्रहों का षड्बल और 12 भावों का भावबल अलग-अलग दिखेगा। अभी इस जन्म-कुंडली के लिए प्रमाणित संख्यात्मक परिणाम इंजन से उपलब्ध नहीं हैं; इसलिए गलत अंक नहीं दिखाए जा रहे हैं।";
+    strength.appendChild(strengthIntro);
+    const balaGroups=[
+      ["षड्बल — छह अंग",["स्थान बल (Sthana Bala)","दिक् बल (Dig Bala)","काल बल (Kala Bala)","चेष्टा बल (Cheshta Bala)","नैसर्गिक बल (Naisargika Bala)","दृक् बल (Drik Bala)"]],
+      ["भावबल — 12 भाव",["प्रथम भाव","द्वितीय भाव","तृतीय भाव","चतुर्थ भाव","पंचम भाव","षष्ठ भाव","सप्तम भाव","अष्टम भाव","नवम भाव","दशम भाव","एकादश भाव","द्वादश भाव"]]
+    ];
+    for(const [groupName,items] of balaGroups){
+      const section=document.createElement("section");
+      const heading=document.createElement("h4");
+      heading.textContent=groupName;
+      heading.style.cssText="margin:14px 0 8px;color:#f5c66b";
+      section.appendChild(heading);
+      const list=document.createElement("ul");
+      list.style.cssText="margin:0;padding-inline-start:22px;line-height:1.8";
+      for(const item of items){const li=document.createElement("li");li.textContent=item+" — गणना जोड़नी बाकी";list.appendChild(li);}
+      section.appendChild(list);strength.appendChild(section);
+    }
+    const note=document.createElement("p");
+    note.className="chat-info";
+    note.textContent="ध्यान दें: षड्बल में प्रत्येक ग्रह के लिए रूप (Virupa) और आवश्यक न्यूनतम बल की तुलना भी दी जाएगी। भावबल में प्रत्येक भाव का कुल बल और उसके घटक दिखेंगे।";
+    strength.appendChild(note);
   }
 
   function renderVargaCharts(chart) {
