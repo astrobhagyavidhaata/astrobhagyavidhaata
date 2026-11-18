@@ -179,8 +179,8 @@
     <section class="panel app-page-panel" data-app-page="kundli">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
-        <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="dob">जन्म तारीख</label><input id="dob" name="dob" type="date" required>
+        <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="birthTime">जन्म समय</label><input id="birthTime" name="birthTime" type="time" required>
         <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
         <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली मेरे लॉगिन खाते में सुरक्षित करें</label>
@@ -223,12 +223,6 @@
       <div id="rashiGocharOut" class="chat-info" aria-live="polite"></div>
     </section>
 
-    <section class="panel app-page-panel" data-app-page="consult">
-      <h2>💬 AI ज्योतिष परामर्श</h2>
-      <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न AI ज्योतिष सहायक से पूछें। हर अकाउंट को पहली बार केवल 1 मिनट मुफ्त मिलेगा। उसके बाद ₹5 प्रति मिनट वॉलेट से कटेंगे।</p>
-      <button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">चैट शुरू करें</button>
-      <div id="walletMessage" role="status" aria-live="polite"></div>
-    </section>
 
     <section class="panel app-page-panel" data-app-page="help" id="customerCare"><details class="app-folder" id="customerCareFolder"><summary>📁 Customer Care / Help Centre</summary>
       <p class="support-note">Contact us for payment deductions, wallet balance, login, birth chart, chat, or any app-related issue. You can also share your suggestions.</p>
