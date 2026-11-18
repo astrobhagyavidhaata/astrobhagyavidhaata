@@ -169,14 +169,30 @@
       ashtak.appendChild(method);
       const savTitle=document.createElement("h4");savTitle.textContent="सर्वाष्टकवर्ग (SAV) — कुल "+av.sarva.total+" बिंदु";savTitle.style.cssText="margin:10px 0;color:#f5c66b";ashtak.appendChild(savTitle);
       const makeSignGrid=(host,rows)=>{
-        const grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:8px 0 14px";
-        rows.forEach(item=>{
-          const cell=document.createElement("div");cell.style.cssText="padding:9px 4px;border:1px solid #66547f;border-radius:8px;background:#181326;text-align:center;min-width:0";
-          const sign=document.createElement("strong");sign.textContent=item.rashi;sign.style.cssText="display:block;color:#f5d994;font-size:12px";
-          const score=document.createElement("span");score.textContent=String(item.bindus)+" बिंदु";score.style.cssText="display:block;color:#fff;font-size:15px;font-weight:700;margin-top:4px";
-          cell.append(sign,score);grid.appendChild(cell);
-        });
-        host.appendChild(grid);
+        const asc=Number(chart.d1?.ascendant?.rashiIndex);
+        if(!Number.isInteger(asc)||asc<0||asc>11){addNote(host,"लग्न राशि उपलब्ध नहीं है, इसलिए उत्तर भारतीय अष्टकवर्ग चार्ट नहीं बन सका।");return;}
+        const bySign=new Map(rows.map(item=>[Number(item.rashiIndex),item]));
+        const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
+        svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");
+        svg.setAttribute("aria-label","उत्तर भारतीय अष्टकवर्ग राशि चार्ट");
+        svg.style.cssText="display:block;width:100%;max-width:400px;height:auto;margin:10px auto 16px;background:#f7e9c9;border-radius:8px";
+        const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
+        const border=document.createElementNS(ns,"rect");
+        for(const [k,v] of Object.entries({x:2,y:2,width:396,height:396,fill:"none",stroke:"#875b2b","stroke-width":3}))border.setAttribute(k,v);
+        svg.appendChild(border);
+        line(2,2,398,398);line(398,2,2,398);line(200,2,398,200);line(398,200,200,398);line(200,398,2,200);line(2,200,200,2);
+        const pos=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
+        for(let house=1;house<=12;house++){
+          const signIndex=(asc+house-1)%12,item=bySign.get(signIndex),[x,y]=pos[house-1];
+          const sign=document.createElementNS(ns,"text");sign.setAttribute("x",x);sign.setAttribute("y",y-10);
+          sign.setAttribute("text-anchor","middle");sign.setAttribute("font-size","12");sign.setAttribute("font-weight","bold");
+          sign.setAttribute("fill","#4b2d16");sign.textContent=signs[signIndex];
+          const score=document.createElementNS(ns,"text");score.setAttribute("x",x);score.setAttribute("y",y+13);
+          score.setAttribute("text-anchor","middle");score.setAttribute("font-size","14");score.setAttribute("font-weight","700");
+          score.setAttribute("fill","#9a421d");score.textContent=item?String(item.bindus)+" बिंदु":"—";
+          svg.append(sign,score);
+        }
+        host.appendChild(svg);
       };
       makeSignGrid(ashtak,av.sarva.signs);
       const bavTitle=document.createElement("h4");bavTitle.textContent="सात ग्रहों का भिन्नाष्टकवर्ग (BAV)";bavTitle.style.cssText="margin:14px 0 8px;color:#f5c66b";ashtak.appendChild(bavTitle);
