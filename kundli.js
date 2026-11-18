@@ -36,21 +36,21 @@
     root.replaceChildren();
     root.style.cssText = 'margin:18px auto;padding:12px;max-width:520px;background:#fffaf0;color:#3b2615;border:1px solid #b78b45;border-radius:12px';
     const title = document.createElement('h3');
-    title.textContent = 'जन्म कुंडली';
+    title.textContent = 'Birth Chart';
     title.style.cssText = 'text-align:center;color:#70451d;margin:0 0 8px';
     root.appendChild(title);
-    const names = ['मेष','वृषभ','मिथुन','कर्क','सिंह','कन्या','तुला','वृश्चिक','धनु','मकर','कुंभ','मीन'];
+    const names = Array.from({length:12}, (_, i) => String(i + 1));
     const ascIndex = Number.isInteger(chart.d1.ascendant.rashiIndex) ? chart.d1.ascendant.rashiIndex : names.indexOf(chart.d1.ascendant.rashi);
-    if (ascIndex < 0 || ascIndex > 11) throw new Error('लग्न राशि का index सही नहीं है।');
+    if (ascIndex < 0 || ascIndex > 11) throw new Error('Invalid ascendant sign index.');
     const occupants = {};
     for (const [planet, p] of Object.entries(chart.d1.planets || {})) {
-      (occupants[p.house] ||= []).push(planet + (p.retrograde ? ' ℞' : ''));
+      (occupants[p.house] ||= []).push((({सूर्य:'Sun',चंद्र:'Moon',मंगल:'Mars',बुध:'Mercury',गुरु:'Jupiter',शुक्र:'Venus',शनि:'Saturn',राहु:'Rahu',केतु:'Ketu'})[planet] || planet) + (p.retrograde ? ' ℞' : ''));
     }
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('viewBox','0 0 400 400');
     svg.setAttribute('role','img');
-    svg.setAttribute('aria-label','उत्तर भारतीय शैली की बारह भावों वाली जन्म कुंडली');
+    svg.setAttribute('aria-label','उत्तर भारतीय शैली की बारह भावों वाली Birth Chart');
     svg.style.cssText = 'display:block;width:100%;height:auto;max-width:460px;margin:auto;background:#fffaf0';
     const line = (x1,y1,x2,y2) => {
       const el=document.createElementNS(ns,'line');
@@ -70,14 +70,14 @@
       const label=document.createElementNS(ns,'text');
       label.setAttribute('x',x); label.setAttribute('y',y-19); label.setAttribute('text-anchor','middle'); label.setAttribute('font-size','11'); label.setAttribute('fill','#9a6b35'); label.textContent=String(house);
       const sign=document.createElementNS(ns,'text');
-      sign.setAttribute('x',x); sign.setAttribute('y',y-4); sign.setAttribute('text-anchor','middle'); sign.setAttribute('font-size','13'); sign.setAttribute('font-weight','bold'); sign.setAttribute('fill','#4b2d16'); sign.textContent=names[signIndex]||'';
+      sign.setAttribute('x',x); sign.setAttribute('y',y-4); sign.setAttribute('text-anchor','middle'); sign.setAttribute('font-size','13'); sign.setAttribute('font-weight','bold'); sign.setAttribute('fill','#4b2d16'); sign.textContent=String(signIndex + 1);
       const planet=document.createElementNS(ns,'text');
       planet.setAttribute('x',x); planet.setAttribute('y',y+14); planet.setAttribute('text-anchor','middle'); planet.setAttribute('font-size','12'); planet.setAttribute('font-weight','bold'); planet.setAttribute('fill','#9a421d'); planet.textContent=(occupants[house]||[]).join(' ');
       group.append(label,sign,planet); svg.appendChild(group);
     }
     root.appendChild(svg);
     const asc=document.createElement('p');
-    asc.textContent='लग्न: '+chart.d1.ascendant.rashi+' '+Number(chart.d1.ascendant.degreeInRashi).toFixed(2)+'°';
+    asc.textContent='Ascendant: '+String(ascIndex + 1)+' '+Number(chart.d1.ascendant.degreeInRashi).toFixed(2)+'°';
     asc.style.cssText='text-align:center;font-weight:bold;color:#70451d;margin:8px 0 0'; root.appendChild(asc);
   }
 
@@ -86,10 +86,10 @@
     if(!root)return;
     root.replaceChildren();
     const heading=document.createElement("h3");
-    heading.textContent="षोडशवर्ग — 16 छोटी कुंडलियाँ";
+    heading.textContent="Shodashvarga — 16 Divisional Charts";
     root.appendChild(heading);
     const note=document.createElement("p");
-    note.textContent="हर कुंडली में 12 भाव, राशि और ग्रहों की स्थिति अलग-अलग दिखाई गई है।";
+    note.textContent="Each chart displays the twelve houses, sign numbers, and planetary placements.";
     root.appendChild(note);
     const wrap=document.createElement("div");
     wrap.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px";
@@ -111,9 +111,9 @@
         const cell=document.createElement("div");
         cell.style.cssText="min-height:72px;padding:6px;border-radius:7px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);font-size:12px;overflow-wrap:anywhere";
         const houseLabel=document.createElement("strong");
-        houseLabel.textContent="भाव "+house;
+        houseLabel.textContent="House "+house;
         const signLabel=document.createElement("div");
-        signLabel.textContent=window.AstroRashis?.[signIndex]||["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"][signIndex];
+        signLabel.textContent=String(signIndex + 1);
         const planetLabel=document.createElement("div");
         planetLabel.style.cssText="margin-top:4px;color:#f5d994";
         planetLabel.textContent=(occupants[house]||[]).join(", ")||"—";
@@ -184,21 +184,21 @@
       !details.time ||
       !details.place
     ) {
-      throw new Error("कृपया सभी जन्म विवरण भरें।");
+      throw new Error("Please enter all birth details.");
     }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(details.date)) {
-      throw new Error("कृपया जन्म तारीख कैलेंडर से चुनें।");
+      throw new Error("Please select a valid birth date.");
     }
     const [year, month, day] = details.date.split("-").map(Number);
     const birthDate = new Date(Date.UTC(year, month - 1, day));
     if (birthDate.getUTCFullYear() !== year || birthDate.getUTCMonth() !== month - 1 || birthDate.getUTCDate() !== day) {
-      throw new Error("जन्म तारीख सही भरें।");
+      throw new Error("Please enter a valid birth date.");
     }
     const today = new Date();
     const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
     if (birthDate.getTime() > todayUtc) {
-      throw new Error("जन्म तारीख भविष्य की नहीं हो सकती।");
+      throw new Error("Birth date cannot be in the future.");
     }
 
     return details;
@@ -217,7 +217,7 @@
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error("जन्मस्थान खोजने में समस्या आई।");
+      throw new Error("Unable to search for the birth place.");
     }
 
     const data = await response.json();
@@ -235,7 +235,7 @@
 
     const heading = document.createElement("p");
     heading.textContent =
-      "कृपया अपना सही जन्मस्थान चुनें:";
+      "Please select the correct birth place:";
 
     const select = document.createElement("select");
 
@@ -259,7 +259,7 @@
     const button = document.createElement("button");
 
     button.type = "button";
-    button.textContent = "जन्मस्थान चुनें";
+    button.textContent = "Select birth place";
 
     button.addEventListener("click", () => {
       callback(results[Number(select.value)]);
@@ -291,7 +291,7 @@
         zodiac: "sidereal",
         ayanamsa: "lahiri",
         houseSystem: "whole_sign",
-        language: "hi"
+        language: "en"
       }
     };
 
