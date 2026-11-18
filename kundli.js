@@ -115,7 +115,7 @@
       d.id=id;
       const heading=document.createElement("h3");heading.textContent=title;d.appendChild(heading);
       if(tabs){
-        const button=document.createElement("button");button.type="button";button.textContent=title.replace(/^[0-9]+[.]\\s*/,"");
+        const button=document.createElement("button");button.type="button";button.textContent=title.replace(/^[0-9]+[.]/,"").trim();
         button.setAttribute("role","tab");button.setAttribute("aria-selected",String(firstPage));
         button.addEventListener("click",()=>{
           root.querySelectorAll(".calculation-page").forEach(page=>page.classList.toggle("active",page===d));
@@ -165,6 +165,47 @@
       const dates=document.createElement("p");dates.className="chat-info";
       dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString():"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString():"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString():"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString():"—");
       dashaFolder.appendChild(dates);
+      const periodDate=value=>value?new Date(value).toLocaleDateString("hi-IN",{day:"2-digit",month:"short",year:"numeric"}):"—";
+      const periodRange=(item)=>periodDate(item.start)+" से "+periodDate(item.end);
+      const activeMD=active.mahadasha, activeAD=active.antardasha, activePD=active.pratyantardasha;
+      const activeBox=document.createElement("div");activeBox.className="dasha-current-card";
+      activeBox.innerHTML="";
+      const activeTitle=document.createElement("h4");activeTitle.textContent="अभी चल रही विंशोत्तरी दशा";activeBox.appendChild(activeTitle);
+      const activeGrid=document.createElement("div");activeGrid.className="dasha-current-grid";
+      [[ "महादशा",activeMD,active.mahadashaStart,active.mahadashaEnd ],["अंतरदशा",activeAD,active.antardashaStart,active.antardashaEnd],["प्रत्यंतरदशा",activePD,active.pratyantardashaStart,active.pratyantardashaEnd]].forEach(([label,planet,start,end])=>{
+        const item=document.createElement("div");item.className="dasha-current-item";
+        const name=document.createElement("strong");name.textContent=label;const value=document.createElement("span");value.textContent=planet||"—";
+        const range=document.createElement("small");range.textContent=periodDate(start)+" – "+periodDate(end);
+        item.append(name,value,range);activeGrid.appendChild(item);
+      });
+      activeBox.appendChild(activeGrid);dashaFolder.appendChild(activeBox);
+      const scheduleTitle=document.createElement("h4");scheduleTitle.textContent="पूरी महादशा एवं अंतरदशा समय-सारणी";dashaFolder.appendChild(scheduleTitle);
+      const schedule=Array.isArray(dasha.mahadashas)?dasha.mahadashas:[];
+      if(schedule.length){
+        schedule.forEach(mdItem=>{
+          const mdDetails=document.createElement("details");mdDetails.className="dasha-period";
+          const mdSummary=document.createElement("summary");mdSummary.textContent=mdItem.planet+" महादशा  •  "+periodRange(mdItem)+(mdItem.planet===activeMD?"  |  अभी चल रही":"");
+          mdDetails.appendChild(mdSummary);
+          const adList=document.createElement("div");adList.className="dasha-subperiod-list";
+          (mdItem.antardashas||[]).forEach(adItem=>{
+            const adDetails=document.createElement("details");adDetails.className="dasha-subperiod";
+            const adSummary=document.createElement("summary");adSummary.textContent=mdItem.planet+" / "+adItem.planet+"  •  "+periodRange(adItem)+(mdItem.planet===activeMD&&adItem.planet===activeAD?"  |  वर्तमान":"");
+            adDetails.appendChild(adSummary);
+            const pdTable=document.createElement("table");pdTable.className="dasha-date-table";
+            const head=document.createElement("tr");["प्रत्यंतरदशा","आरंभ","समाप्ति"].forEach(label=>{const th=document.createElement("th");th.textContent=label;head.appendChild(th);});pdTable.appendChild(head);
+            (adItem.pratyantardashas||[]).forEach(pdItem=>{
+              const row=document.createElement("tr");
+              [pdItem.planet,periodDate(pdItem.start),periodDate(pdItem.end)].forEach((value,index)=>{const cell=document.createElement("td");cell.textContent=value;row.appendChild(cell);});
+              if(mdItem.planet===activeMD&&adItem.planet===activeAD&&pdItem.planet===activePD)row.className="dasha-active-row";
+              pdTable.appendChild(row);
+            });
+            adDetails.appendChild(pdTable);adList.appendChild(adDetails);
+          });
+          mdDetails.appendChild(adList);
+          if(mdItem.planet===activeMD){mdDetails.open=true;const currentAd=Array.from(adList.children).find((el)=>el.querySelector("summary")?.textContent.startsWith(activeMD+" / "+activeAD));if(currentAd)currentAd.open=true;}
+          dashaFolder.appendChild(mdDetails);
+        });
+      } else addNote(dashaFolder,"विंशोत्तरी दशा की पूरी समय-सारणी उपलब्ध नहीं है।");
       const nakNames=["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वाभाद्रपद","उत्तराभाद्रपद","रेवती"];
       const nakLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
       const houseThemes=["स्वभाव, शरीर और जीवन-दिशा","धन, वाणी और परिवार","साहस, प्रयास और छोटे भाई-बहन","माता, घर, सुख और संपत्ति","संतान, शिक्षा, बुद्धि और रचनात्मकता","ऋण, रोग, प्रतियोगिता और सेवा","विवाह, साझेदारी और सार्वजनिक संबंध","परिवर्तन, शोध, गोपनीयता और साझा संसाधन","भाग्य, धर्म, गुरु और उच्च शिक्षा","कर्म, पेशा, प्रतिष्ठा और जिम्मेदारी","लाभ, आय, मित्र और इच्छापूर्ति","व्यय, विदेश, एकांत और आध्यात्मिकता"];
