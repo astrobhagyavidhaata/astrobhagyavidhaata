@@ -12,7 +12,7 @@
     "https://geocoding-api.open-meteo.com/v1/search";
 
   const API_ENDPOINT = "/api/kundli";
-  const signNames = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+  const signNames = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
   const $ = (id) => document.getElementById(id);
 
