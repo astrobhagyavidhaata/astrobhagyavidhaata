@@ -62,6 +62,13 @@
     if(!host||!nav||!chart?.d1?.ascendant||!chart?.d9?.ascendant)return;
     host.replaceChildren();
     const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+    const ascendantIndex=Number(chart.d1.ascendant.rashiIndex);
+    const moonIndex=Number(chart.d1.planets?.चंद्र?.rashiIndex);
+    let summary=$("chartBirthSummary");
+    if(!summary){summary=document.createElement("p");summary.id="chartBirthSummary";summary.className="chart-asc";nav.insertBefore(summary,host);}
+    const ascendantName=Number.isInteger(ascendantIndex)&&ascendantIndex>=0&&ascendantIndex<12?signs[ascendantIndex]:"राशि उपलब्ध नहीं";
+    const moonName=Number.isInteger(moonIndex)&&moonIndex>=0&&moonIndex<12?signs[moonIndex]:"राशि उपलब्ध नहीं";
+    summary.textContent="जन्म लग्न: "+localizeChartText(ascendantName)+" | चंद्र राशि: "+localizeChartText(moonName);
     const moon=chart.d1.planets?.चंद्र;
     const moonAsc=Number(moon?.rashiIndex);
     const moonPlanets=Object.fromEntries(Object.entries(chart.d1.planets||{}).map(([name,p])=>[name,{...p,house:((Number(p.rashiIndex)-moonAsc+12)%12)+1}]));
@@ -75,7 +82,7 @@
       const card=document.createElement("section");card.className="chart-card";card.id=spec.id;
       const heading=document.createElement("h3");heading.textContent=spec.title;card.appendChild(heading);
       const occupants={};
-      for(const [planet,p] of Object.entries(spec.planets)){const house=Number(p.house);if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||=[]).push(planet);}
+      for(const [planet,p] of Object.entries(spec.planets)){const house=Number(p.house);if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||=[]).push(localizeChartText(planet));}
       const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
       svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");svg.setAttribute("aria-label",spec.title);
       const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
