@@ -182,6 +182,9 @@
   }
 
   function renderAstrologyCalculations(chart) {
+    let activeMD = null;
+    let activeAD = null;
+    let activePD = null;
     const root=$("jyotishCalculations");
     if(!root)return;
     root.replaceChildren();
@@ -238,7 +241,9 @@
     const dasha=chart.dasha;
     if(dasha){
       const active=dasha.current||{};
-      const activeMD=active.mahadasha, activeAD=active.antardasha, activePD=active.pratyantardasha;
+      activeMD=active.mahadasha||null;
+      activeAD=active.antardasha||null;
+      activePD=active.pratyantardasha||null;
       const p=document.createElement("p");p.className="chat-info";
       p.textContent="वर्तमान दशा: "+(active.mahadasha||"—")+" महादशा / "+(active.antardasha||"—")+" अंतर्दशा / "+(active.pratyantardasha||"—")+" प्रत्यंतरदशा";
       dashaFolder.appendChild(p);
@@ -863,19 +868,38 @@
     },null,null).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
   }
   async function restoreAstroSession(form){
-    // Empty initial state: restore only birth-form drafts, never show a previously generated chart on page load.
-    const saved=readAstroSession();
-    const details=saved?.birthDetails;
-    if(!details)return;
+    // Restore the last generated chart as well as the birth form after navigation or refresh.
+    let saved=readAstroSession();
+    if(!saved?.chart){
+      try{
+        const databaseRecord=await readAstroSessionDB();
+        if(databaseRecord?.chart)saved=databaseRecord;
+      }catch(error){
+        console.warn("IndexedDB से पिछली कुंडली नहीं पढ़ी जा सकी:",error);
+      }
+    }
+    const details=saved?.birthDetails||{};
     if(form){
-      const values={name:details.name,dob:details.date,birthTime:details.time,birthPlace:details.place};
+      const values={name:details.name||"",dob:details.date||"",birthTime:details.time||"",birthPlace:details.place||""};
       for(const [id,value] of Object.entries(values)){const field=$(id);if(field&&value)field.value=value;}
     }
-    if(saved.location?.latitude!=null&&saved.location?.longitude!=null){
-      selectedBirthPlace={...saved.location,label:[saved.location.name,saved.location.admin1,saved.location.country].filter(Boolean).join(", ")||details.place};
+    if(saved?.location?.latitude!=null&&saved?.location?.longitude!=null){
+      selectedBirthPlace={...saved.location,label:[saved.location.name,saved.location.admin1,saved.location.country].filter(Boolean).join(", ")||details.place||""};
     }
-    const panel=$("kBox");if(panel)panel.style.display="none";
-    const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=true;
+    if(saved?.chart){
+      window.AstroKundli=saved.chart;
+      renderMainKundliChart(saved.chart);
+      renderVargaCharts(saved.chart);
+      renderAstrologyCalculations(saved.chart);
+      const panel=$("kBox");if(panel)panel.style.display="block";
+      const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=false;
+      const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=false;
+      document.dispatchEvent(new CustomEvent("astro:kundli-ready",{detail:saved.chart}));
+    }else{
+      const panel=$("kBox");if(panel)panel.style.display="none";
+      const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=true;
+      const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=true;
+    }
   }
   async function requestInitialConsultation(chart){
     const status=$("aiInitialSummary");
