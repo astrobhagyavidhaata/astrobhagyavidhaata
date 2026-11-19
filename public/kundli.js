@@ -163,9 +163,9 @@
       p.textContent="वर्तमान दशा: "+(active.mahadasha||"—")+" महादशा / "+(active.antardasha||"—")+" अंतर्दशा / "+(active.pratyantardasha||"—")+" प्रत्यंतरदशा";
       dashaFolder.appendChild(p);
       const dates=document.createElement("p");dates.className="chat-info";
-      dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString():"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString():"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString():"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString():"—");
+      dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—");
       dashaFolder.appendChild(dates);
-      const periodDate=value=>value?new Date(value).toLocaleDateString("hi-IN",{day:"2-digit",month:"short",year:"numeric"}):"—";
+      const periodDate=value=>value?new Date(value).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en",{day:"2-digit",month:"short",year:"numeric"}):"—";
       const periodRange=(item)=>periodDate(item.start)+" से "+periodDate(item.end);
       const activeMD=active.mahadasha, activeAD=active.antardasha, activePD=active.pratyantardasha;
       const activeBox=document.createElement("div");activeBox.className="dasha-current-card";
@@ -257,7 +257,7 @@
       const timelineTitle=document.createElement("h4");timelineTitle.textContent="विंशोत्तरी महादशा समय-रेखा";timelineTitle.style.cssText="color:#f5c66b;margin:4px 0 8px";timeline.appendChild(timelineTitle);
       const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
       const header=document.createElement("tr");["महादशा","आरंभ","समाप्ति","अंतर्दशाएँ"].forEach(v=>{const th=document.createElement("th");th.textContent=v;th.style.cssText="text-align:left;padding:7px;color:#f5d994";header.appendChild(th);});table.appendChild(header);
-      const fmt=v=>v?new Date(v).toLocaleDateString("hi-IN"):"—";
+      const fmt=v=>v?new Date(v).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—";
       const appendPeriodBar=(host,periods,label)=>{
         const valid=(periods||[]).map(period=>({...period,startMs:new Date(period.start).getTime(),endMs:new Date(period.end).getTime()}))
           .filter(period=>Number.isFinite(period.startMs)&&Number.isFinite(period.endMs)&&period.endMs>period.startMs);
@@ -498,7 +498,7 @@
     url.search = new URLSearchParams({
       name: place,
       count: "8",
-      language: "en",
+      language: (window.AstroLanguage?.get?.() || document.documentElement.lang || "en").split("-")[0],
       format: "json"
     });
 
