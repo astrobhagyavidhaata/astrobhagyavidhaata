@@ -3,7 +3,7 @@
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const recentRequests=new Map();
-const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process!=="undefined" ? process.env?.GEMINI_API_KEY : "");
+const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
 const PRIVATE_FIELD_KEYS = new Set([
   "name", "fullname", "email", "phone", "mobile", "birthplace", "place",
