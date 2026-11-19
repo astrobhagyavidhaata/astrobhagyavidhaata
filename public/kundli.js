@@ -424,7 +424,7 @@
       dashaFolder.replaceChildren();
       if(heading)dashaFolder.appendChild(heading);
       dashaFolder.append(tabs,viewport);
-=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
+    const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
     const av=chart.ashtakavarga;
     if(av?.validation?.passed && av.bhinna && av.sarva){
       const method=document.createElement("p");method.className="chat-info";
