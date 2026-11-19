@@ -173,7 +173,7 @@
         throw new Error("AI से सही उत्तर प्राप्त नहीं हुआ।");
       }
 
-      loading.textContent = activeAstro + ": " + data.answer;
+      loading.textContent = "मैं Astro vidhata AI हूँ: " + data.answer;
 
       chatHistory.push(
         { role: "user", content: question },
