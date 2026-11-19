@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17112b">
+  <title>Astro Bhagya Vidhata | वैदिक ज्योतिष</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:#100d1c;color:#fff}
+    header{background:#211638;border-bottom:1px solid #493568;padding:18px 14px;text-align:center}
+    header h1{color:#f5c66b;margin:0;font-size:24px}
+    .app-header{position:relative;display:flex;align-items:center;justify-content:center;min-height:86px;padding:14px 56px}
+    .header-title{text-align:center}
+    .header-menu{position:absolute;right:12px;top:12px}
+    .header-menu>button{width:42px;height:42px;margin:0;padding:0;border:1px solid #70558e;border-radius:10px;background:#2c2140;color:#f5d994;font-size:28px;line-height:1}
+    .header-menu-panel{position:absolute;right:0;top:49px;width:min(290px,calc(100vw - 24px));z-index:500;background:#181326;border:1px solid #70558e;border-radius:12px;padding:10px;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+    .header-menu-panel[hidden]{display:none}
+    #menuChartFolderHost .app-folder{margin:0}
+    #menuChartFolderHost .app-folder>summary{list-style:none}
+    #menuChartFolderHost .app-folder>summary::-webkit-details-marker{display:none}
+    #menuChartFolderHost .app-folder>summary:before{content:"▸ ";color:#f5c66b}
+    #menuChartFolderHost .app-folder[open]>summary:before{content:"▾ "}
+    header p{color:#d4c9e5;margin:8px 0 0;font-size:14px}
+    .wallet-bar{max-width:650px;margin:14px auto 0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .wallet{background:#2c2140;border:1px solid #70558e;border-radius:10px;padding:11px 14px;color:#f5c66b;font-weight:bold}
+    .wallet button{width:auto;margin:0 0 0 8px;padding:7px 12px;font-size:13px}
+    main{max-width:650px;margin:18px auto;padding:14px}
+    .panel{background:#211a32;border:1px solid #493568;border-radius:15px;padding:20px;margin-bottom:16px}
+    h2{color:#f5c66b;font-size:19px;margin-top:0}
+    h3{color:#f5c66b;font-size:16px;margin:18px 0 8px}
+    label{display:block;margin:16px 0 7px;color:#e6d9f5;font-size:14px}
+    input,select,textarea{width:100%;padding:13px;border-radius:8px;border:1px solid #66547f;background:#151020;color:#fff;font-size:16px}
+    button{width:100%;padding:14px;border:0;border-radius:9px;background:#e8b957;color:#211638;font-size:16px;font-weight:bold;cursor:pointer;margin-top:18px}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .secondary{background:#493568;color:white}
+    #message,#walletMessage,#panchangMessage{display:none;padding:12px;margin-top:14px;border-radius:8px;background:#151020;color:#f5d994;line-height:1.6;overflow-wrap:anywhere}
+    #kBox{display:none;margin-top:18px}
+    #kTxt{display:none!important}
+    .app-folder{display:block;margin:14px 0;border:1px solid #70558e;border-radius:12px;background:#181326;padding:12px}
+    .app-folder>summary{cursor:pointer;color:#f5d994;font-weight:bold;font-size:16px;padding:5px;list-style-position:inside}
+    .app-folder[open]>summary{margin-bottom:12px}
+    .chart-view-toolbar{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;margin:10px 0 12px;padding-bottom:5px}
+    .chart-view-btn{flex:0 0 auto;width:auto;margin:0;padding:10px 13px;border:1px solid #70558e;border-radius:9px;background:#302342;color:#f5d994;font-size:13px}
+    .chart-view-btn.active{background:#e8b957;color:#211638;border-color:#e8b957}
+    .chart-cards{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 1px 12px;-webkit-overflow-scrolling:touch}
+    .chart-card{flex:0 0 min(78vw,290px);min-width:240px;scroll-snap-align:start;border:1px solid #70558e;border-radius:12px;padding:10px;background:#181326;overflow:hidden}
+    .chart-card h3{margin:2px 0 8px;text-align:center;font-size:15px}
+    .chart-card svg{display:block;width:100%;height:auto;background:#fffaf0;border-radius:7px}
+    .chart-card .chart-asc{margin:8px 0 0;text-align:center;color:#f5d994;font-size:12px}
+    .nakshatra-panel{overflow-x:auto;margin:8px 0 12px;border:1px solid #70558e;border-radius:10px;padding:9px;background:#181326}
+    .nakshatra-panel table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+    .nakshatra-panel th,.nakshatra-panel td{padding:8px 7px;text-align:left;border-bottom:1px solid #493568}
+    .nakshatra-panel th{color:#f5c66b}
+    .nakshatra-panel[hidden]{display:none}
+    .chart-item{margin:9px 0;border:1px solid #66547f;border-radius:9px;padding:10px;background:#211a32}
+    .chart-item>summary{cursor:pointer;color:#f5d994;font-weight:bold;list-style-position:inside}
+    .chart-item[open]>summary{margin-bottom:10px}
+    .chat-info{color:#d4c9e5;font-size:14px;line-height:1.6}
+    .modal{display:none;position:fixed;left:0;right:0;top:var(--chat-vtop,0px);height:calc(var(--chat-vh,100dvh) - var(--chat-lift,0px));z-index:1000;background:rgba(0,0,0,.82);padding:10px;overflow:hidden;box-sizing:border-box}
+    .modal.keyboard-lift{--chat-lift:120px}
+    .modal-box{display:flex;flex-direction:column;width:100%;max-width:520px;height:100%;max-height:100%;min-height:0;margin:0 auto;padding:12px;border-radius:14px;background:#211a32;border:1px solid #70558e;box-sizing:border-box;overflow:hidden}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:0 0 auto}
+    .modal-head h2{font-size:17px;margin:0}
+    .close-button{width:auto;margin:0;padding:8px 13px;background:#493568;color:white}
+    #consultationBillingStatus{flex:0 0 auto;margin:8px 0}
+    #chatMessages{flex:1 1 auto;height:auto;min-height:70px;min-width:0;overflow-y:auto;background:#151020;border:1px solid #66547f;border-radius:10px;padding:12px;margin-top:8px}
+    .msg-bot{background:#302342;padding:11px;border-radius:9px;margin-bottom:10px;line-height:1.6;overflow-wrap:anywhere}
+    .msg-user{background:#17483f;padding:11px;border-radius:9px;margin-bottom:10px;text-align:right;line-height:1.6;overflow-wrap:anywhere}
+    #userMsgInput{flex:0 0 auto;width:100%;box-sizing:border-box;margin-top:6px;min-height:48px;max-height:110px;resize:vertical}
+    .modal-box>label[for="userMsgInput"]{flex:0 0 auto;margin-top:8px}
+    .chat-actions{display:flex;gap:9px;flex:0 0 auto;padding-bottom:env(safe-area-inset-bottom,0px)}
+    .chat-actions button{flex:1}
+    @media(max-height:520px){.modal-box{padding:8px}.modal-head h2{font-size:15px}#consultationBillingStatus{font-size:12px}.modal-box>label[for="userMsgInput"]{font-size:13px}}
+    #panchangOutput{display:none;margin-top:18px;line-height:1.6}
+    #panchangOutput p{margin:8px 0}
+    #panchangOutput table{color:#eee}
+    #panchangOutput th{text-align:left;padding:7px;color:#f5c66b}
+    #panchangOutput td{padding:7px;border-top:1px solid #493568}
+
+    .support-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    .support-link{display:block;text-align:center;text-decoration:none;padding:13px 10px;border-radius:9px;background:#e8b957;color:#211638;font-weight:bold}
+    .support-link.whatsapp{background:#1f8f5f;color:#fff}
+    .support-note{color:#d4c9e5;font-size:14px;line-height:1.7}
+    #birthPlaceSuggestions button{display:block;width:100%;margin:0;padding:11px 12px;text-align:left;border-radius:0;background:#211a32;color:#fff;border-bottom:1px solid #493568;font-weight:normal}\n    .legal-details{margin-top:14px;border:1px solid #66547f;border-radius:10px;padding:12px;background:#181326}
+    .legal-details summary{color:#f5d994;font-weight:bold;cursor:pointer;list-style-position:inside}
+    .legal-details[open] summary{margin-bottom:10px}
+    .support-topics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+    .support-topics a{display:block;text-align:center;text-decoration:none;padding:11px 8px;border:1px solid #66547f;border-radius:8px;color:#f5d994;font-size:13px}
+    @media(max-width:360px){.support-actions,.support-topics{grid-template-columns:1fr}}
+    footer{text-align:center;padding:20px 14px;color:#a99bbd;font-size:12px;line-height:1.7}
+    .language-picker{display:flex;align-items:center;gap:8px;margin:8px 0}.language-picker label{color:#f5c66b;font-size:13px}.language-picker select{max-width:190px;padding:8px 10px;border:1px solid #806b9b;border-radius:8px;background:#151020;color:#fff;font-size:14px}
+    @media(max-width:420px){header h1{font-size:21px}.panel{padding:15px}#chatMessages{height:300px}}
+      .goog-te-banner-frame.skiptranslate, .skiptranslate > iframe, #goog-gt-tt, .goog-te-balloon-frame, .goog-tooltip {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    body { top: 0px !important; position: static !important; }
+  </style>
+</head>
+<body>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"><details class="app-folder" id="jyotishCalculationsFolder"><summary>📁 ज्योतिषीय गणनाएँ</summary><div id="jyotishCalculations"><p class="chat-info">पहले जन्म विवरण भरकर कुंडली बनाएँ। उसके बाद नवतारा, दशा और उपलब्ध गणनाएँ यहाँ खुलेंगी।</p></div></details></div></div></div></header>
+  <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
+  <script>
+    (function(){
+      const picker=document.getElementById("preferredLanguage");
+      if(!picker)return;
+      const supported=new Set(["en","hi","mr","pa","ur","fr","de","es","pt","ar","bn","gu","ta","te"]);
+      let saved="en";
+      try{saved=localStorage.getItem("astro_language")||"en";}catch(_){}
+      picker.value=supported.has(saved)?saved:"en";
+      picker.addEventListener("change",()=>{
+        try{localStorage.setItem("astro_language",picker.value);}catch(_){}
+        document.documentElement.lang=picker.value;
+        const notice=document.getElementById("languageNotice");
+        if(notice)notice.textContent="Prediction language: "+picker.options[picker.selectedIndex].text;
+      });
+      document.documentElement.lang=picker.value;
+    })();
+  </script>
+  <main>
+    <section class="panel">
+      <h2>👤 गेस्ट लॉगिन</h2>
+      <p id="loginState" class="chat-info">गेस्ट अकाउंट की स्थिति जाँची जा रही है…</p>
+      <div id="guestConsentWrap">
+        <label style="display:flex;align-items:flex-start;gap:9px;line-height:1.6">
+          <input id="guestConsent" type="checkbox" style="width:auto;flex:0 0 auto;margin-top:4px">
+          <span>मैं <a href="/TERMS.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Terms &amp; Conditions</a> और <a href="/PRIVACY.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Privacy Policy</a> से सहमत हूँ।</span>
+        </label>
+      </div>
+      <button id="guestContinueButton" type="button">बिना OTP जारी रखें</button>
+      <div id="authMessage" role="status" aria-live="polite"></div>
+    </section>
+    <section class="panel">
+      <h2>🌟 अपनी जन्म जानकारी भरें</h2>
+      <form id="kundliForm">
+        <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
+        <label for="dob">जन्म तारीख</label><input id="dob" name="dob" type="date" required>
+        <label for="birthTime">जन्म समय</label><input id="birthTime" name="birthTime" type="time" required>
+        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
+        <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली मेरे लॉगिन खाते में सुरक्षित करें</label>
+        <button type="submit">मेरी कुंडली बनाएं</button>
+      </form>
+      <div id="message" role="status" aria-live="polite"></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+    </section>
+
+    <section class="panel">
+      <h2>📚 मेरी सुरक्षित कुंडलियाँ</h2>
+      <p class="chat-info">केवल वे कुंडलियाँ दिखेंगी जिन्हें बनाते समय आपने खाते में सुरक्षित करने की अनुमति दी थी।</p>
+      <button type="button" id="loadKundliHistory" class="secondary">मेरी कुंडलियाँ देखें</button>
+      <div id="kundliHistoryList" class="chat-info" aria-live="polite"></div>
+      <div id="savedKundliPreview" class="chat-info"></div>
+    </section>
+
+    <section class="panel">
+      <h2>📅 दैनिक पंचांग और शुभ-अशुभ काल</h2>
+      <p class="chat-info">तिथि, नक्षत्र, योग, करण, सूर्योदय-सूर्यास्त, राहुकाल, यमगण्ड, गुलिक काल, अभिजित और 24 होरा की गणना।</p>
+      <form id="panchangForm">
+        <label for="panchangDate">तारीख</label><input id="panchangDate" type="date" required>
+        <label for="panchangPlace">शहर या गाँव</label><input id="panchangPlace" type="text" placeholder="जैसे: Warud, Maharashtra" required>
+        <button type="button" id="panchangFindPlace" class="secondary">स्थान खोजें</button>
+        <select id="panchangPlaceResults" style="display:none" aria-label="सही स्थान चुनें"></select>
+        <input id="panchangLat" type="hidden" required>
+        <input id="panchangLon" type="hidden" required>
+        <button type="submit">आज का पंचांग निकालें</button>
+      </form>
+      <div id="panchangMessage" role="status" aria-live="polite"></div>
+      <div id="panchangOutput" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+      <h2>🪐 आज का ग्रह गोचर</h2>
+      <label for="rashiSelect">अपनी चंद्र राशि चुनें</label>
+      <select id="rashiSelect">
+        <option value="मेष">मेष</option><option value="वृषभ">वृषभ</option><option value="मिथुन">मिथुन</option><option value="कर्क">कर्क</option><option value="सिंह">सिंह</option><option value="कन्या">कन्या</option><option value="तुला">तुला</option><option value="वृश्चिक">वृश्चिक</option><option value="धनु">धनु</option><option value="मकर">मकर</option><option value="कुंभ">कुंभ</option><option value="मीन">मीन</option>
+      </select>
+      <div id="rashiGocharOut" class="chat-info" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+      <h2>💬 AI ज्योतिष परामर्श</h2>
+      <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न AI ज्योतिष सहायक से पूछें। हर अकाउंट को पहली बार केवल 1 मिनट मुफ्त मिलेगा। उसके बाद ₹5 प्रति मिनट वॉलेट से कटेंगे।</p>
+      <button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">चैट शुरू करें</button>
+      <div id="walletMessage" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" id="customerCare"><details class="app-folder" id="customerCareFolder"><summary>📁 Customer Care / Help Centre</summary>
+      <p class="support-note">Contact us for payment deductions, wallet balance, login, birth chart, chat, or any app-related issue. You can also share your suggestions.</p>
+      <p class="support-note"><strong>Support:</strong> <a href="tel:8208091073" style="color:#f5c66b;text-decoration:none">8208091073</a> (Call and WhatsApp)</p>
+      <p class="support-note"><strong>Email:</strong> <a href="mailto:amitdiksha975695@gmail.com" style="color:#f5c66b;text-decoration:none">amitdiksha975695@gmail.com</a></p>
+      <div class="support-actions">
+        <a class="support-link" href="tel:8208091073">📞 Call Now</a>
+        <a class="support-link whatsapp" href="https://wa.me/918208091073?text=Namaste%2C%20mujhe%20Astro%20Bhagya%20Vidhata%20app%20mein%20sahayata%20chahiye." target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+      </div>
+      <div class="support-topics">
+        <a href="https://wa.me/918208091073?text=Payment%20complaint%3A%20mere%20paise%20kat%20gaye%20hain%2C%20kripya%20madad%20karein." target="_blank" rel="noopener noreferrer">Payment Complaint</a>
+        <a href="https://wa.me/918208091073?text=App%20problem%3A%20mujhe%20app%20mein%20takneeki%20samasya%20aa%20rahi%20hai." target="_blank" rel="noopener noreferrer">App Issue</a>
+        <a href="https://wa.me/918208091073?text=Namaste%2C%20main%20app%20ke%20baare%20mein%20sujhav%20dena%20chahta%2Fchahti%20hoon." target="_blank" rel="noopener noreferrer">Suggestions / Feedback</a>
+        <a href="https://wa.me/918208091073?text=Namaste%2C%20mujhe%20wallet%20balance%20ke%20baare%20mein%20sahayata%20chahiye." target="_blank" rel="noopener noreferrer">Wallet Balance</a>
+      </div>
+      <div style="margin-top:14px">
+        <details class="legal-details" id="legalPolicies">
+          <summary>Legal &amp; Policies</summary>
+          <div class="legal-details">
+            <details>
+              <summary>Terms &amp; Conditions</summary>
+              <p class="support-note">Read the rules for account use, consultations, wallet payments, cancellations and refunds.</p>
+              <a href="/TERMS.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Open Terms &amp; Conditions</a>
+            </details>
+          </div>
+          <div class="legal-details">
+            <details>
+              <summary>Privacy Policy</summary>
+              <p class="support-note">Read how account, birth, consultation and payment information is handled.</p>
+              <a href="/PRIVACY.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Open Privacy Policy</a>
+            </details>
+          </div>
+        </details>
+      </div>
+      </details>
+    </section>
+
+
+  </main>
+  <div id="chatModal" class="modal"><div class="modal-box">
+    <div class="modal-head"><h2 id="chatTitle">AI वैदिक ज्योतिष परामर्श</h2><button type="button" class="close-button" onclick="closeChatBox()">बंद करें</button></div>
+    <p id="consultationBillingStatus" class="chat-info">पहली बार 1 मिनट मुफ्त। उसके बाद ₹5 प्रति मिनट।</p>
+    <div id="chatMessages" aria-live="polite"></div>
+    <label for="userMsgInput">अपना प्रश्न लिखें</label><textarea id="userMsgInput" placeholder="अपना ज्योतिष संबंधी प्रश्न लिखें..." maxlength="4000" rows="3"></textarea>
+    <div class="chat-actions"><button type="button" onclick="sendUserMsg()">संदेश भेजें</button></div>
+  </div></div>
+  <div id="google_translate_element" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"></div>
+  <footer>© 2026 Astro Bhagya Vidhata<br>AI Vedic Astrology Consultation<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।</footer>
+  <script>
+    (function(){
+      const chatModal=document.getElementById('chatModal');
+      function fitChatToKeyboard(){
+        if(!chatModal) return;
+        const viewport=window.visualViewport;
+        const height=viewport ? viewport.height : window.innerHeight;
+        const top=viewport ? viewport.offsetTop : 0;
+        chatModal.style.setProperty('--chat-vh',Math.max(220,height)+'px');
+        chatModal.style.setProperty('--chat-vtop',Math.max(0,top)+'px');
+      }
+      fitChatToKeyboard();
+      if(window.visualViewport){
+        window.visualViewport.addEventListener('resize',fitChatToKeyboard);
+        window.visualViewport.addEventListener('scroll',fitChatToKeyboard);
+      }
+      window.addEventListener('resize',fitChatToKeyboard);
+      const chatInput=document.getElementById('userMsgInput');
+      if(chatInput){
+        chatInput.addEventListener('focus',()=>{
+          chatModal.classList.add('keyboard-lift');
+          fitChatToKeyboard();
+          setTimeout(()=>chatInput.scrollIntoView({block:'nearest'}),80);
+        });
+        chatInput.addEventListener('blur',()=>chatModal.classList.remove('keyboard-lift'));
+      }
+    })();
+    (function(){
+      const btn=document.getElementById('appMenuButton');
+      const panel=document.getElementById('appMenuPanel');
+      if(btn && panel){
+        btn.addEventListener('click',function(){
+          const opening=panel.hidden;
+          panel.hidden=!opening;
+          btn.setAttribute('aria-expanded',String(opening));
+        });
+        document.addEventListener('click',function(event){
+          if(!event.target.closest('.header-menu')){
+            panel.hidden=true;
+            btn.setAttribute('aria-expanded','false');
+          }
+        });
+      }
+    })();
+  </script>
+  <script src="kundli.js"></script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="wallet.js"></script><script src="auth.js"></script><script src="kundli-history.js"></script><script src="ai_chat.js"></script><script src="panchang.js"></script><script src="gochar.js"></script>
+<script>
+window.googleTranslateElementInit = function () {
+  if (window.google && google.translate) {
+    new google.translate.TranslateElement({pageLanguage:"en",includedLanguages:"en,hi,mr,pa,ur,fr,de,es,pt,ar,bn,gu,ta,te,kn,ml,or,as",autoDisplay:false}, "google_translate_element");
+  }
+};
+(function(){
+  const map={"en-CA":"en","fr-CA":"fr","pt-BR":"pt","ar-SA":"ar"};
+  function applySelectedLanguage(){
+    const select=document.getElementById("preferredLanguage");
+    if(!select)return;
+    const target=map[select.value]||select.value;
+    let attempts=0;
+    function apply(){
+      const combo=document.querySelector(".goog-te-combo");
+      if(combo){combo.value=target;combo.dispatchEvent(new Event("change"));return;}
+      if(++attempts<30)setTimeout(apply,250);
+    }
+    apply();
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.getElementById("preferredLanguage")?.addEventListener("change",applySelectedLanguage);
+  });
+  window.applyAstroGoogleTranslation=applySelectedLanguage;
+})();
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</body>
+</html>
