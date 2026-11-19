@@ -997,6 +997,8 @@
       if (panel) panel.style.display = "block";
       const aiLaunch = $("aiAstrologerLaunch");
       if (aiLaunch) aiLaunch.hidden = false;
+      const aiPanel = $("aiAstrologer");
+      if (aiPanel) aiPanel.hidden = false;
 
       await saveAstroSession(details,chart,location);
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
