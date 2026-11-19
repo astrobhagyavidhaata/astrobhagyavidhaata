@@ -63,7 +63,8 @@
       const card=document.createElement("section");card.className="chart-card";card.id=spec.id;
       const heading=document.createElement("h3");heading.textContent=spec.title;card.appendChild(heading);
       const occupants={};
-      for(const [planet,p] of Object.entries(spec.planets)){const house=Number(p.house);if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||=[]).push(planet);}
+      const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};
+      for(const [planet,p] of Object.entries(spec.planets)){const house=Number(p.house);if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||=[]).push(selectedChartLanguage()==="hi"?(hindiPlanets[planet]||planet):planet);}
       const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
       svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");svg.setAttribute("aria-label",spec.title);
       const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
@@ -107,7 +108,8 @@
         const rashiLord=Number.isInteger(rashiIndex)&&rashiIndex>=0&&rashiIndex<12?rashiLords[rashiIndex]:"—";
         const nakshatraIndex=Number(p.nakshatraIndex);
         const nakshatraLord=Number.isInteger(nakshatraIndex)&&nakshatraIndex>=0&&nakshatraIndex<27?nakshatraLords[nakshatraIndex%9]:"—";
-        const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};\n        const planetText=(selectedChartLanguage()==="hi"?(hindiPlanets[planet]||planet):planet)+(p.retrograde?" ℞":"");
+        const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};
+        const planetText=(selectedChartLanguage()==="hi"?(hindiPlanets[planet]||planet):planet)+(p.retrograde?" ℞":"");
         const values=[planetText,p.rashi||signs[p.rashiIndex]||"—",rashiLord,houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
         const tr=document.createElement("tr");
         values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});
@@ -342,7 +344,7 @@
       grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px";
       const occupants={};
       for(const [planetName,position] of Object.entries(varga.planets||{})){
-        (occupants[position.house]||(occupants[position.house]=[])).push(planetName+(position.retrograde?" ℞":""));
+        (occupants[position.house]||(occupants[position.house]=[])).push((selectedChartLanguage()==="hi"?({Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"}[planetName]||planetName):planetName)+(position.retrograde?" ℞":""));
       }
       for(let house=1;house<=12;house++){
         const signIndex=(varga.ascendant.rashiIndex+house-1)%12;
