@@ -71,8 +71,8 @@
     if(language==="en") {
       for(const [source,target] of Object.entries(I18N_DICT.en.nakshatras)) result=result.split(source).join(target);
       for(const [source,target] of Object.entries(I18N_DICT.en.words)) result=result.split(source).join(target);
-      result=result.replace(/चरण\\s*(\\d+)/g,"Pada $1");
-      result=result.replace(/(\\d+)वाँ/g,(_,n)=>{const v=Number(n),suffix=v%100>=11&&v%100<=13?"th":v%10===1?"st":v%10===2?"nd":v%10===3?"rd":"th";return v+suffix;});
+      result=result.replace(/चरण\s*(\d+)/g,"Pada $1");
+      result=result.replace(/(\d+)वाँ/g,(_,n)=>{const v=Number(n),suffix=v%100>=11&&v%100<=13?"th":v%10===1?"st":v%10===2?"nd":v%10===3?"rd":"th";return v+suffix;});
     } else if(window.AstroLanguage?.translate) {
       result=window.AstroLanguage.translate(result);
     }
@@ -308,7 +308,8 @@
             adDetails.appendChild(pdTable);adList.appendChild(adDetails);
           });
           mdDetails.appendChild(adList);
-          mdDetails.open=false;\n          adList.querySelectorAll("details").forEach(adDetails=>{adDetails.open=false;});
+          mdDetails.open=false;
+          adList.querySelectorAll("details").forEach(adDetails=>{adDetails.open=false;});
           dashaFolder.appendChild(mdDetails);
         });
       } else addNote(dashaFolder,"विंशोत्तरी दशा की पूरी समय-सारणी उपलब्ध नहीं है।");
