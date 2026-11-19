@@ -81,7 +81,8 @@
    const base=active.split("-")[0];
    const hasPack=Boolean(dictionaries[base]) || base==="en";
    document.documentElement.lang=active;
-   document.documentElement.dir=(base==="ar"||base==="ur")?"rtl":"ltr";
+   document.documentElement.dir="ltr";
+   if(document.body)document.body.dir="ltr";
    document.title=base==="fr"?"Astro Bhagya Vidhata | Astrologie védique":base==="pa"?"Astro Bhagya Vidhata | ਵੈਦਿਕ ਜੋਤਿਸ਼":"Astro Bhagya Vidhata | Vedic Astrology";
    document.body.childNodes.forEach(node=>translateElement(node,base));
    const notice=document.getElementById("languageNotice");
@@ -106,13 +107,25 @@
  function applyGoogleTranslation(lang){
    const base=String(lang||"en").split("-")[0];
    document.cookie="googtrans=/hi/"+base+"; path=/; SameSite=Lax";
+   document.documentElement.dir="ltr";
+   if(document.body)document.body.dir="ltr";
    const combo=document.querySelector(".goog-te-combo");
    if(combo){combo.value=base;combo.dispatchEvent(new Event("change"));}
  }
  window.googleTranslateElementInit=window.googleTranslateElementInit||function(){
    if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"en",autoDisplay:false},"google_translate_element");}
  };
-picker.addEventListener("change",()=>{setLanguage(picker.value);applyGoogleTranslation(picker.value);});
+// Google Translate may try to switch the page direction for Urdu/Arabic.
+ // Keep the application shell LTR while allowing translated Arabic/Urdu text itself.
+ const directionGuard=new MutationObserver(()=>{
+   if(document.documentElement.dir!=="ltr")document.documentElement.dir="ltr";
+   if(document.body&&document.body.dir!=="ltr")document.body.dir="ltr";
+ });
+ directionGuard.observe(document.documentElement,{attributes:true,attributeFilter:["dir"]});
+ if(document.body)directionGuard.observe(document.body,{attributes:true,attributeFilter:["dir"]});
+ document.documentElement.dir="ltr";
+ if(document.body)document.body.dir="ltr";
+ picker.addEventListener("change",()=>{setLanguage(picker.value);applyGoogleTranslation(picker.value);});
  // Always open the app in English; users can choose another language after opening.
  picker.value="en";
  setLanguage("en");
