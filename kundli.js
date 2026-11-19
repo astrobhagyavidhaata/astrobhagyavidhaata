@@ -238,20 +238,7 @@
         info.appendChild(infoTable);
         const chainNote=document.createElement("p");chainNote.className="chat-info";chainNote.textContent="ऊपर प्रत्येक दशा-स्वामी के जन्म नक्षत्र के स्वामी की राशि, भाव और नक्षत्र भी दिखाए गए हैं।";info.appendChild(chainNote);
         dashaFolder.appendChild(info);
-        const md= currentLords[0], ad=currentLords[1];
-        if(md&&ad){
-          const result=document.createElement("div");result.className="nakshatra-panel";
-          const title=document.createElement("h4");title.textContent="महादशा–अंतरदशा का पारंपरिक फल-संकेत";result.appendChild(title);
-          const p=document.createElement("p");p.className="chat-info";
-          const mdTheme=planetThemes[md.planet]||"ग्रह के कारकत्व";
-          const adTheme=planetThemes[ad.planet]||"ग्रह के कारकत्व";
-          const mdHouse=md.house?houseThemes[md.house-1]:"भाव स्थिति उपलब्ध नहीं";
-          const adHouse=ad.house?houseThemes[ad.house-1]:"भाव स्थिति उपलब्ध नहीं";
-          p.textContent=md.planet+" महादशा में "+mdTheme+" प्रमुख विषय रहेंगे। इसका आधार जन्म-कुंडली में "+md.planet+" का "+md.sign+" राशि तथा "+mdHouse+" से संबंध है। "+ad.planet+" अंतरदशा इस अवधि में "+adTheme+" और "+adHouse+" के विषय सक्रिय करेगी। "+(md.nakLord!=="—"?"महादशा स्वामी "+md.nak+" नक्षत्र में है, जिसका स्वामी "+md.nakLord+" है। ":"")+(ad.nakLord!=="—"?"अंतरदशा स्वामी "+ad.nak+" नक्षत्र में है, जिसका स्वामी "+ad.nakLord+" है। ":"");
-          result.appendChild(p);
-          const caution=document.createElement("p");caution.className="chat-info";caution.textContent="यह प्रारंभिक कारकत्व-आधारित संकेत है। अंतिम फलादेश में लग्नानुसार भावेशत्व, ग्रह-दृष्टि, युति, अवस्था, बल, वर्ग कुंडली और नक्षत्र-स्वामी की स्थिति का संयुक्त विचार आवश्यक है।";result.appendChild(caution);
-          dashaFolder.appendChild(result);
-        }
+
       }
       const timeline=document.createElement("div");timeline.className="nakshatra-panel";
       const timelineTitle=document.createElement("h4");timelineTitle.textContent="विंशोत्तरी महादशा समय-रेखा";timelineTitle.style.cssText="color:#f5c66b;margin:4px 0 8px";timeline.appendChild(timelineTitle);
