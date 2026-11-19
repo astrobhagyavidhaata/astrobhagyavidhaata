@@ -115,12 +115,21 @@
     table.append(tbody);scroller.append(table);section.append(scroller);host.append(section);
   }
   function retriggerGoogleTranslation(lang) {
-    const base=String(lang||"hi").split("-")[0];
-    if(base==="hi")return;
-    const target=base;
+    const target=String(lang||"hi").split("-")[0];
+    if(target==="hi")return;
     document.cookie="googtrans=/hi/"+target+"; path=/; SameSite=Lax";
-    const combo=document.querySelector(".goog-te-combo");
-    if(combo){combo.value=target;combo.dispatchEvent(new Event("change",{bubbles:true}));}
+    const trigger=()=>{
+      const combo=document.querySelector(".goog-te-combo");
+      if(!combo)return false;
+      combo.value=target;
+      combo.dispatchEvent(new Event("change",{bubbles:true}));
+      return true;
+    };
+    if(!trigger()){
+      const observer=new MutationObserver(()=>{if(trigger())observer.disconnect();});
+      observer.observe(document.body,{childList:true,subtree:true});
+      window.setTimeout(()=>observer.disconnect(),12000);
+    }
   }
   function render(data) {
     latest=data;
