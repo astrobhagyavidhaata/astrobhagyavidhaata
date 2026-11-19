@@ -248,7 +248,7 @@
     return details;
   }
 
-  async function findBirthPlace(place) {
+  async function findBirthPlace(place, options = {}) {
     const openMeteoUrl = new URL(GEOCODING_URL);
     openMeteoUrl.search = new URLSearchParams({
       name: place,
@@ -267,40 +267,23 @@
       openMeteoError = error;
     }
 
-    // Global fallback: OpenStreetMap Nominatim. Convert its response to the
-    // same location shape used by the chart form.
-    try {
-      const osmUrl = new URL("https://nominatim.openstreetmap.org/search");
-      osmUrl.search = new URLSearchParams({
-        q: place,
-        format: "jsonv2",
-        addressdetails: "1",
-        limit: "8"
-      });
-      const response = await fetch(osmUrl, { headers: { "Accept": "application/json", "Accept-Language": "en" } });
-      if (!response.ok) throw new Error("OpenStreetMap geocoding returned HTTP " + response.status);
-      const rows = await response.json();
-      return (Array.isArray(rows) ? rows : []).map(item => {
-        const address = item.address || {};
-        const city = address.city || address.town || address.village ||
-          address.municipality || address.county || item.name || item.display_name;
-        return {
-          name: city,
-          admin1: address.state || address.region || address.state_district || "",
-          country: address.country || "",
-          country_code: String(address.country_code || "").toLowerCase(),
-          latitude: Number(item.lat),
-          longitude: Number(item.lon),
-          elevation: null,
-          label: item.display_name || ""
-        };
-      }).filter(item => Number.isFinite(item.latitude) &&
-        Number.isFinite(item.longitude) &&
-        Math.abs(item.latitude) <= 90 && Math.abs(item.longitude) <= 180);
-    } catch (osmError) {
-      console.error("Global geocoding failed:", openMeteoError?.message, osmError?.message);
-      throw new Error("जन्मस्थान नहीं मिल सका। शहर के साथ राज्य और देश का नाम लिखकर दोबारा प्रयास करें।");
+    // Nominatim is used only for an explicit form submission, not autocomplete.
+    // The backend applies an identifying User-Agent and Nominatim's 1 req/sec policy.
+    if (options.allowOsmFallback) {
+      try {
+        const response = await fetch("/api/geocode?q=" + encodeURIComponent(place), {
+          headers: { "Accept": "application/json" }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.message || "OpenStreetMap lookup failed");
+        return Array.isArray(data.results) ? data.results : [];
+      } catch (osmError) {
+        console.error("Global geocoding failed:", openMeteoError?.message, osmError?.message);
+        throw new Error("जन्मस्थान नहीं मिल सका। शहर के साथ राज्य और देश का नाम लिखकर दोबारा प्रयास करें।");
+      }
     }
+    return [];
+
   }
 
   function showLocationChoices(results, callback) {
@@ -462,7 +445,7 @@
       const cached = selectedBirthPlace && selectedBirthPlace.label === details.place
         ? selectedBirthPlace
         : null;
-      const results = cached ? [cached] : await findBirthPlace(details.place);
+      const results = cached ? [cached] : await findBirthPlace(details.place, { allowOsmFallback: true });
 
       if (!results.length) {
         throw new Error(
