@@ -14,7 +14,7 @@
   function dateText(value){
     if(!value)return "";
     const date=new Date(value);
-    return Number.isNaN(date.getTime())?String(value):date.toLocaleDateString("hi-IN");
+    return Number.isNaN(date.getTime())?String(value):date.toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en");
   }
   function showPreview(record){
     const chart=record.chart;
