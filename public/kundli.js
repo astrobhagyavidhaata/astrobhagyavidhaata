@@ -56,7 +56,7 @@
     const language=selectedChartLanguage();
     return CHART_TRANSLATIONS[language] || CHART_TRANSLATIONS[language.split("-")[0]] || CHART_TRANSLATIONS.en;
   }
-  function localizeChartText(value) {
+  // Escape translation keys before building dynamic word-boundary regexes.\n  function chartWordPattern(word) {\n    const escaped=String(word).replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\  function localizeChartText(value) {");\n    return new RegExp("\\\\b"+escaped+"\\\\b","gi");\n  }\n  function localizeChartText(value) {
     const locale=chartLocale();
     const language=selectedChartLanguage().split("-")[0];
     let result=String(value ?? "");
