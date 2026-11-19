@@ -56,12 +56,19 @@
     try {
       getKundliDetails();
 
-      if (!window.AstroWallet) throw new Error("वॉलेट सेवा उपलब्ध नहीं है।");
-      if (Number(rate) !== 5) throw new Error("परामर्श शुल्क ₹5 प्रति मिनट है।");
+      if (!window.AstroWallet) {
+        throw new Error("वॉलेट सेवा उपलब्ध नहीं है।");
+      }
+
+      if (Number(rate) !== 5) {
+        throw new Error("परामर्श शुल्क ₹5 प्रति मिनट है।");
+      }
+
       await window.AstroWallet.ready;
       const started = await window.AstroWallet.startConsultation(
         astroName || "AI वैदिक ज्योतिष सहायक"
       );
+
       if (!started) return false;
 
       activeAstro = astroName || "AI वैदिक ज्योतिष सहायक";
@@ -151,7 +158,8 @@
         body: JSON.stringify({
           question,
           chartContext,
-          conversationHistory: chatHistory.slice(-12)
+          conversationHistory: chatHistory.slice(-12),
+          language: document.getElementById("preferredLanguage")?.value || "en"
         })
       });
 

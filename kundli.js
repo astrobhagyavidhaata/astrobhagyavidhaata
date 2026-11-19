@@ -106,9 +106,29 @@
     const root=$("jyotishCalculations");
     if(!root)return;
     root.replaceChildren();
-    const makeFolder=(title,id)=>{const d=document.createElement("details");d.className="chart-item";const s=document.createElement("summary");s.textContent=title;d.id=id;d.appendChild(s);root.appendChild(d);return d;};
+    const tabs=$("kundliDetailTabs");
+    if(tabs)tabs.replaceChildren();
+    let firstPage=true;
+    const makeFolder=(title,id)=>{
+      const d=document.createElement("section");
+      d.className="calculation-page"+(firstPage?" active":"");
+      d.id=id;
+      const heading=document.createElement("h3");heading.textContent=title;d.appendChild(heading);
+      if(tabs){
+        const button=document.createElement("button");button.type="button";button.textContent=title.replace(/^[0-9]+[.]/,"").trim();
+        button.setAttribute("role","tab");button.setAttribute("aria-selected",String(firstPage));
+        button.addEventListener("click",()=>{
+          root.querySelectorAll(".calculation-page").forEach(page=>page.classList.toggle("active",page===d));
+          tabs.querySelectorAll("button").forEach(tab=>tab.setAttribute("aria-selected",String(tab===button)));
+          button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+        });
+        tabs.appendChild(button);
+      }
+      root.appendChild(d);firstPage=false;return d;
+    };
     const addNote=(host,message)=>{const p=document.createElement("p");p.className="chat-info";p.textContent=message;host.appendChild(p);};
     const tara=makeFolder("1. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");
+    tara.open=true;
     const current=chart.currentTaraBala;
     if(current){
       const p=document.createElement("p");p.className="chat-info";
@@ -145,6 +165,94 @@
       const dates=document.createElement("p");dates.className="chat-info";
       dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString():"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString():"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString():"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString():"—");
       dashaFolder.appendChild(dates);
+      const periodDate=value=>value?new Date(value).toLocaleDateString("hi-IN",{day:"2-digit",month:"short",year:"numeric"}):"—";
+      const periodRange=(item)=>periodDate(item.start)+" से "+periodDate(item.end);
+      const activeMD=active.mahadasha, activeAD=active.antardasha, activePD=active.pratyantardasha;
+      const activeBox=document.createElement("div");activeBox.className="dasha-current-card";
+      activeBox.innerHTML="";
+      const activeTitle=document.createElement("h4");activeTitle.textContent="अभी चल रही विंशोत्तरी दशा";activeBox.appendChild(activeTitle);
+      const activeGrid=document.createElement("div");activeGrid.className="dasha-current-grid";
+      [[ "महादशा",activeMD,active.mahadashaStart,active.mahadashaEnd ],["अंतरदशा",activeAD,active.antardashaStart,active.antardashaEnd],["प्रत्यंतरदशा",activePD,active.pratyantardashaStart,active.pratyantardashaEnd]].forEach(([label,planet,start,end])=>{
+        const item=document.createElement("div");item.className="dasha-current-item";
+        const name=document.createElement("strong");name.textContent=label;const value=document.createElement("span");value.textContent=planet||"—";
+        const range=document.createElement("small");range.textContent=periodDate(start)+" – "+periodDate(end);
+        item.append(name,value,range);activeGrid.appendChild(item);
+      });
+      activeBox.appendChild(activeGrid);dashaFolder.appendChild(activeBox);
+      const scheduleTitle=document.createElement("h4");scheduleTitle.textContent="पूरी महादशा एवं अंतरदशा समय-सारणी";dashaFolder.appendChild(scheduleTitle);
+      const schedule=Array.isArray(dasha.mahadashas)?dasha.mahadashas:[];
+      if(schedule.length){
+        schedule.forEach(mdItem=>{
+          const mdDetails=document.createElement("details");mdDetails.className="dasha-period";
+          const mdSummary=document.createElement("summary");mdSummary.textContent=mdItem.planet+" महादशा  •  "+periodRange(mdItem)+(mdItem.planet===activeMD?"  |  अभी चल रही":"");
+          mdDetails.appendChild(mdSummary);
+          const adList=document.createElement("div");adList.className="dasha-subperiod-list";
+          (mdItem.antardashas||[]).forEach(adItem=>{
+            const adDetails=document.createElement("details");adDetails.className="dasha-subperiod";
+            const adSummary=document.createElement("summary");adSummary.textContent=mdItem.planet+" / "+adItem.planet+"  •  "+periodRange(adItem)+(mdItem.planet===activeMD&&adItem.planet===activeAD?"  |  वर्तमान":"");
+            adDetails.appendChild(adSummary);
+            const pdTable=document.createElement("table");pdTable.className="dasha-date-table";
+            const head=document.createElement("tr");["प्रत्यंतरदशा","आरंभ","समाप्ति"].forEach(label=>{const th=document.createElement("th");th.textContent=label;head.appendChild(th);});pdTable.appendChild(head);
+            (adItem.pratyantardashas||[]).forEach(pdItem=>{
+              const row=document.createElement("tr");
+              [pdItem.planet,periodDate(pdItem.start),periodDate(pdItem.end)].forEach((value,index)=>{const cell=document.createElement("td");cell.textContent=value;row.appendChild(cell);});
+              if(mdItem.planet===activeMD&&adItem.planet===activeAD&&pdItem.planet===activePD)row.className="dasha-active-row";
+              pdTable.appendChild(row);
+            });
+            adDetails.appendChild(pdTable);adList.appendChild(adDetails);
+          });
+          mdDetails.appendChild(adList);
+          if(mdItem.planet===activeMD){mdDetails.open=true;const currentAd=Array.from(adList.children).find((el)=>el.querySelector("summary")?.textContent.startsWith(activeMD+" / "+activeAD));if(currentAd)currentAd.open=true;}
+          dashaFolder.appendChild(mdDetails);
+        });
+      } else addNote(dashaFolder,"विंशोत्तरी दशा की पूरी समय-सारणी उपलब्ध नहीं है।");
+      const nakNames=["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वाभाद्रपद","उत्तराभाद्रपद","रेवती"];
+      const nakLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
+      const houseThemes=["स्वभाव, शरीर और जीवन-दिशा","धन, वाणी और परिवार","साहस, प्रयास और छोटे भाई-बहन","माता, घर, सुख और संपत्ति","संतान, शिक्षा, बुद्धि और रचनात्मकता","ऋण, रोग, प्रतियोगिता और सेवा","विवाह, साझेदारी और सार्वजनिक संबंध","परिवर्तन, शोध, गोपनीयता और साझा संसाधन","भाग्य, धर्म, गुरु और उच्च शिक्षा","कर्म, पेशा, प्रतिष्ठा और जिम्मेदारी","लाभ, आय, मित्र और इच्छापूर्ति","व्यय, विदेश, एकांत और आध्यात्मिकता"];
+      const planetThemes={सूर्य:"आत्मविश्वास, पिता, नेतृत्व और अधिकार",चंद्र:"मन, माता, भावनाएँ और जनसंपर्क",मंगल:"ऊर्जा, साहस, भूमि और प्रतिस्पर्धा",बुध:"बुद्धि, संवाद, व्यापार और विश्लेषण",गुरु:"ज्ञान, गुरु, संतान, विस्तार और मार्गदर्शन",शुक्र:"प्रेम, विवाह, कला, सुख और सुविधा",शनि:"अनुशासन, श्रम, देरी, जिम्मेदारी और स्थायित्व",राहु:"महत्वाकांक्षा, असामान्य अनुभव, तकनीक और विदेशी संपर्क",केतु:"वैराग्य, शोध, आध्यात्मिकता और अलगाव"};
+      const planetData=chart.d1?.planets||{};
+      const describeLord=(planet)=>{
+        const p=planetData[planet]||{};
+        const ni=Number.isInteger(Number(p.nakshatraIndex))?Number(p.nakshatraIndex):nakNames.indexOf(p.nakshatra);
+        const lord=ni>=0?nakLords[ni%9]:"—";
+        const house=Number(p.house);
+        return {planet,sign:p.rashi||signNames[Number(p.rashiIndex)]||"—",house:Number.isInteger(house)&&house>=1&&house<=12?house:null,nak:p.nakshatra||"—",pada:p.pada||"—",nakLord:lord,retrograde:!!p.retrograde};
+      };
+      const currentLords=[describeLord(active.mahadasha),describeLord(active.antardasha),describeLord(active.pratyantardasha)].filter(x=>x.planet&&x.planet!=="null");
+      if(currentLords.length){
+        const info=document.createElement("div");info.className="nakshatra-panel";
+        const infoTitle=document.createElement("h4");infoTitle.textContent="वर्तमान दशा-स्वामियों की जन्म-कुंडली स्थिति";info.appendChild(infoTitle);
+        const infoTable=document.createElement("table");
+        const infoHead=document.createElement("tr");["दशा स्तर","ग्रह","राशि / भाव","नक्षत्र / चरण","नक्षत्र स्वामी","स्वामी की स्थिति"].forEach(v=>{const th=document.createElement("th");th.textContent=v;infoHead.appendChild(th);});infoTable.appendChild(infoHead);
+        const lordPlacement=(name)=>{
+          const q=planetData[name]||{};
+          const qHouse=Number(q.house);
+          return {sign:q.rashi||signNames[Number(q.rashiIndex)]||"—",house:Number.isInteger(qHouse)&&qHouse>=1&&qHouse<=12?qHouse:null,nak:q.nakshatra||"—",pada:q.pada||"—"};
+        };
+        currentLords.forEach((x,index)=>{
+          const nakLordInfo=lordPlacement(x.nakLord);
+          const tr=document.createElement("tr");
+          const vals=[["महादशा","अंतरदशा","प्रत्यंतरदशा"][index]||"दशा",x.planet+(x.retrograde?" ℞":""),x.sign+(x.house?" / "+x.house+"वाँ भाव":""),x.nak+" / "+(x.pada||"—"),x.nakLord,nakLordInfo.sign+(nakLordInfo.house?" / "+nakLordInfo.house+"वाँ भाव":"")+" • "+nakLordInfo.nak+" "+nakLordInfo.pada];
+          vals.forEach(v=>{const td=document.createElement("td");td.textContent=String(v);tr.appendChild(td);});infoTable.appendChild(tr);
+        });
+        info.appendChild(infoTable);
+        const chainNote=document.createElement("p");chainNote.className="chat-info";chainNote.textContent="ऊपर प्रत्येक दशा-स्वामी के जन्म नक्षत्र के स्वामी की राशि, भाव और नक्षत्र भी दिखाए गए हैं।";info.appendChild(chainNote);
+        dashaFolder.appendChild(info);
+        const md= currentLords[0], ad=currentLords[1];
+        if(md&&ad){
+          const result=document.createElement("div");result.className="nakshatra-panel";
+          const title=document.createElement("h4");title.textContent="महादशा–अंतरदशा का पारंपरिक फल-संकेत";result.appendChild(title);
+          const p=document.createElement("p");p.className="chat-info";
+          const mdTheme=planetThemes[md.planet]||"ग्रह के कारकत्व";
+          const adTheme=planetThemes[ad.planet]||"ग्रह के कारकत्व";
+          const mdHouse=md.house?houseThemes[md.house-1]:"भाव स्थिति उपलब्ध नहीं";
+          const adHouse=ad.house?houseThemes[ad.house-1]:"भाव स्थिति उपलब्ध नहीं";
+          p.textContent=md.planet+" महादशा में "+mdTheme+" प्रमुख विषय रहेंगे। इसका आधार जन्म-कुंडली में "+md.planet+" का "+md.sign+" राशि तथा "+mdHouse+" से संबंध है। "+ad.planet+" अंतरदशा इस अवधि में "+adTheme+" और "+adHouse+" के विषय सक्रिय करेगी। "+(md.nakLord!=="—"?"महादशा स्वामी "+md.nak+" नक्षत्र में है, जिसका स्वामी "+md.nakLord+" है। ":"")+(ad.nakLord!=="—"?"अंतरदशा स्वामी "+ad.nak+" नक्षत्र में है, जिसका स्वामी "+ad.nakLord+" है। ":"");
+          result.appendChild(p);
+          const caution=document.createElement("p");caution.className="chat-info";caution.textContent="यह प्रारंभिक कारकत्व-आधारित संकेत है। अंतिम फलादेश में लग्नानुसार भावेशत्व, ग्रह-दृष्टि, युति, अवस्था, बल, वर्ग कुंडली और नक्षत्र-स्वामी की स्थिति का संयुक्त विचार आवश्यक है।";result.appendChild(caution);
+          dashaFolder.appendChild(result);
+        }
+      }
       const timeline=document.createElement("div");timeline.className="nakshatra-panel";
       const timelineTitle=document.createElement("h4");timelineTitle.textContent="विंशोत्तरी महादशा समय-रेखा";timelineTitle.style.cssText="color:#f5c66b;margin:4px 0 8px";timeline.appendChild(timelineTitle);
       const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
@@ -236,71 +344,75 @@
       ashtak.appendChild(check);
       (av.notes||[]).forEach(note=>addNote(ashtak,note));
     } else addNote(ashtak,"इस जन्म-कुंडली के लिए सत्यापित अष्टकवर्ग डेटा उपलब्ध नहीं है।");
-    const strength=makeFolder("4. षड्बल और भावबल","shadbalaFolder");
-    addNote(strength,"षड्बल और भावबल की शास्त्रीय गणना अभी पूरी तरह लागू नहीं है। सत्यापित गणना जुड़ने के बाद ही ग्रहों और भावों के बल दिखाए जाएँगे।");
+    const strength=makeFolder("4. षड्बल और भावबल — खोलने के लिए स्पर्श करें","shadbalaFolder");
+    strength.open=true;
+    const strengthIntro=document.createElement("p");
+    strengthIntro.className="chat-info";
+    strengthIntro.textContent="यहाँ ग्रहों का षड्बल और 12 भावों का भावबल अलग-अलग दिखेगा। अभी इस जन्म-कुंडली के लिए प्रमाणित संख्यात्मक परिणाम इंजन से उपलब्ध नहीं हैं; इसलिए गलत अंक नहीं दिखाए जा रहे हैं।";
+    strength.appendChild(strengthIntro);
+    const balaGroups=[
+      ["षड्बल — छह अंग",["स्थान बल (Sthana Bala)","दिक् बल (Dig Bala)","काल बल (Kala Bala)","चेष्टा बल (Cheshta Bala)","नैसर्गिक बल (Naisargika Bala)","दृक् बल (Drik Bala)"]],
+      ["भावबल — 12 भाव",["प्रथम भाव","द्वितीय भाव","तृतीय भाव","चतुर्थ भाव","पंचम भाव","षष्ठ भाव","सप्तम भाव","अष्टम भाव","नवम भाव","दशम भाव","एकादश भाव","द्वादश भाव"]]
+    ];
+    for(const [groupName,items] of balaGroups){
+      const section=document.createElement("section");
+      const heading=document.createElement("h4");
+      heading.textContent=groupName;
+      heading.style.cssText="margin:14px 0 8px;color:#f5c66b";
+      section.appendChild(heading);
+      const list=document.createElement("ul");
+      list.style.cssText="margin:0;padding-inline-start:22px;line-height:1.8";
+      for(const item of items){const li=document.createElement("li");li.textContent=item+" — गणना जोड़नी बाकी";list.appendChild(li);}
+      section.appendChild(list);strength.appendChild(section);
+    }
+    const note=document.createElement("p");
+    note.className="chat-info";
+    note.textContent="ध्यान दें: षड्बल में प्रत्येक ग्रह के लिए रूप (Virupa) और आवश्यक न्यूनतम बल की तुलना भी दी जाएगी। भावबल में प्रत्येक भाव का कुल बल और उसके घटक दिखेंगे।";
+    strength.appendChild(note);
   }
 
   function renderVargaCharts(chart) {
     const root=$("vargaCharts");
     if(!root)return;
     root.replaceChildren();
-    const heading=document.createElement("h3");
-    heading.textContent="षोडश वर्ग कुंडलियाँ — उत्तर भारतीय शैली";
-    root.appendChild(heading);
     const charts=chart.vargas||{};
-    const entries=Object.entries(charts);
+    const entries=Object.entries(charts).filter(([,v])=>v?.ascendant&&Number.isInteger(Number(v.ascendant.rashiIndex)));
     if(!entries.length){
       const p=document.createElement("p");p.className="chat-info";
       p.textContent="इस जन्म विवरण के लिए विभाजित कुंडली डेटा उपलब्ध नहीं है।";
       root.appendChild(p);return;
     }
-    for(const [key,varga] of entries){
-      if(!varga?.ascendant||!Number.isInteger(Number(varga.ascendant.rashiIndex)))continue;
-      const card=document.createElement("details");
-      card.className="chart-card";
-      card.style.cssText="margin:12px 0;padding:12px";
-      const title=document.createElement("summary");
-      title.textContent=key+" — "+(varga.name||"वर्ग कुंडली")+" | लग्न "+(signNames[varga.ascendant.rashiIndex]||"—");
-      card.appendChild(title);
+    const toolbar=document.createElement("div");toolbar.className="calculation-tabs varga-tabs";toolbar.setAttribute("role","tablist");toolbar.setAttribute("aria-label","विभाजित कुंडलियाँ");
+    const pages=document.createElement("div");pages.className="varga-pages";
+    entries.forEach(([key,varga],index)=>{
+      const button=document.createElement("button");button.type="button";button.textContent=key;button.setAttribute("role","tab");button.setAttribute("aria-selected",String(index===0));
+      const card=document.createElement("section");card.className="chart-card varga-page"+(index===0?" active":"");card.setAttribute("role","tabpanel");card.setAttribute("aria-label",key+" "+(varga.name||"वर्ग कुंडली"));
+      const title=document.createElement("h4");title.textContent=key+" — "+(varga.name||"वर्ग कुंडली");card.appendChild(title);
       const occupants={};
       for(const [planetName,position] of Object.entries(varga.planets||{})){
         const house=Number(position.house);
-        if(Number.isInteger(house)&&house>=1&&house<=12){
-          (occupants[house]||(occupants[house]=[])).push(planetName+(position.retrograde?" ℞":""));
-        }
+        if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||(occupants[house]=[])).push(planetName+(position.retrograde?" ℞":""));
       }
       const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
-      svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");
-      svg.setAttribute("aria-label",key+" उत्तर भारतीय कुंडली");
-      svg.style.cssText="display:block;width:100%;max-width:400px;height:auto;margin:12px auto 0;background:#f7e9c9;border-radius:8px";
-      const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
-      const border=document.createElementNS(ns,"rect");
-      for(const [k,v] of Object.entries({x:2,y:2,width:396,height:396,fill:"none",stroke:"#875b2b","stroke-width":3}))border.setAttribute(k,v);
-      svg.appendChild(border);
+      svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");svg.setAttribute("aria-label",key+" उत्तर भारतीय शैली की 12 भाव वाली कुंडली");svg.setAttribute("data-chart-layout","north-indian");
+      svg.style.cssText="display:block;width:100%;max-width:400px;height:auto;aspect-ratio:1/1;margin:12px auto 0;background:#f7e9c9;border-radius:8px";
+      const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,val] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,val);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
+      const border=document.createElementNS(ns,"rect");for(const [k,val] of Object.entries({x:2,y:2,width:396,height:396,fill:"none",stroke:"#875b2b","stroke-width":3}))border.setAttribute(k,val);svg.appendChild(border);
       line(2,2,398,398);line(398,2,2,398);line(200,2,398,200);line(398,200,200,398);line(200,398,2,200);line(2,200,200,2);
       const pos=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
       for(let house=1;house<=12;house++){
-        const [x,y]=pos[house-1],sign=(Number(varga.ascendant.rashiIndex)+house-1)%12;
-        const group=document.createElementNS(ns,"g");
-        const signText=document.createElementNS(ns,"text");
-        signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");
-        signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");
-        signText.textContent=signNames[sign];
-        const planetText=document.createElementNS(ns,"text");
-        planetText.setAttribute("x",x);planetText.setAttribute("y",y+9);planetText.setAttribute("text-anchor","middle");
-        planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
-        const names=occupants[house]||[];
-        for(let i=0;i<names.length;i+=2){
-          const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");
-          span.textContent=names.slice(i,i+2).join(" ");planetText.appendChild(span);
-        }
+        const [x,y]=pos[house-1],sign=(Number(varga.ascendant.rashiIndex)+house-1)%12,group=document.createElementNS(ns,"g");
+        const signText=document.createElementNS(ns,"text");signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");signText.textContent=signNames[sign];
+        const planetText=document.createElementNS(ns,"text");planetText.setAttribute("x",x);planetText.setAttribute("y",y+9);planetText.setAttribute("text-anchor","middle");planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
+        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=names.slice(i,i+2).join(" ");planetText.appendChild(span);}
         group.append(signText,planetText);svg.appendChild(group);
       }
       card.appendChild(svg);
-      const caption=document.createElement("p");caption.className="chart-asc";
-      caption.textContent="लग्न: "+signNames[Number(varga.ascendant.rashiIndex)];
-      card.appendChild(caption);root.appendChild(card);
-    }
+      const caption=document.createElement("p");caption.className="chart-asc";caption.textContent="लग्न: "+signNames[Number(varga.ascendant.rashiIndex)];card.appendChild(caption);
+      button.addEventListener("click",()=>{pages.querySelectorAll(".varga-page").forEach(page=>page.classList.toggle("active",page===card));toolbar.querySelectorAll("button").forEach(tab=>tab.setAttribute("aria-selected",String(tab===button)));button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});});
+      toolbar.appendChild(button);pages.appendChild(card);
+    });
+    root.append(toolbar,pages);
   }
 
   let selectedBirthPlace = null;

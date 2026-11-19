@@ -65,13 +65,12 @@
     const el=$("consultationBillingStatus");
     if(!el)return;
     if(!consultation){
-      el.textContent="पहली बार 1 मिनट मुफ्त। उसके बाद ₹5 प्रति मिनट।";
+      el.textContent="पहला मिनट शुरू होते ही ₹5 और हर पूरा अतिरिक्त मिनट ₹5 है।";
       return;
     }
     const minutes=Number(consultation.billedMinutes||0);
     const amount=(minutes*RATE).toFixed(2);
     el.textContent=(consultation.status==="active"?"परामर्श सक्रिय":"परामर्श समाप्त")+
-      (consultation.isFreeTrial?" · पहला 1 मिनट मुफ्त":"")+
       " · बिल किए गए मिनट: "+minutes+" · कुल शुल्क: ₹"+amount;
   }
 
@@ -242,7 +241,7 @@
 
       timer = window.setInterval(heartbeat, 15000);
 
-      message(data.consultation.isFreeTrial ? "आपका पहला 1 मिनट मुफ्त शुरू हो गया है। उसके बाद ₹5 प्रति मिनट लगेंगे।" : "परामर्श शुरू हो गया। शुल्क ₹5 प्रति मिनट।");
+      message("परामर्श शुरू हो गया। शुल्क ₹5 प्रति मिनट।");
 
       document.dispatchEvent(
         new CustomEvent("astro:consultation-started", {
