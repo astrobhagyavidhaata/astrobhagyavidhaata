@@ -1,21 +1,17 @@
-import { httpServerHandler } from "cloudflare:node";
-import app from "./server.js";
-
-// Keep the Express API server and serve static files through the ASSETS binding.
-app.listen(3000);
-const nodeHandler = httpServerHandler({ port: 3000 });
-
+// Cloudflare Worker entry point. Keep Express/server.js out of this bundle.
 export default {
-  async fetch(request, env, ctx) {
-    if (env?.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
-    if (env?.GEMINI_MODEL) process.env.GEMINI_MODEL = env.GEMINI_MODEL;
+  async fetch(request, env) {
+    const url = new URL(request.url);
 
-    const pathname = new URL(request.url).pathname;
-    if (pathname === "/healthz" || pathname === "/api" || pathname.startsWith("/api/")) {
-      if (nodeHandler && typeof nodeHandler.fetch === "function") {
-        return nodeHandler.fetch(request, env, ctx);
-      }
-      return Response.json({ error: "API handler unavailable" }, { status: 503 });
+    if (url.pathname === "/healthz") {
+      return Response.json({ status: "ok", runtime: "cloudflare-worker" });
+    }
+
+    if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
+      return Response.json(
+        { success: false, message: "API handlers are not connected to the Worker yet." },
+        { status: 503 }
+      );
     }
 
     if (env?.ASSETS && typeof env.ASSETS.fetch === "function") {
