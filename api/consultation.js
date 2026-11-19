@@ -1,6 +1,5 @@
 "use strict";
 const { askGemini } = require("../lib/gemini");
-const { getAuthenticatedUser, activeConsultation } = require("../lib/supabase");
 const { buildLiveAstrologyContext } = require("../lib/consultation-context");
 const requestWindow = new Map();
 
@@ -14,47 +13,45 @@ function rateLimit(req) {
   const ip = String(req.headers["cf-connecting-ip"] || req.headers["x-forwarded-for"] || "unknown").split(",")[0].trim();
   const now = Date.now();
   const recent = (requestWindow.get(ip) || []).filter(t => now - t < 60000);
-  if (recent.length >= 10) return false;
+  if (recent.length >= 8) return false;
   recent.push(now);
   if (requestWindow.size > 10000) requestWindow.clear();
   requestWindow.set(ip, recent);
   return true;
 }
 
-function compactChartContext(source){
-  if(!source||typeof source!=="object"||Array.isArray(source))return {};
-  const d=source.dasha||{},current=d.current||{};
-  const md=(d.mahadashas||[]).find(x=>x.planet===current.mahadasha);
-  const ad=(md?.antardashas||[]).find(x=>x.planet===current.antardasha);
-  const pd=(ad?.pratyantardashas||[]).find(x=>x.planet===current.pratyantardasha);
+function compactChartContext(source) {
+  if (!source || typeof source !== "object" || Array.isArray(source)) return {};
+  const d = source.dasha || {}, current = d.current || {};
+  const md = (d.mahadashas || []).find(x => x.planet === current.mahadasha);
+  const ad = (md?.antardashas || []).find(x => x.planet === current.antardasha);
+  const pd = (ad?.pratyantardashas || []).find(x => x.planet === current.pratyantardasha);
   return {
-    name:source.name||"",
-    birth:source.birth||{},
-    calculation:source.calculation||{},
-    d1:source.d1||null,
-    d9:source.d9||null,
-    vargas:source.vargas||{},
-    relationships:source.relationships||{},
-    specialLagnas:source.specialLagnas||{},
-    kharaPoints:source.kharaPoints||{},
-    argala:source.argala||null,
-    drishti:source.drishti||null,
-    gochar:source.gochar||source.transits||null,
-    dasha:{
-      birthMoon:d.birthMoon||{},
-      startingMahadasha:d.startingMahadasha||null,
-      balanceAtBirthYears:d.balanceAtBirthYears||null,
+    calculation: source.calculation || {},
+    d1: source.d1 || null,
+    d9: source.d9 || null,
+    vargas: source.vargas || {},
+    relationships: source.relationships || {},
+    specialLagnas: source.specialLagnas || {},
+    kharaPoints: source.kharaPoints || {},
+    argala: source.argala || null,
+    drishti: source.drishti || null,
+    gochar: source.gochar || source.transits || null,
+    currentTaraBala: source.currentTaraBala || null,
+    taraChart: source.taraChart || [],
+    dasha: {
+      birthMoon: d.birthMoon || {},
+      startingMahadasha: d.startingMahadasha || null,
+      balanceAtBirthYears: d.balanceAtBirthYears || null,
       current,
-      currentMahadasha:md?{planet:md.planet,start:md.start,end:md.end}:null,
-      currentAntardasha:ad?{planet:ad.planet,start:ad.start,end:ad.end}:null,
-      currentPratyantardasha:pd?{planet:pd.planet,start:pd.start,end:pd.end}:null,
-      currentMahadashaAntardashas:(md?.antardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end})),
-      currentAntardashaPratyantardashas:(ad?.pratyantardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end}))
-    },
-    taraChart:source.taraChart||[]
+      currentMahadasha: md ? { planet: md.planet, start: md.start, end: md.end } : null,
+      currentAntardasha: ad ? { planet: ad.planet, start: ad.start, end: ad.end } : null,
+      currentPratyantardasha: pd ? { planet: pd.planet, start: pd.start, end: pd.end } : null,
+      currentMahadashaAntardashas: (md?.antardashas || []).map(x => ({ planet: x.planet, start: x.start, end: x.end })),
+      currentAntardashaPratyantardashas: (ad?.pratyantardashas || []).map(x => ({ planet: x.planet, start: x.start, end: x.end }))
+    }
   };
 }
-
 
 module.exports = async function(req, res) {
   if (req.method !== "POST") {
@@ -63,16 +60,13 @@ module.exports = async function(req, res) {
   }
   if (!allowedSameOrigin(req)) return res.status(403).json({ success: false, message: "यह अनुरोध स्वीकार नहीं है।" });
   try {
-    const user = await getAuthenticatedUser(req, res);
-    if (!user) return res.status(401).json({ success: false, message: "Gemini ज्योतिष परामर्श के लिए पहले लॉगिन करें।" });
-    const consultation = await activeConsultation(user.id);
-    if (!consultation) return res.status(402).json({ success: false, message: "पहले ₹5 प्रति मिनट वाला ज्योतिष परामर्श शुरू करें।" });
     if (!rateLimit(req)) return res.status(429).json({ success: false, message: "बहुत जल्दी-जल्दी प्रश्न भेजे जा रहे हैं। एक मिनट बाद फिर प्रयास करें।" });
     const body = req.body || {};
     const question = body.question || body.content;
     if (typeof question !== "string" || !question.trim()) return res.status(400).json({ success: false, message: "कृपया अपना प्रश्न लिखें।" });
     if (question.length > 4000) return res.status(400).json({ success: false, message: "प्रश्न 4000 अक्षरों से छोटा रखें।" });
-    const live = buildLiveAstrologyContext(body.chartContext, new Date());
+    const sourceChart = body.chartContext && typeof body.chartContext === "object" && !Array.isArray(body.chartContext) ? body.chartContext : {};
+    const live = buildLiveAstrologyContext(sourceChart, new Date());
     const chartContext = compactChartContext(live);
     const history = Array.isArray(body.conversationHistory)
       ? body.conversationHistory.slice(-12).map(item => ({
@@ -85,10 +79,8 @@ module.exports = async function(req, res) {
     const answer = await askGemini({ question: question.trim(), chartContext, conversationHistory: history, language });
     return res.status(200).json({ success: true, answer });
   } catch (error) {
-    console.error("AI chat API error:", error.message);
-    const message = error.message.includes("GEMINI_API_KEY")
-      ? "Gemini API Key अभी सर्वर में सेट नहीं है।"
-      : "AI से उत्तर नहीं मिल पाया। कृपया थोड़ी देर बाद फिर प्रयास करें।";
+    const message = String(error?.message || error || "अज्ञात सर्वर त्रुटि");
+    console.error("AI chat API error:", message);
     return res.status(503).json({ success: false, message });
   }
 };
