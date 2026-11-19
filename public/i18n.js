@@ -105,8 +105,7 @@
  
  function applyGoogleTranslation(lang){
    const base=String(lang||"en").split("-")[0];
-   if(base==="en"){document.cookie="googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";return;}
-   document.cookie="googtrans=/en/"+base+"; path=/; SameSite=Lax";
+   document.cookie="googtrans=/hi/"+base+"; path=/; SameSite=Lax";
    const combo=document.querySelector(".goog-te-combo");
    if(combo){combo.value=base;combo.dispatchEvent(new Event("change"));}
  }
