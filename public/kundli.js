@@ -370,8 +370,7 @@
       timeline.appendChild(table);dashaFolder.appendChild(timeline);
     } else addNote(dashaFolder,"विंशोत्तरी दशा डेटा उपलब्ध नहीं है।");
 
-    // Keep the combined Mahadasha + Antardasha reading in the first compact slide.
-    // Move the long period schedule into separate touch/swipe slides.
+    // Keep current dasha details first and move the period schedule into touch/swipe slides.
     if(dashaFolder && dasha){
       const heading=dashaFolder.querySelector(":scope > h3");
       const nodes=Array.from(dashaFolder.children).filter(node=>node!==heading);
@@ -384,7 +383,7 @@
 
       const deckStyle=document.getElementById("dashaSlideStyle")||document.createElement("style");
       deckStyle.id="dashaSlideStyle";
-      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-combined-prediction{display:block;margin:12px 0 4px;padding:14px;border:1px solid #e7a15b;border-radius:12px;background:#fff7ed;color:#34251b}.dasha-combined-prediction h4{color:#9a4300;margin:0 0 8px}.dasha-combined-prediction p{line-height:1.65;margin:7px 0}.dasha-slide-card{flex:0 0 100%;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
+      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-slide-card{flex:0 0 100%;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
       if(!deckStyle.isConnected)document.head.appendChild(deckStyle);
 
       const summarySlide=document.createElement("section");summarySlide.className="dasha-slide-card";
