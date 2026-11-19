@@ -1,6 +1,7 @@
 "use strict";
 (function(){
   const $=id=>document.getElementById(id);
+  const tr=value=>window.AstroLanguage?.translate?window.AstroLanguage.translate(value):String(value??"");
   const form=$("panchangForm");
   if(!form)return;
   const today=new Date();
@@ -13,7 +14,7 @@
     if(!place)return;
     $("panchangLat").value=String(place.latitude);
     $("panchangLon").value=String(place.longitude);
-    status.textContent="स्थान चुना गया: "+[place.name,place.admin1,place.country].filter(Boolean).join(", ");
+    status.textContent=tr("स्थान चुना गया: ")+[place.name,place.admin1,place.country].filter(Boolean).join(", ");
     status.style.display="block";
   }
   placeButton.addEventListener("click",async()=>{
@@ -44,17 +45,17 @@
   const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function render(d){
     const p=d.panchang,k=d.kaal;
-    const dayChoghadiya=d.choghadiya.day.map(x=>"<tr><td>"+x.number+"</td><td>"+esc(x.name)+"</td><td>"+esc(x.time)+"</td></tr>").join("");
+    const dayChoghadiya=d.choghadiya.day.map(x=>"<tr><td>"+x.number+"</td><td>"+esc(tr(x.name))+"</td><td>"+esc(tr(x.time))+"</td></tr>").join("");
     const nightChoghadiya=d.choghadiya.night.map(x=>"<tr><td>"+x.number+"</td><td>"+esc(x.name)+"</td><td>"+esc(x.time)+"</td></tr>").join("");
     const bhadra=(k.bhadraIntervals&&k.bhadraIntervals.length)?k.bhadraIntervals.map(esc).join("<br>"):"इस दिन सूर्योदय से अगले सूर्योदय तक भद्रा नहीं।";
-    const rows=d.hora.map(h=>"<tr><td>"+h.number+"</td><td>"+esc(h.lord)+"</td><td>"+esc(h.time)+"</td></tr>").join("");
+    const rows=d.hora.map(h=>"<tr><td>"+h.number+"</td><td>"+esc(tr(h.lord))+"</td><td>"+esc(tr(h.time))+"</td></tr>").join("");
     out.innerHTML=[
-      "<div class='chat-info'><strong>"+esc(d.weekday)+" · "+esc(d.date)+"</strong> ("+esc(d.timezone)+")</div>",
+      "<div class='chat-info'><strong>"+esc(tr(d.weekday))+" · "+esc(d.date)+"</strong> ("+esc(d.timezone)+")</div>",
       "<h3>पंचांग के पाँच अंग</h3><div class='chat-info'>",
-      "<p><strong>तिथि:</strong> "+esc(p.tithi)+" ("+esc(p.paksha)+") · समाप्ति "+esc(p.tithiEnds||"उपलब्ध नहीं")+"</p>",
-      "<p><strong>नक्षत्र:</strong> "+esc(p.nakshatra)+", चरण "+p.pada+" · समाप्ति "+esc(p.nakshatraEnds||"उपलब्ध नहीं")+"</p>",
-      "<p><strong>योग:</strong> "+esc(p.yoga)+" · समाप्ति "+esc(p.yogaEnds||"उपलब्ध नहीं")+"</p>",
-      "<p><strong>करण:</strong> "+esc(p.karana)+" · समाप्ति "+esc(p.karanaEnds||"उपलब्ध नहीं")+"</p></div>",
+      "<p><strong>तिथि:</strong> "+esc(tr(p.tithi))+" ("+esc(tr(p.paksha))+") · समाप्ति "+esc(p.tithiEnds||"उपलब्ध नहीं")+"</p>",
+      "<p><strong>नक्षत्र:</strong> "+esc(tr(p.nakshatra))+", चरण "+p.pada+" · समाप्ति "+esc(p.nakshatraEnds||"उपलब्ध नहीं")+"</p>",
+      "<p><strong>योग:</strong> "+esc(tr(p.yoga))+" · समाप्ति "+esc(p.yogaEnds||"उपलब्ध नहीं")+"</p>",
+      "<p><strong>करण:</strong> "+esc(tr(p.karana))+" · समाप्ति "+esc(p.karanaEnds||"उपलब्ध नहीं")+"</p></div>",
       "<h3>सूर्य और चंद्र समय</h3><div class='chat-info'><p>सूर्योदय: "+esc(d.sunrise)+" · सूर्यास्त: "+esc(d.sunset)+"</p>",
       "<p>चंद्रोदय: "+esc(d.moonrise||"नहीं मिला")+" · चंद्रास्त: "+esc(d.moonset||"नहीं मिला")+"</p></div>",
       "<h3>दैनिक काल</h3><div class='chat-info'><p>राहुकाल: "+esc(k.rahuKaal)+"</p><p>यमगण्ड: "+esc(k.yamagand)+"</p>",
@@ -62,7 +63,7 @@
       "<h3>दिन का चौघड़िया</h3><div style='overflow-x:auto'><table style='width:100%;border-collapse:collapse;font-size:13px'><thead><tr><th>भाग</th><th>चौघड़िया</th><th>समय</th></tr></thead><tbody>"+dayChoghadiya+"</tbody></table></div>",
       "<h3>रात्रि का चौघड़िया</h3><div style='overflow-x:auto'><table style='width:100%;border-collapse:collapse;font-size:13px'><thead><tr><th>भाग</th><th>चौघड़िया</th><th>समय</th></tr></thead><tbody>"+nightChoghadiya+"</tbody></table></div>",
       "<h3>आज की 24 होरा</h3><div style='overflow-x:auto'><table style='width:100%;border-collapse:collapse;font-size:13px'><thead><tr><th>होरा</th><th>ग्रह</th><th>समय</th></tr></thead><tbody>"+rows+"</tbody></table></div>",
-      "<p class='chat-info'>"+esc(d.note)+"</p>"
+      "<p class='chat-info'>"+esc(tr(d.note))+"</p>"
     ].join("");
     out.style.display="block";
   }
