@@ -21,7 +21,7 @@
     if(!query){status.textContent="पहले शहर या गाँव का नाम लिखें।";status.style.display="block";return;}
     placeButton.disabled=true;status.textContent="स्थान खोजा जा रहा है…";status.style.display="block";
     try{
-      const url="https://geocoding-api.open-meteo.com/v1/search?"+new URLSearchParams({name:query,count:"8",language:"en",format:"json"});
+      const url="https://geocoding-api.open-meteo.com/v1/search?"+new URLSearchParams({name:query,count:"8",language:(window.AstroLanguage?.get?.() || document.documentElement.lang || "en").split("-")[0],format:"json"});
       const response=await fetch(url);
       if(!response.ok)throw new Error("स्थान खोजने में समस्या आई।");
       const data=await response.json();foundPlaces=Array.isArray(data.results)?data.results:[];
