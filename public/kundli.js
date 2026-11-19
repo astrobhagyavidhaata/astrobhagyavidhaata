@@ -15,6 +15,21 @@
   const signNames = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
 
   const $ = (id) => document.getElementById(id);
+  const selectedChartLanguage = () => document.getElementById("preferredLanguage")?.value || "en";
+  function triggerChartTranslation() {
+    const language = selectedChartLanguage();
+    if (language === "hi") { document.documentElement.lang = "hi"; return; }
+    document.documentElement.lang = language;
+    const languageMap = {"en-CA":"en","fr-CA":"fr","pt-BR":"pt","ar-SA":"ar"};
+    const target = languageMap[language] || language;
+    let attempts = 0;
+    function apply() {
+      const combo = document.querySelector(".goog-te-combo");
+      if (combo) { combo.value = target; combo.dispatchEvent(new Event("change")); return; }
+      if (++attempts < 30) setTimeout(apply, 250);
+    }
+    if (window.applyAstroGoogleTranslation) window.applyAstroGoogleTranslation(); else apply();
+  }
 
   function showMessage(message, error = false) {
     const box = $("message");
@@ -30,8 +45,13 @@
     if(!host||!nav||!chart?.d1?.ascendant||!chart?.d9?.ascendant)return;
     host.replaceChildren();
     const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
-    const moon=chart.d1.planets?.चंद्र;
+    const moon=chart.d1.planets?.चंद्र || chart.d1.planets?.Moon || Object.entries(chart.d1.planets||{}).find(([name])=>/moon|चंद्र/i.test(name))?.[1];
     const moonAsc=Number(moon?.rashiIndex);
+    const ascendantIndex=Number(chart.d1.ascendant.rashiIndex);
+    const summary=$("chartBirthSummary")||document.createElement("p");
+    summary.id="chartBirthSummary";summary.className="chart-birth-summary";
+    summary.textContent="जन्म लग्न: "+(Number.isInteger(ascendantIndex)?signs[ascendantIndex]:"—")+" | चंद्र राशि: "+(Number.isInteger(moonAsc)?signs[moonAsc]:"—");
+    if(host.parentNode)host.parentNode.insertBefore(summary,host);
     const moonPlanets=Object.fromEntries(Object.entries(chart.d1.planets||{}).map(([name,p])=>[name,{...p,house:((Number(p.rashiIndex)-moonAsc+12)%12)+1}]));
     const specs=[
       {id:"chartD1",title:"D1 — जन्म कुंडली",asc:Number(chart.d1.ascendant.rashiIndex),planets:chart.d1.planets||{}},
@@ -54,7 +74,7 @@
         const [x,y]=pos[house-1],sign=(spec.asc+house-1)%12,g=document.createElementNS(ns,"g");
         const s=document.createElementNS(ns,"text");s.setAttribute("x",x);s.setAttribute("y",y-9);s.setAttribute("text-anchor","middle");s.setAttribute("font-size","12");s.setAttribute("font-weight","bold");s.setAttribute("fill","#4b2d16");s.textContent=signs[sign]+" "+(sign+1);
         const ptext=document.createElementNS(ns,"text");ptext.setAttribute("x",x);ptext.setAttribute("y",y+9);ptext.setAttribute("text-anchor","middle");ptext.setAttribute("font-size","10");ptext.setAttribute("font-weight","600");ptext.setAttribute("fill","#9a421d");
-        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=names.slice(i,i+2).join(" ");ptext.appendChild(span);}
+        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};const shownNames=names.slice(i,i+2).map(name=>selectedChartLanguage()==="hi"?(hindiPlanets[name]||name):name);span.textContent=shownNames.join(" ");ptext.appendChild(span);}
         g.append(s,ptext);svg.appendChild(g);
       }
       card.appendChild(svg);const asc=document.createElement("p");asc.className="chart-asc";asc.textContent="लग्न: "+signs[spec.asc]+" ("+(spec.asc+1)+")";card.appendChild(asc);host.appendChild(card);
@@ -95,6 +115,7 @@
       }
       table.appendChild(tbody);panel.appendChild(table);
     }
+    triggerChartTranslation();
     nav.querySelectorAll("[data-chart-target]").forEach(button=>{
       button.onclick=()=>{
         nav.querySelectorAll("[data-chart-target]").forEach(item=>item.classList.toggle("active",item===button));
