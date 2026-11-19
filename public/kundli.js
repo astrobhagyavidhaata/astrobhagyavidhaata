@@ -217,6 +217,7 @@
     const dasha=chart.dasha;
     if(dasha){
       const active=dasha.current||{};
+      const activeMD=active.mahadasha, activeAD=active.antardasha, activePD=active.pratyantardasha;
       const p=document.createElement("p");p.className="chat-info";
       p.textContent="वर्तमान दशा: "+(active.mahadasha||"—")+" महादशा / "+(active.antardasha||"—")+" अंतर्दशा / "+(active.pratyantardasha||"—")+" प्रत्यंतरदशा";
       dashaFolder.appendChild(p);
@@ -257,7 +258,6 @@
       combined.appendChild(interpretation);dashaFolder.appendChild(combined);
       const periodDate=value=>value?new Date(value).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en",{day:"2-digit",month:"short",year:"numeric"}):"—";
       const periodRange=(item)=>periodDate(item.start)+" से "+periodDate(item.end);
-      const activeMD=active.mahadasha, activeAD=active.antardasha, activePD=active.pratyantardasha;
       const activeBox=document.createElement("div");activeBox.className="dasha-current-card";
       activeBox.innerHTML="";
       const activeTitle=document.createElement("h4");activeTitle.textContent="अभी चल रही विंशोत्तरी दशा";activeBox.appendChild(activeTitle);
@@ -482,7 +482,14 @@
     if(!taraPage)heading(slide("slide-navtara"),"नवतारा चक्र (तारा बल)");
     if(!ashtakPage)heading(slide("slide-ashtakvarga"),"अष्टकवर्ग");
     if(!vargaFolder)heading(slide("slide-shodashvarga"),"षोडश वर्ग कुंडलियाँ (D2–D60)");
-    const viewport=$("astroSlideViewport");if(viewport){viewport.scrollLeft=0;syncAstroTabOnScroll();}
+    const viewport=$("astroSlideViewport"),slideTabs=$("astroSlideTabs");
+    if(viewport&&slideTabs){
+      const buttons=Array.from(slideTabs.querySelectorAll("[data-astro-slide-tab]"));
+      const syncAstroTabOnScroll=()=>{const index=Math.max(0,Math.min(buttons.length-1,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));buttons.forEach((button,i)=>button.setAttribute("aria-selected",String(i===index)));buttons[index]?.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});};
+      buttons.forEach(button=>{button.onclick=()=>{const target=$(button.dataset.astroSlideTab);if(target)viewport.scrollTo({left:target.offsetLeft-viewport.offsetLeft,behavior:"smooth"});};});
+      viewport.onscroll=()=>{if(viewport._astroSlideFrame)return;viewport._astroSlideFrame=requestAnimationFrame(()=>{viewport._astroSlideFrame=0;syncAstroTabOnScroll();});};
+      viewport.scrollLeft=0;syncAstroTabOnScroll();
+    }
   }
 
   function renderVargaCharts(chart) {
@@ -672,6 +679,83 @@
 
   const SAVED_KUNDALIS_KEY = "saved_kundalis";
 
+  const ASTRO_SAVED_SESSION_KEY = "astro_saved_session";
+  function readAstroSession(){
+    try{return JSON.parse(localStorage.getItem(ASTRO_SAVED_SESSION_KEY)||"null");}catch(_){return null;}
+  }
+  function saveAstroSession(details, chart, location){
+    try{
+      const old=readAstroSession();
+      const same=old?.birthDetails&&old.birthDetails.name===details.name&&old.birthDetails.date===details.date&&old.birthDetails.time===details.time&&old.birthDetails.place===details.place;
+      const savedLocation=location?{
+        name:location.name||details.place,admin1:location.admin1||"",country:location.country||"",
+        country_code:location.country_code||"",latitude:location.latitude,longitude:location.longitude,elevation:location.elevation
+      }:(same?old.location:null);
+      const record={
+        version:1,savedAt:new Date().toISOString(),
+        birthDetails:{name:details.name||"",date:details.date||"",time:details.time||"",place:details.place||""},
+        location:savedLocation,
+        chart:chart|| (same?old.chart:null)
+      };
+      localStorage.setItem(ASTRO_SAVED_SESSION_KEY,JSON.stringify(record));
+      return record;
+    }catch(error){console.warn("जन्म विवरण का ऑटो-सेव नहीं हो सका:",error);return null;}
+  }
+  function saveFormDraft(form){
+    const data=new FormData(form);
+    saveAstroSession({
+      name:String(data.get("name")||"").trim(),
+      date:String(data.get("dob")||""),
+      time:String(data.get("birthTime")||""),
+      place:String(data.get("birthPlace")||"").trim()
+    },null,null);
+  }
+  function restoreAstroSession(form){
+    const saved=readAstroSession(),details=saved?.birthDetails;
+    if(!details)return;
+    if(form){
+      const values={name:details.name,dob:details.date,birthTime:details.time,birthPlace:details.place};
+      for(const [id,value] of Object.entries(values)){const field=$(id);if(field&&value)field.value=value;}
+    }
+    if(saved.location?.latitude!=null&&saved.location?.longitude!=null){
+      selectedBirthPlace={...saved.location,label:[saved.location.name,saved.location.admin1,saved.location.country].filter(Boolean).join(", ")||details.place};
+    }
+    if(saved.chart){
+      window.AstroKundli=saved.chart;
+      renderMainKundliChart(saved.chart);
+      renderVargaCharts(saved.chart);
+      renderAstrologyCalculations(saved.chart);
+      const panel=$("kBox");if(panel)panel.style.display="block";
+      const status=$("message");if(status){status.style.display="block";status.textContent="आपकी पिछली कुंडली और जन्म विवरण इस डिवाइस से वापस लोड किए गए हैं।";}
+    }
+  }
+  async function requestInitialConsultation(chart){
+    const status=$("aiInitialSummary");
+    if(status)status.textContent="एस्ट्रो भाग्य विधाता ऐप AI आपकी कुंडली का प्रारंभिक विश्लेषण तैयार कर रहा है…";
+    const chartContext={
+      d1:chart.d1||null,d9:chart.d9||null,vargas:chart.vargas||{},
+      taraChart:chart.taraChart||[],currentTaraBala:chart.currentTaraBala||null,
+      gochar:chart.gochar||chart.transits||null,dasha:chart.dasha||{}
+    };
+    try{
+      const response=await fetch("/api/consultation",{
+        method:"POST",credentials:"same-origin",
+        headers:{"Content-Type":"application/json","Accept":"application/json"},
+        body:JSON.stringify({
+          question:"मेरी अभी बनी जन्म कुंडली का संक्षिप्त प्रारंभिक समन्वित परिचय दें। D1, D9, ग्रहों के नक्षत्र-पाद, नवतारा/तारा बल, उपलब्ध गोचर और वर्तमान महादशा-अंतर्दशा को साथ पढ़ें। केवल उपलब्ध गणना डेटा का उपयोग करें।",
+          chartContext,language:window.AstroLanguage?.get?.()||$("preferredLanguage")?.value||"hi"
+        })
+      });
+      const data=await response.json();
+      if(!response.ok||!data.success||!data.answer)throw new Error(data.message||"AI उत्तर उपलब्ध नहीं है।");
+      window.AstroInitialConsultation=data.answer;
+      if(status)status.textContent=data.answer;
+      const host=$("ai-response-box");
+      if(host&&!host.dataset.initialConsultation){const item=document.createElement("div");item.className="ai-chat-message assistant";item.textContent=data.answer;host.appendChild(item);host.dataset.initialConsultation="true";}
+      document.dispatchEvent(new CustomEvent("astro:ai-consultation-ready",{detail:{answer:data.answer,chartContext}}));
+    }catch(error){if(status)status.textContent="AI कनेक्शन: "+(error.message||"अभी उपलब्ध नहीं है।");}
+  }
+
   function saveKundliLocally(chart, details, location) {
     const existing = JSON.parse(localStorage.getItem(SAVED_KUNDALIS_KEY) || "[]");
     if (!Array.isArray(existing)) throw new Error("सेव की गई कुंडलियों की सूची सही नहीं है।");
@@ -764,7 +848,9 @@
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
 
+      saveAstroSession(details,chart,location);
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
+      requestInitialConsultation(chart);
       if (details.saveToAccount) {
         try {
           saveKundliLocally(chart, details, location);
@@ -809,6 +895,7 @@
       const details = validateBirthDetails(
         new FormData(form)
       );
+      saveAstroSession(details,null,null);
 
       if (button) {
         button.disabled = true;
@@ -885,6 +972,9 @@
     }
 
     form.addEventListener("submit", handleSubmit);
+    form.addEventListener("input",()=>saveFormDraft(form));
+    form.addEventListener("change",()=>saveFormDraft(form));
+    restoreAstroSession(form);
     const languagePicker = $("preferredLanguage");
     if (languagePicker) {
       languagePicker.addEventListener("change", () => {
