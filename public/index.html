@@ -243,7 +243,9 @@
     .calculation-tabs .calculation-tab-arrow,.calculation-tabs-with-arrows .calculation-tab-arrow{position:sticky;z-index:2;flex:0 0 auto;width:auto;min-width:36px;padding:8px 10px;font-size:20px;background:#e8b957;color:#211638}
     .calculation-page{display:none;min-width:0;margin:12px 0;padding:12px;border:1px solid #66547f;border-radius:12px;background:#181326}
     .calculation-page.active{display:block}
-  </style>
+  
+    #chatMessages:empty,#ai-response-box:empty{display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+</style>
 </head>
 <body>
   <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>Vedic Astrology &amp; Personal Birth Chart</p></div><div class="language-picker notranslate"><label for="preferredLanguage">Language</label><select id="preferredLanguage" onchange="changeAppLanguage(this.value)" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div></header>
