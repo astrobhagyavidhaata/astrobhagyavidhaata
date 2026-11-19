@@ -7,6 +7,7 @@ const { buildChart } = require("../lib/chart-engine");
 const { getVimshottariDasha, getCompleteTaraChart, getTaraFromMoonLongitudes } = require("../lib/astrology-engine");
 const { getAuthenticatedUser, serviceFetch } = require("../lib/supabase");
 const { calculateAshtakavarga } = require("../lib/ashtakavarga");
+const { calculateShadbala } = require("../lib/shadbala");
 
 function resolveBirthTimeZone(latitude, longitude) {
   // Prefer the coordinate-based IANA zone: it includes country borders and DST rules.
@@ -48,6 +49,18 @@ module.exports = async function handler(req, res) {
 
     const positions = calculateSiderealPositions(birthUtc, lat, lon);
     const chart = buildChart(positions.ascendantLongitude, positions.planets);
+    const shadbalaPlanets = {};
+    const planetNames = { सूर्य:"Sun", चंद्र:"Moon", मंगल:"Mars", बुध:"Mercury", गुरु:"Jupiter", शुक्र:"Venus", शनि:"Saturn" };
+    for (const [nativeName, englishName] of Object.entries(planetNames)) {
+      const source = positions.planets[nativeName] || {};
+      const d1Planet = chart.d1?.planets?.[nativeName] || {};
+      shadbalaPlanets[englishName] = {
+        longitude: source.longitude,
+        retrograde: Boolean(source.retrograde),
+        house: d1Planet.house
+      };
+    }
+    const shadbala = calculateShadbala(shadbalaPlanets, positions.ascendantLongitude);
     const ashtakavarga = calculateAshtakavarga(positions.planets, chart.d1.ascendant.rashiIndex);
     const dasha = getVimshottariDasha(birthUtc, positions.planets.चंद्र.longitude);
     const taraChart = getCompleteTaraChart(
@@ -77,6 +90,8 @@ module.exports = async function handler(req, res) {
         accuracyNote:"Uses a linear Lahiri ayanamsa approximation and mean lunar node; this is not a Swiss Ephemeris-certified result."
       },
       ...chart,
+      shadbala,
+      shadbalaMethod: "heuristic approximation; not complete classical BPHS Shadbala",
       ashtakavarga,
       dasha,
       taraChart,
