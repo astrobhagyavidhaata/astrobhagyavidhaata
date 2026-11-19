@@ -35,7 +35,7 @@
     const heading = document.createElement("b");
     heading.textContent = data.basisRashi + " राशि से आज का गोचर";
     const stamp = document.createElement("p");
-    stamp.textContent = "गणना समय: " + new Date(data.asOf).toLocaleString("hi-IN") +
+    stamp.textContent = "गणना समय: " + new Date(data.asOf).toLocaleString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en") +
       " | अयनांश: " + data.ayanamsa;
     output.append(heading,stamp);
 
