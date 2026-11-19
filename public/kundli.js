@@ -188,6 +188,7 @@
     const tara=makeFolder("2. नवतारा चक्र (तारा बल)","navtaraFolder");
     const strength=makeFolder("3. षड्बल और भाव बल","shadbalaFolder");
     const ashtak=makeFolder("4. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
+    dashaFolder.open=true;tara.open=true;ashtak.open=true;strength.open=true;
     const currentDasha=chart.dasha?.current||{},positions=chart.d1?.planets||{};
     const meanings={"सूर्य":"आत्मविश्वास, नेतृत्व और प्रतिष्ठा","चंद्र":"मन, भावनाएँ और जनसंपर्क","मंगल":"ऊर्जा, साहस और प्रतिस्पर्धा","बुध":"बुद्धि, संवाद और व्यापार","गुरु":"ज्ञान, शिक्षा और विस्तार","शुक्र":"संबंध, कला और सुख-सुविधा","शनि":"अनुशासन, श्रम और जिम्मेदारी","राहु":"महत्वाकांक्षा, तकनीक और असामान्य अवसर","केतु":"शोध, वैराग्य और आध्यात्मिकता"};
     const sideTitle=document.createElement("h4");sideTitle.textContent="वर्तमान दशा स्वामी — स्थिति व संकेत";side.appendChild(sideTitle);
@@ -359,6 +360,7 @@
     const strengthSections=Array.from(strength.children).filter(node=>node.tagName==="SECTION");
     if(strengthSections[0])pages[2].appendChild(strengthSections[0]);
     if(strengthSections[1])pages[3].appendChild(strengthSections[1]);
+    if(!strengthSections[1]){const bhavaNote=document.createElement("p");bhavaNote.className="chat-info";bhavaNote.textContent="भाव बल की प्रमाणित संख्यात्मक गणना अभी इंजन में उपलब्ध नहीं है; सत्यापित गणना जुड़ने तक कोई अनुमानित अंक नहीं दिखाया जाएगा।";pages[3].appendChild(bhavaNote);}
     Array.from(strength.children).filter(node=>node.tagName!=="SECTION").forEach(node=>pages[2].appendChild(node));
     const vargaFolder=$("kundliChartsFolder");
     if(vargaFolder)pages[5].appendChild(vargaFolder);
