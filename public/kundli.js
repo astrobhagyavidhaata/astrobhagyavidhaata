@@ -888,6 +888,7 @@
       const panel=$("kBox");if(panel)panel.style.display="block";
       const status=$("message");if(status){status.style.display="block";status.textContent="आपकी पिछली कुंडली और जन्म विवरण इस डिवाइस से वापस लोड किए गए हैं।";}
       document.dispatchEvent(new CustomEvent("astro:kundli-restored",{detail:saved.chart}));
+      requestInitialConsultation(saved.chart);
     }
   }
   async function requestInitialConsultation(chart){
