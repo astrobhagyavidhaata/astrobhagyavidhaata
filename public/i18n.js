@@ -72,11 +72,11 @@
    document.documentElement.lang=active;
    document.documentElement.dir=(base==="ar"||base==="ur")?"rtl":"ltr";
    document.title=base==="fr"?"Astro Bhagya Vidhata | Astrologie védique":base==="pa"?"Astro Bhagya Vidhata | ਵੈਦਿਕ ਜੋਤਿਸ਼":"Astro Bhagya Vidhata | Vedic Astrology";
-   document.body.childNodes.forEach(node=>translateElement(node,hasPack?base:"en"));
+   document.body.childNodes.forEach(node=>translateElement(node,base));
    const notice=document.getElementById("languageNotice");
    if(notice){
      const labels={"en":"Language: English","en-CA":"Language: English (Canada)","hi":"भाषा: हिन्दी","mr":"भाषा: मराठी","pa":"ਐਪ ਦੀ ਭਾਸ਼ਾ: ਪੰਜਾਬੀ","ur":"زبان: اردو","fr":"Langue : Français","fr-CA":"Langue : Français (Canada)","de":"Sprache: Deutsch","es":"Idioma: Español","pt-BR":"Idioma: Português (Brasil)","ar-SA":"اللغة: العربية (السعودية)","bn":"ভাষা: বাংলা","gu":"ભાષા: ગુજરાતી","ta":"மொழி: தமிழ்","te":"భాష: తెలుగు","kn":"ಭಾಷೆ: ಕನ್ನಡ","ml":"ഭാഷ: മലയാളം","or":"ଭାଷା: ଓଡ଼ିଆ","as":"ভাষা: অসমীয়া"};
-     notice.textContent=hasPack?(labels[active]||"Language selected"):(labels[active]+" — complete translation pack is not available yet; English is shown for now.");
+     notice.textContent=hasPack?(labels[active]||"Language selected"):(labels[active]+" — some detailed descriptions are still being translated.");
    }
    try{localStorage.setItem("astro_language",active)}catch(_){}
  }
