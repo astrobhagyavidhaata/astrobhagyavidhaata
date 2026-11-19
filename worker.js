@@ -14,7 +14,7 @@ function createResponse() {
   };
 }
 
-async function runApi(handler, request, env) {
+async function runApi(handler, request, env = {}) {
   if (request.method !== "POST") {
     return Response.json({ success: false, message: "Only POST requests are accepted." }, {
       status: 405, headers: { Allow: "POST", "Content-Type": "application/json" }
@@ -33,7 +33,7 @@ async function runApi(handler, request, env) {
   };
   const res = createResponse();
   try {
-    await handler(req, res, env);
+    await handler(req, res, env || {});
     return res.result();
   } catch (error) {
     console.error("Worker API error:", error?.message || error);
@@ -42,23 +42,41 @@ async function runApi(handler, request, env) {
 }
 
 export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    if (url.pathname === "/api/consultation") {
-      return runApi(consultationHandler, request, env);
-    }
-    if (url.pathname === "/api/chart" || url.pathname === "/api/kundli") {
-      return runApi(kundliHandler, request, env);
-    }
-    if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
-      return Response.json({ success: false, message: "API endpoint not found." }, { status: 404 });
-    }
-    if (!env?.ASSETS || typeof env.ASSETS.fetch !== "function") {
-      return new Response("Static assets binding is unavailable", {
-        status: 503,
+  async fetch(request, env = {}, ctx) {
+    try {
+      const url = new URL(request.url);
+      const bindings = env || {};
+
+      // AI consultation API
+      if (url.pathname === "/api/consultation") {
+        return await runApi(consultationHandler, request, bindings);
+      }
+
+      // Kundli calculation API
+      if (url.pathname === "/api/chart" || url.pathname === "/api/kundli") {
+        return await runApi(kundliHandler, request, bindings);
+      }
+
+      if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
+        return Response.json({ success: false, message: "API endpoint not found." }, { status: 404 });
+      }
+
+      // Static assets binding may be absent in preview or misconfigured deployments.
+      const assets = bindings && bindings.ASSETS;
+      if (assets && typeof assets.fetch === "function") {
+        return await assets.fetch(request);
+      }
+
+      return new Response("Astro Bhagya Vidhata Server Active", {
+        status: 200,
         headers: { "Content-Type": "text/plain; charset=utf-8" }
       });
+    } catch (err) {
+      console.error("Worker request error:", err?.message || err);
+      return Response.json({ error: err?.message || "Internal server error" }, {
+        status: 500,
+        headers: { "Content-Type": "application/json; charset=utf-8" }
+      });
     }
-    return env.ASSETS.fetch(request);
   }
 };
