@@ -188,12 +188,37 @@ Google या Gemini का नाम अपनी पहचान के रू
     }
 
     if (!aiRes.ok) {
+      const lastMessage = String(aiJson?.error?.message || "");
+      const modelUnavailable = aiRes.status === 404 ||
+        (aiRes.status === 400 && /model|generateContent|not found|not supported|unsupported/i.test(lastMessage));
+      if (modelUnavailable) {
+        const listRes = await fetch("https://" + host + "/v1beta/models" + apiKeyQuery);
+        const listJson = await listRes.json().catch(() => ({}));
+        if (!listRes.ok) {
+          return Response.json({ success: false, message: "Google API त्रुटि: " + (listJson?.error?.message || listRes.status) }, { status: 502, headers: jsonHeaders });
+        }
+        const available = (listJson.models || [])
+          .filter(item => Array.isArray(item.supportedGenerationMethods) && item.supportedGenerationMethods.includes("generateContent") && typeof item.name === "string")
+          .map(item => item.name.replace(/^models\\//, ""))
+          .filter(name => !modelCandidates.includes(name))
+          .sort((a, b) => Number(/flash/i.test(b)) - Number(/flash/i.test(a)));
+        for (const candidateModel of available) {
+          const apiUrl = "https://" + host + "/v1beta/models/" + candidateModel + ":generateContent" + apiKeyQuery;
+          aiRes = await fetch(apiUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(requestBody) });
+          aiJson = await aiRes.json().catch(() => ({}));
+          if (aiRes.ok) break;
+          const nextMessage = String(aiJson?.error?.message || "");
+          const nextUnavailable = aiRes.status === 404 || (aiRes.status === 400 && /model|generateContent|not found|not supported|unsupported/i.test(nextMessage));
+          if (!nextUnavailable) break;
+        }
+      }
+    }
+
+    if (!aiRes.ok) {
       return Response.json(
         {
           success: false,
-          message:
-            "AI त्रुटि: " +
-            (aiJson?.error?.message || aiRes.status)
+          message: "AI त्रुटि: " + (aiJson?.error?.message || aiRes.status)
         },
         { status: aiRes.status === 429 ? 429 : 502, headers: jsonHeaders }
       );
