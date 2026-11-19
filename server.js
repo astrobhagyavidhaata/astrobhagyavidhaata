@@ -57,4 +57,11 @@ app.use((req,res,next)=>{
 
 app.use(express.static(path.join(__dirname),{dotfiles:"deny",index:false}));
 app.get("*",(req,res)=>res.sendFile(path.join(__dirname,"index.html")));
-app.listen(port,()=>console.log("Astro Bhagya Vidhata running on http://localhost:"+port));
+
+// Cloudflare Worker imports the Express app and owns its listener.
+// Start a local HTTP listener only when this file is run directly.
+if(require.main===module){
+  app.listen(port,()=>console.log("Astro Bhagya Vidhata running on http://localhost:"+port));
+}
+
+module.exports=app;
