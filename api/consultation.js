@@ -3,6 +3,7 @@
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const recentRequests=new Map();
+const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process!=="undefined" ? process.env?.GEMINI_API_KEY : "");
 
 const PRIVATE_FIELD_KEYS = new Set([
   "name", "fullname", "email", "phone", "mobile", "birthplace", "place",
@@ -76,6 +77,7 @@ function compactChartContext(source){
 }
 
 module.exports=async function(req,res,env={}){
+  const geminiApiKey=runtimeApiKey(env);
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
   try{
     const body=req.body||{};
@@ -94,12 +96,12 @@ module.exports=async function(req,res,env={}){
     const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
     const language=supportedLanguages.has(body.language)?body.language:"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:env.GEMINI_API_KEY,model:"gemini-2.5-flash"});
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash"});
     return res.status(200).json({success:true,answer});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
     console.error("Consultation API error:",message);
-    if(!env?.GEMINI_API_KEY){
+    if(!geminiApiKey){
       return res.status(503).json({success:false,message:"Gemini API key Cloudflare Worker binding में उपलब्ध नहीं है।"});
     }
     if(/GEMINI_API_KEY/.test(message)){
