@@ -23,6 +23,26 @@ function stripPersonalFields(value){
   return clean;
 }
 
+function collectPrivateValues(value, output=[]){
+  if(Array.isArray(value)){for(const item of value)collectPrivateValues(item,output);return output;}
+  if(!value||typeof value!=="object")return output;
+  for(const [key,item] of Object.entries(value)){
+    const normalized=key.replace(/[_\\s-]/g,"").toLowerCase();
+    if(PRIVATE_FIELD_KEYS.has(normalized)&&typeof item==="string"&&item.trim().length>1)output.push(item.trim());
+    else collectPrivateValues(item,output);
+  }
+  return output;
+}
+
+function redactQuestion(question, rawChart){
+  let clean=String(question||"");
+  const values=[...new Set(collectPrivateValues(rawChart))].sort((a,b)=>b.length-a.length);
+  for(const value of values)clean=clean.split(value).join("[निजी जानकारी हटाई गई]");
+  clean=clean.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi,"[ईमेल हटाया गया]");
+  clean=clean.replace(/(?:\\+?\\d[\\d\\s().-]{7,}\\d)/g,"[फोन नंबर हटाया गया]");
+  return clean;
+}
+
 function compactChartContext(source){
   if(!source||typeof source!=="object"||Array.isArray(source))return {};
   const d=source.dasha||{},current=d.current||{};
@@ -87,7 +107,8 @@ module.exports=async function(req,res){
     }
     const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
     const language=supportedLanguages.has(body.language)?body.language:"en";
-    const answer=await askGemini({question:question.trim(),chartContext,conversationHistory:history,language});
+    const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language});
     if(active){
       try{
         await serviceFetch("/chat_messages",{
