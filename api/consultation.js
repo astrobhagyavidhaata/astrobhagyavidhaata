@@ -53,6 +53,10 @@ function compactChartContext(source){
     // Only calculated astrology data is sent to the answer engine.
     d1:source.d1||null,
     d9:source.d9||null,
+    planets:source.planets||source.d1?.planets||{},
+    shadbala:source.shadbala||null,
+    shadbalaMethod:source.shadbalaMethod||null,
+    ashtakavarga:source.ashtakavarga||null,
     vargas:source.vargas||{},
     relationships:source.relationships||{},
     specialLagnas:source.specialLagnas||{},
