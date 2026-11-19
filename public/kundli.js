@@ -439,15 +439,16 @@
       const heading=dashaFolder.querySelector(":scope > h3");
       const nodes=Array.from(dashaFolder.children).filter(node=>node!==heading);
       const summaryNodes=nodes.slice(0,3);
+      const combinedPrediction=nodes.find(node=>node.classList.contains("nakshatra-panel") && /पारंपरिक फल-संकेत/.test(node.textContent));
       const activeBox=nodes.find(node=>node.classList.contains("dasha-current-card") && node!==summaryNodes[2]);
       const scheduleTitle=nodes.find(node=>node.tagName==="H4" && /पूरी महादशा/.test(node.textContent));
       const mahadashaNodes=nodes.filter(node=>node.classList.contains("dasha-period"));
       const timeline=nodes.find(node=>node.classList.contains("nakshatra-panel") && /विंशोत्तरी महादशा समय-रेखा/.test(node.textContent));
-      const extras=nodes.filter(node=>!summaryNodes.includes(node)&&node!==activeBox&&node!==scheduleTitle&&!mahadashaNodes.includes(node)&&node!==timeline);
+      const extras=nodes.filter(node=>!summaryNodes.includes(node)&&node!==combinedPrediction&&node!==activeBox&&node!==scheduleTitle&&!mahadashaNodes.includes(node)&&node!==timeline);
 
       const deckStyle=document.getElementById("dashaSlideStyle")||document.createElement("style");
       deckStyle.id="dashaSlideStyle";
-      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-slide-card{flex:0 0 100%;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
+      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-combined-prediction{display:block;margin:12px 0 4px;padding:14px;border:1px solid #e7a15b;border-radius:12px;background:#fff7ed;color:#34251b}.dasha-combined-prediction h4{color:#9a4300;margin:0 0 8px}.dasha-combined-prediction p{line-height:1.65;margin:7px 0}.dasha-slide-card{flex:0 0 100%;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
       if(!deckStyle.isConnected)document.head.appendChild(deckStyle);
 
       const summarySlide=document.createElement("section");summarySlide.className="dasha-slide-card";
@@ -487,6 +488,12 @@
       dashaFolder.replaceChildren();
       if(heading)dashaFolder.appendChild(heading);
       dashaFolder.append(tabs,viewport);
+      if(combinedPrediction){
+        combinedPrediction.classList.add("dasha-combined-prediction");
+        const predictionTitle=combinedPrediction.querySelector("h4");
+        if(predictionTitle)predictionTitle.textContent="चयनित महादशा–अंतर्दशा का संयुक्त फलादेश";
+        dashaFolder.appendChild(combinedPrediction);
+      }
     }
 
     const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
@@ -856,21 +863,8 @@
     },null,null).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
   }
   async function restoreAstroSession(form){
-    let saved=readAstroSession();
-    if(!saved?.chart){
-      try{
-        const backup=await readAstroSessionDB();
-        if(backup?.chart){
-          const sameDetails=!saved?.birthDetails||(
-            saved.birthDetails.name===backup.birthDetails?.name&&
-            saved.birthDetails.date===backup.birthDetails?.date&&
-            saved.birthDetails.time===backup.birthDetails?.time&&
-            saved.birthDetails.place===backup.birthDetails?.place
-          );
-          if(sameDetails)saved={...(saved||backup),...saved,chart:backup.chart,location:saved?.location||backup.location};
-        }
-      }catch(error){console.warn("IndexedDB से पिछली कुंडली वापस नहीं पढ़ी जा सकी:",error);}
-    }
+    // Empty initial state: restore only birth-form drafts, never show a previously generated chart on page load.
+    const saved=readAstroSession();
     const details=saved?.birthDetails;
     if(!details)return;
     if(form){
@@ -880,16 +874,8 @@
     if(saved.location?.latitude!=null&&saved.location?.longitude!=null){
       selectedBirthPlace={...saved.location,label:[saved.location.name,saved.location.admin1,saved.location.country].filter(Boolean).join(", ")||details.place};
     }
-    if(saved.chart){
-      window.AstroKundli=saved.chart;
-      renderMainKundliChart(saved.chart);
-      renderVargaCharts(saved.chart);
-      renderAstrologyCalculations(saved.chart);
-      const panel=$("kBox");if(panel)panel.style.display="block";
-      const status=$("message");if(status){status.style.display="block";status.textContent="आपकी पिछली कुंडली और जन्म विवरण इस डिवाइस से वापस लोड किए गए हैं।";}
-      document.dispatchEvent(new CustomEvent("astro:kundli-restored",{detail:saved.chart}));
-      requestInitialConsultation(saved.chart);
-    }
+    const panel=$("kBox");if(panel)panel.style.display="none";
+    const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=true;
   }
   async function requestInitialConsultation(chart){
     const status=$("aiInitialSummary");
@@ -1009,6 +995,8 @@
 
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
+      const aiLaunch = $("aiAstrologerLaunch");
+      if (aiLaunch) aiLaunch.hidden = false;
 
       await saveAstroSession(details,chart,location);
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
