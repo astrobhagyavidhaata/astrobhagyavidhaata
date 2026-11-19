@@ -121,7 +121,19 @@ footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.l
 .main-tabs button{margin:0;padding:11px 5px;background:#fff!important;color:#8c3c00!important;border:1px solid #e7a15b;border-radius:10px;font-size:13px;line-height:1.25}
 .main-tabs button.active{background:#d35400!important;color:#fff!important;border-color:#d35400}.tab-panel[hidden]{display:none!important}
 @media(max-width:420px){.main-tabs{gap:5px}.main-tabs button{font-size:11px;padding:10px 3px}}
-</style>
+
+    .astro-slide-shell{margin:14px 0 8px;min-width:0}
+    .astro-slide-tabs{display:flex;gap:7px;overflow-x:auto;white-space:nowrap;padding:7px 2px 10px;margin:0 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-bottom:1px solid #66547f}
+    .astro-slide-tabs::-webkit-scrollbar{display:none}
+    .astro-slide-tabs button{flex:0 0 auto;width:auto;margin:0;padding:10px 13px;border:1px solid #70558e;border-radius:9px;background:#302342;color:#f5d994;font-size:13px}
+    .astro-slide-tabs button[aria-selected="true"]{background:#e8b957;color:#211638;border-color:#e8b957}
+    .astro-slide-viewport{display:flex;width:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
+    .astro-slide-viewport::-webkit-scrollbar{display:none}
+    .astro-slide-card{flex:0 0 100%;width:100%;min-width:100%;max-height:58vh;min-height:220px;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start;scroll-snap-stop:always;padding:12px;border:1px solid #70558e;border-radius:12px;background:#181326}
+    .astro-slide-card>section,.astro-slide-card>.app-folder{margin:0;border:0;background:transparent;padding:0}
+    .astro-slide-card h3:first-child{margin-top:0}
+
+  </style>
 </head>
 <body>
   <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"><details class="app-folder" id="jyotishCalculationsFolder"><summary>📁 ज्योतिषीय गणनाएँ</summary><div id="jyotishCalculations"><p class="chat-info">पहले जन्म विवरण भरकर कुंडली बनाएँ। उसके बाद नवतारा, दशा और उपलब्ध गणनाएँ यहाँ खुलेंगी।</p></div></details></div></div></div></header>
@@ -173,7 +185,30 @@ footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.l
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div>
+<div class="astro-slide-shell">
+  <nav id="astroSlideTabs" class="astro-slide-tabs" role="tablist" aria-label="ज्योतिषीय गणना स्लाइड">
+    <button type="button" data-astro-slide-tab="slide-dasha" aria-selected="true">महादशा व संयुक्त फलादेश</button>
+    <button type="button" data-astro-slide-tab="slide-navtara" aria-selected="false">नवतारा चक्र</button>
+    <button type="button" data-astro-slide-tab="slide-shadbala" aria-selected="false">षड्बल</button>
+    <button type="button" data-astro-slide-tab="slide-bhavabala" aria-selected="false">भाव बल</button>
+    <button type="button" data-astro-slide-tab="slide-ashtakvarga" aria-selected="false">अष्टकवर्ग</button>
+    <button type="button" data-astro-slide-tab="slide-shodashvarga" aria-selected="false">षोडश वर्ग (D2–D60)</button>
+  </nav>
+  <div id="astroSlideViewport" class="astro-slide-viewport">
+    <section id="slide-dasha" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-navtara" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-shadbala" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-bhavabala" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-ashtakvarga" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-shodashvarga" class="astro-slide-card" role="tabpanel"></section>
+  </div>
+</div>
+<div id="kundliDetailTabs" hidden></div>
+<div id="jyotishCalculations" hidden></div>
+<section class="app-folder" id="kundliChartsFolder"><div id="vargaCharts"></div></section>
+<div id="aiInitialSummary" class="chat-info" role="status" aria-live="polite"></div>
+<div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
     <section class="panel tab-panel" id="savedTabPanel" hidden>
