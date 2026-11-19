@@ -18,14 +18,14 @@ function mockResponse() {
 }
 
 test("Gochar API returns nine grahas, both house references and transit drishti", async () => {
-  const req = { method: "GET", query: { rashi: "तुला", lagna: "मेष", date:"2026-11-18" } };
+  const before = Date.now();\n  const req = { method: "GET", query: { rashi: "तुला", lagna: "मेष" } };
   const res = mockResponse();
 
   await gocharHandler(req, res);
 
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.success, true);
-  assert.equal(res.body.asOf, "2026-11-18T12:00:00.000Z");
+  const calculatedAt = Date.parse(res.body.asOf);\n  assert.ok(Number.isFinite(calculatedAt));\n  assert.ok(calculatedAt >= before && calculatedAt <= Date.now());
   assert.equal(res.body.basisRashi, "तुला");
   assert.equal(res.body.basisLagna, "मेष");
   assert.equal(res.body.planets.length, 9);
@@ -50,7 +50,7 @@ test("Gochar API returns nine grahas, both house references and transit drishti"
 });
 
 test("Gochar API rejects an invalid Moon sign", async () => {
-  const req = { method: "GET", query: { rashi: "गलत", lagna: "मेष", date:"2026-11-18" } };
+  const req = { method: "GET", query: { rashi: "गलत", lagna: "मेष" } };
   const res = mockResponse();
 
   await gocharHandler(req, res);
@@ -60,7 +60,7 @@ test("Gochar API rejects an invalid Moon sign", async () => {
 });
 
 test("Gochar API rejects an invalid ascendant when supplied", async () => {
-  const req = { method: "GET", query: { rashi: "तुला", lagna: "गलत", date:"2026-11-18" } };
+  const req = { method: "GET", query: { rashi: "तुला", lagna: "गलत" } };
   const res = mockResponse();
 
   await gocharHandler(req, res);
