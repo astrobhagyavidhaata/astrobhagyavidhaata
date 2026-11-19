@@ -439,7 +439,7 @@
       const heading=dashaFolder.querySelector(":scope > h3");
       const nodes=Array.from(dashaFolder.children).filter(node=>node!==heading);
       const summaryNodes=nodes.slice(0,3);
-      const activeBox=nodes.find(node=>node.classList.contains("dasha-current-card") && node!==combined);
+      const activeBox=nodes.find(node=>node.classList.contains("dasha-current-card") && node!==summaryNodes[2]);
       const scheduleTitle=nodes.find(node=>node.tagName==="H4" && /पूरी महादशा/.test(node.textContent));
       const mahadashaNodes=nodes.filter(node=>node.classList.contains("dasha-period"));
       const timeline=nodes.find(node=>node.classList.contains("nakshatra-panel") && /विंशोत्तरी महादशा समय-रेखा/.test(node.textContent));
