@@ -33,7 +33,10 @@ module.exports = async function handler(req,res) {
     res.setHeader("Allow","GET");
     return res.status(405).json({success:false,message:"केवल GET अनुरोध स्वीकार है।"});
   }
-  if(req.query?.date && !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(req.query.date))) {\n    return res.status(400).json({success:false,message:"तारीख YYYY-MM-DD प्रारूप में होनी चाहिए।"});\n  }\n  const rashi=String(req.query?.rashi||"");
+  if(req.query?.date && !/^\d{4}-\d{2}-\d{2}$/.test(String(req.query.date))) {
+    return res.status(400).json({success:false,message:"तारीख YYYY-MM-DD प्रारूप में होनी चाहिए।"});
+  }
+  const rashi=String(req.query?.rashi||"");
   const lagna=String(req.query?.lagna||"");
   if((rashi&&!RASHIS.includes(rashi))||(lagna&&!RASHIS.includes(lagna))||(!rashi&&!lagna)) {
     return res.status(400).json({success:false,message:"जन्म लग्न या चंद्र राशि में से कम-से-कम एक मान्य राशि चुनें।"});
