@@ -206,7 +206,7 @@
     .chart-item,.chart-item[open],.chart-item>summary,.chart-item>*:not(summary){height:auto!important;min-height:0!important;}
     .dasha-slide-card .chart-item{background:transparent!important;}
   
-    #chatMessages:empty,#ai-response-box:empty{display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+    #chatMessages:not(:has(.msg-bot,.msg-user)),#ai-response-box:not(:has(.ai-chat-message)){display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
 </style>
 </head>
 <body>
