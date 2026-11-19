@@ -29,7 +29,18 @@
    const dict=astroTerms[base]||astroTerms.en;
    let out=String(value??"");
    const keys=Object.keys(dict).sort((a,b)=>b.length-a.length);
+   // Match complete Hindi terms only; substring replacement corrupts words such as "प्रभाव".
+   if(keys.length){
+     const pattern=new RegExp("(?<![\\p{L}\\p{N}])(?:"+keys.map(k=>k.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\function translateAstroText(value,locale){
+   const base=localeTerms[locale]||String(locale||"en").split("-")[0];
+   const dict=astroTerms[base]||astroTerms.en;
+   let out=String(value??"");
+   const keys=Object.keys(dict).sort((a,b)=>b.length-a.length);
    for(const key of keys) out=out.split(key).join(dict[key]);
+   return out;
+ }")).join("|")+")(?![\\p{L}\\p{N}])","gu");
+     out=out.replace(pattern,match=>dict[match]??match);
+   }
    return out;
  }
 
@@ -43,7 +54,8 @@
    if(!raw||!raw.trim())return;
    if(!original.has(node))original.set(node,raw);
    const source=original.get(node);
-   const map=dictionaries[lang]||{};
+   const base=localeTerms[lang]||String(lang||"en").split("-")[0];
+   const map=dictionaries[base]||{};
    const trimmed=source.trim();
    if(map[trimmed]){
      const lead=source.match(/^\s*/)?.[0]||"",trail=source.match(/\s*$/)?.[0]||"";
@@ -58,7 +70,8 @@
      if(el.hasAttribute(attr)){
        const key="data-i18n-original-"+attr;
        if(!el.hasAttribute(key))el.setAttribute(key,el.getAttribute(attr));
-       const source=el.getAttribute(key),value=(dictionaries[lang]||{})[source]||translateAstroText(source,lang);
+       const base=localeTerms[lang]||String(lang||"en").split("-")[0];
+       const source=el.getAttribute(key),value=(dictionaries[base]||{})[source]||translateAstroText(source,lang);
        el.setAttribute(attr,value||source);
      }
    }
