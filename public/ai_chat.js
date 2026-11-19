@@ -29,7 +29,7 @@
   const chartContext=getKundliDetails();chatBusy=true;input.value="";addMessage("आप",question,"user");
   const loading=document.createElement("div");loading.className="msg-bot";loading.textContent="ज्योतिषाचार्य उत्तर तैयार कर रहे हैं...";$("chatMessages")?.appendChild(loading);
   try{
-   const response=await fetch(CHAT_API,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({question,chartContext,language:$("preferredLanguage")?.value||"hi",conversationHistory:chatHistory.slice(-12)})});
+   const response=await fetch(CHAT_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,chartContext,language:$("preferredLanguage")?.value||"hi",conversationHistory:chatHistory.slice(-12)})});
    const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.message||"AI सेवा अभी उपलब्ध नहीं है।");
    if(typeof data.answer!=="string"||!data.answer.trim())throw new Error("AI से सही उत्तर प्राप्त नहीं हुआ।");
    loading.textContent=activeAstro+": "+data.answer;chatHistory.push({role:"user",content:question},{role:"assistant",content:data.answer});chatHistory=chatHistory.slice(-12);
