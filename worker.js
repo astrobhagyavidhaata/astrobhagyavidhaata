@@ -3,10 +3,8 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === "/healthz") {
-      return Response.json({ status: "ok", runtime: "cloudflare-worker" });
-    }
-
+    // API requests are handled separately; every other request goes straight
+    // to the static asset binding (index.html, CSS, JS, images, and other files).
     if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
       return Response.json(
         { success: false, message: "API handlers are not connected to the Worker yet." },
@@ -14,19 +12,13 @@ export default {
       );
     }
 
-    if (env?.ASSETS && typeof env.ASSETS.fetch === "function") {
-      if (url.pathname === "/") {
-        return env.ASSETS.fetch(
-          new Request(new URL("/index.html", request.url), request)
-        );
-      }
-
-      return env.ASSETS.fetch(request);
+    if (!env?.ASSETS || typeof env.ASSETS.fetch !== "function") {
+      return new Response("Static assets binding is unavailable", {
+        status: 503,
+        headers: { "Content-Type": "text/plain; charset=utf-8" }
+      });
     }
 
-    return new Response("Static assets are unavailable", {
-      status: 503,
-      headers: { "Content-Type": "text/plain; charset=utf-8" }
-    });
+    return env.ASSETS.fetch(request);
   }
 };
