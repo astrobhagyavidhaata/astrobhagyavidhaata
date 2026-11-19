@@ -104,6 +104,8 @@ async function runGeminiConsultation(request, env = {}) {
         rawKundali.navtara ??
         {},
       shadbala: rawKundali.shadbala ?? {},
+      shadbalaMethod: rawKundali.shadbalaMethod ?? null,
+      ashtakavarga: rawKundali.ashtakavarga ?? {},
       gochar:
         rawKundali.gochar ??
         rawKundali.current_gochar ??
@@ -137,6 +139,7 @@ async function runGeminiConsultation(request, env = {}) {
 
 1. पहचान: यदि कोई पूछे कि तुम कौन हो या तुम्हारा नाम क्या है,
 तो हमेशा यही बोलो: "मैं Astro vidhata AI हूँ।"
+Google या Gemini का नाम अपनी पहचान के रूप में कभी मत बताओ।
 
 2. कुंडली विश्लेषण: उपलब्ध D1 लग्न कुंडली, D9 नवांश,
 ग्रहों के नक्षत्र, चरण और भाव, महादशा-अंतर्दशा,
