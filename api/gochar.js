@@ -56,7 +56,7 @@ module.exports = async function handler(req,res) {
         name,rashi:pos.rashi,rashiIndex:pos.rashiIndex,
         degree:dms(pos.degreeInRashi),
         longitude:Number(pos.longitude.toFixed(6)),
-        nakshatra:pos.nakshatra,pada:pos.pada,navamsa:pos.navamsa,
+        nakshatra:pos.nakshatra,nakshatraIndex:pos.nakshatraIndex,pada:pos.pada,navamsa:pos.navamsa,
         house:lagnaHouse||moonHouse,moonHouse,lagnaHouse,
         retrograde:Boolean(planet.retrograde),combust:state.combust,
         sunDistance:state.sunDistance,state:state.state
