@@ -47,7 +47,16 @@ export default {
       const url = new URL(request.url);
       const bindings = env || {};
 
-      // AI consultation API
+      // Non-secret readiness check for the AI consultation binding.
+      if (url.pathname === "/api/consultation/health") {
+        return Response.json({
+          success: true,
+          configured: Boolean(bindings.GEMINI_API_KEY),
+          model: bindings.GEMINI_MODEL || "gemini-2.5-flash"
+        }, { headers: { "Cache-Control": "no-store" } });
+      }
+
+      // AI consultation API — pass Worker bindings through unchanged.
       if (url.pathname === "/api/consultation") {
         return await runApi(consultationHandler, request, bindings);
       }
