@@ -7,7 +7,7 @@ test("Tara Bala maps all nine navatara groups and wraps at 27",()=>{
   assert.equal(calculateTaraBal(1,1).name,"जन्म तारा");
   assert.equal(calculateTaraBal(1,2).name,"संपत तारा");
   assert.equal(calculateTaraBal(1,3).score,-2);
-  assert.equal(calculateTaraBal(1,27).name,"मित्र तारा");
+  assert.equal(calculateTaraBal(1,27).name,"अतिमित्र तारा");
   assert.equal(calculateTaraBal(27,1).name,"संपत तारा");
   assert.equal(calculateTaraBal(0,1),null);
   assert.equal(calculateTaraBal(1,28),null);
@@ -34,7 +34,7 @@ test("life-event synthesis includes dasha lord, Tara Bala and natal placements w
   assert.equal(result.dashaInfo.mahadashaLord,"गुरु");
   assert.equal(result.transitPlanets[0].natal.house,4);
   assert.equal(result.transitPlanets[0].isCurrentDashaLord,true);
-  assert.equal(result.transitPlanets[0].taraBal.taraNumber,4);
+  assert.equal(result.transitPlanets[0].taraBal.taraNumber,5);
   assert.equal(result.transitPlanets[0].shadbalaPercent,null);
   assert.equal("name" in result.kundali,false);
 });
