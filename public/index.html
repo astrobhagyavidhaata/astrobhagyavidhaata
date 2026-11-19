@@ -206,6 +206,21 @@
     .gochar-ai-output{margin-top:12px;padding:12px;border-radius:9px;background:#fff;color:#252525;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
     .gochar-ai-panel[hidden]{display:none}
 
+    /* Hide Google Translate banner, tooltip and translation-rating popup */
+    .goog-te-banner-frame.skiptranslate,
+    .goog-te-balloon-frame,
+    #goog-gt-tt,
+    .goog-tooltip,
+    .goog-tooltip:hover {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+    body { top: 0px !important; }
+    #ai-response-box { user-select:text; }
   </style>
 </head>
 <body>
@@ -235,7 +250,7 @@
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
         <p class="chat-info">आपकी तैयार जन्म कुंडली के डेटा के आधार पर सवाल पूछें। परामर्श के लिए लॉगिन और सक्रिय सत्र आवश्यक है।</p>
-        <div id="aiAstrologerMessages" class="ai-chat-messages" role="log" aria-live="polite"></div>
+        <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
         <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
         <textarea id="aiAstrologerQuestion" rows="3" maxlength="4000" placeholder="उदाहरण: मेरी नौकरी और करियर के योग कैसे हैं?"></textarea>
         <button id="aiAstrologerSend" type="button">सवाल भेजें</button>
