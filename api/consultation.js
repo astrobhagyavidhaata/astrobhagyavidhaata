@@ -16,7 +16,7 @@ function stripPersonalFields(value){
   if(!value||typeof value!=="object")return value;
   const clean={};
   for(const [key,item] of Object.entries(value)){
-    const normalized=key.replace(/[_\\s-]/g,"").toLowerCase();
+    const normalized=key.replace(/[_\s-]/g,"").toLowerCase();
     if(PRIVATE_FIELD_KEYS.has(normalized))continue;
     clean[key]=stripPersonalFields(item);
   }
