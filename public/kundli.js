@@ -61,7 +61,7 @@
     const escaped=String(word).replace(/[|\\{}()[\]^$+*?.]/g,"\\$&");
     return new RegExp("\\b"+escaped+"\\b","gi");
   }
-  function localizeChartText(value) {");\n    return new RegExp("\\\\b"+escaped+"\\\\b","gi");\n  }\n  function localizeChartText(value) {
+  function localizeChartText(value) {
     const locale=chartLocale();
     const language=selectedChartLanguage().split("-")[0];
     let result=String(value ?? "");
