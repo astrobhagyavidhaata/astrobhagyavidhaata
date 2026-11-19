@@ -11,10 +11,8 @@ function compactChartContext(source){
   const md=(d.mahadashas||[]).find(x=>x.planet===current.mahadasha);
   const ad=(md?.antardashas||[]).find(x=>x.planet===current.antardasha);
   const pd=(ad?.pratyantardashas||[]).find(x=>x.planet===current.pratyantardasha);
-  return {
-    name:source.name||"",
-    birth:source.birth||{},
-    calculation:source.calculation||{},
+  return stripPersonalFields({
+    // Only calculated astrology data is sent to the answer engine.
     d1:source.d1||null,
     d9:source.d9||null,
     vargas:source.vargas||{},
@@ -35,8 +33,9 @@ function compactChartContext(source){
       currentMahadashaAntardashas:(md?.antardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end})),
       currentAntardashaPratyantardashas:(ad?.pratyantardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end}))
     },
-    taraChart:source.taraChart||[]
-  };
+    taraChart:source.taraChart||[],
+    currentTaraBala:source.currentTaraBala||null
+  });
 }
 
 module.exports=async function(req,res){
