@@ -232,7 +232,7 @@
     .calculation-page{display:none;min-width:0;margin:12px 0;padding:12px;border:1px solid #66547f;border-radius:12px;background:#181326}
     .calculation-page.active{display:block}
   
-    #chatMessages:empty,#ai-response-box:empty{display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+    #chatMessages:not(:has(.msg-bot,.msg-user)),#ai-response-box:not(:has(.ai-chat-message)){display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
 </style>
 </head>
 <body>
