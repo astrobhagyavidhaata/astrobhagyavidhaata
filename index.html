@@ -201,6 +201,10 @@
   
     /* Prevent artificial dark/blank space beneath chart and dasha slides. */
     .app-swipe-deck,.app-page-panel,.astro-slide-viewport,.astro-slide-card,.dasha-slide-viewport,.dasha-slide-card{height:auto!important;min-height:0!important}
+  
+    /* Planet-position expandable card must not leave a dark empty block. */
+    .chart-item,.chart-item[open],.chart-item>summary,.chart-item>*:not(summary){height:auto!important;min-height:0!important;}
+    .dasha-slide-card .chart-item{background:transparent!important;}
   </style>
 </head>
 <body>
