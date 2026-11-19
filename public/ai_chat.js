@@ -1,41 +1,72 @@
-/*
- * ASTRO BHAGYA VIDHATA
- * Direct Gemini consultation — no login, wallet, or mandatory birth chart.
- */
+/* Astro Bhagya Vidhata — AI consultation section */
 (() => {
- "use strict";
- const CHAT_API="/api/consultation";
- let activeAstro="AI वैदिक ज्योतिष सहायक",chatBusy=false,chatHistory=[];
- const $=id=>document.getElementById(id);
- function addMessage(sender,text,type){
-  const box=$("chatMessages");if(!box)return;
-  const item=document.createElement("div");item.className=type==="user"?"msg-user":"msg-bot";
-  const heading=document.createElement("b");heading.textContent=sender+": ";
-  const content=document.createElement("span");content.textContent=text;item.append(heading,content);box.appendChild(item);box.scrollTop=box.scrollHeight;
- }
- function getKundliDetails(){if(window.AstroKundli)return window.AstroKundli;const el=$("kTxt");return el&&el.textContent.trim()?el.textContent.trim():null;}
- async function openChatBox(astroName){
-  activeAstro=astroName||"AI वैदिक ज्योतिष सहायक";chatHistory=[];
-  const modal=$("chatModal");if(modal)modal.style.display="block";
-  const title=$("chatTitle");if(title)title.textContent=activeAstro;
-  const box=$("chatMessages");if(box)box.replaceChildren();
-  addMessage(activeAstro,"नमस्कार! आप कुंडली के साथ या बिना कुंडली के अपना प्रश्न सीधे पूछ सकते हैं।","bot");
-  $("userMsgInput")?.focus();return true;
- }
- async function sendUserMsg(){
-  if(chatBusy)return;const input=$("userMsgInput");if(!input)return;
-  const question=input.value.trim();if(!question)return;
-  if(question.length>4000){addMessage("सूचना","प्रश्न 4000 अक्षरों से छोटा रखें।","bot");return;}
-  const chartContext=getKundliDetails();chatBusy=true;input.value="";addMessage("आप",question,"user");
-  const loading=document.createElement("div");loading.className="msg-bot";loading.textContent="ज्योतिषाचार्य उत्तर तैयार कर रहे हैं...";$("chatMessages")?.appendChild(loading);
-  try{
-   const response=await fetch(CHAT_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,chartContext,language:$("preferredLanguage")?.value||"hi",conversationHistory:chatHistory.slice(-12)})});
-   const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.message||"AI सेवा अभी उपलब्ध नहीं है।");
-   if(typeof data.answer!=="string"||!data.answer.trim())throw new Error("AI से सही उत्तर प्राप्त नहीं हुआ।");
-   loading.textContent=activeAstro+": "+data.answer;chatHistory.push({role:"user",content:question},{role:"assistant",content:data.answer});chatHistory=chatHistory.slice(-12);
-  }catch(error){loading.textContent="उत्तर प्राप्त नहीं हुआ: "+error.message;}
-  finally{chatBusy=false;const box=$("chatMessages");if(box)box.scrollTo({top:box.scrollHeight,behavior:"smooth"});}
- }
- function closeChatBox(){const modal=$("chatModal");if(modal)modal.style.display="none";chatHistory=[];activeAstro="AI वैदिक ज्योतिष सहायक";}
- window.openChatBox=openChatBox;window.sendUserMsg=sendUserMsg;window.closeChatBox=closeChatBox;
+  "use strict";
+  const endpoint = "/api/consultation";
+  const byId = id => document.getElementById(id);
+  let busy = false;
+  const history = [];
+
+  function addMessage(text, role) {
+    const box = byId("ai-response-box");
+    if (!box) return;
+    const item = document.createElement("div");
+    item.className = "ai-chat-message " + role;
+    item.textContent = text;
+    box.appendChild(item);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function chartContext() {
+    const chart = window.AstroKundli;
+    if (chart && typeof chart === "object") return chart;
+    const node = byId("kTxt");
+    return node && node.textContent.trim() ? node.textContent.trim() : null;
+  }
+
+  async function sendQuestion() {
+    if (busy) return;
+    const input = byId("aiAstrologerQuestion");
+    const status = byId("aiAstrologerStatus");
+    const button = byId("aiAstrologerSend");
+    const question = input?.value.trim();
+    if (!question) { if (status) status.textContent = "कृपया अपना सवाल लिखें।"; return; }
+    if (question.length > 4000) { if (status) status.textContent = "प्रश्न 4000 अक्षरों से छोटा रखें।"; return; }
+    busy = true;
+    if (button) button.disabled = true;
+    if (status) status.textContent = "ज्योतिषाचार्य उत्तर तैयार कर रहे हैं...";
+    addMessage(question, "user");
+    input.value = "";
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question,
+          chartContext: chartContext(),
+          language: byId("preferredLanguage")?.value || "hi",
+          conversationHistory: history.slice(-10)
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
+      if (typeof data.answer !== "string" || !data.answer.trim()) throw new Error("AI से उत्तर प्राप्त नहीं हुआ।");
+      addMessage(data.answer, "assistant");
+      history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
+      if (status) status.textContent = "";
+    } catch (error) {
+      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + error.message;
+    } finally {
+      busy = false;
+      if (button) button.disabled = false;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const button = byId("aiAstrologerSend");
+    const input = byId("aiAstrologerQuestion");
+    button?.addEventListener("click", sendQuestion);
+    input?.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendQuestion(); }
+    });
+  });
 })();
