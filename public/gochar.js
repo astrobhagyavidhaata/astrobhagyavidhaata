@@ -129,9 +129,32 @@
     button.disabled=true;button.textContent=tr("AI विश्लेषण तैयार हो रहा है...");
     output.textContent=tr("Gemini से गोचर फलादेश प्राप्त किया जा रहा है...");
     try {
+      const chart=window.AstroKundli;
+      if(!chart?.d1?.ascendant||!chart?.d1?.planets||!chart?.dasha?.current){
+        throw new Error("जन्म कुंडली और वर्तमान दशा का डेटा उपलब्ध नहीं है। पहले जन्म कुंडली दोबारा बनाएं।");
+      }
+      // Send astrology factors only; exclude name, birth date/time, place, coordinates and account details.
+      const kundali={
+        d1:{
+          ascendant:{rashi:chart.d1.ascendant.rashi,rashiIndex:chart.d1.ascendant.rashiIndex},
+          planets:Object.fromEntries(Object.entries(chart.d1.planets||{}).map(([name,p])=>[name,{
+            rashi:p.rashi,longitude:p.longitude,house:p.house,nakshatra:p.nakshatra,
+            nakshatraIndex:p.nakshatraIndex,pada:p.pada
+          }]))
+        },
+        dasha:{current:{
+          mahadasha:chart.dasha.current.mahadasha,
+          antardasha:chart.dasha.current.antardasha,
+          pratyantardasha:chart.dasha.current.pratyantardasha,
+          mahadashaStart:chart.dasha.current.mahadashaStart,
+          mahadashaEnd:chart.dasha.current.mahadashaEnd,
+          antardashaStart:chart.dasha.current.antardashaStart,
+          antardashaEnd:chart.dasha.current.antardashaEnd
+        }}
+      };
       const result=await getJSON("/api/gochar-prediction",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({gochar:latest,language})
+        body:JSON.stringify({gochar:latest,kundali,language})
       });
       output.textContent=result.answer||tr("विश्लेषण उपलब्ध नहीं है।");
     } catch(error) {output.textContent=tr(error.message);}
