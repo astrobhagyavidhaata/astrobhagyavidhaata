@@ -96,7 +96,32 @@
       visibility: hidden !important;
     }
     body { top: 0px !important; position: static !important; }
-  </style>
+  
+/* Saffron-white theme */
+:root{color-scheme:light}body{background:#f2f4f8!important;color:#252525!important;padding-bottom:28px}
+header{background:#fff!important;border-bottom:3px solid #e67e22!important;box-shadow:0 2px 9px rgba(0,0,0,.08)}
+.header-title h1,header h1{color:#d35400!important}header p{color:#5b5148!important}
+.header-menu>button{background:#fff7ed!important;color:#9a4300!important;border-color:#e7a15b!important}
+.header-menu-panel{background:#fff!important;border-color:#e7a15b!important}
+.app-folder{background:#fffaf3!important;border-color:#e7a15b!important}.app-folder>summary,.legal-details summary{color:#9a4300!important}
+main{max-width:760px}.panel{background:#fff!important;color:#252525!important;border:1px solid #ead7c4!important;border-radius:14px!important;box-shadow:0 3px 12px rgba(74,45,20,.08)!important}
+h2,h3{color:#9a4300!important}label{color:#4b4038!important}input,select,textarea{background:#fff!important;color:#222!important;border-color:#d8c5b2!important}
+button{background:#e67e22!important;color:#fff!important}button.secondary,.secondary{background:#1a1a2e!important;color:#fff!important}
+.chart-view-btn{background:#fff1df!important;color:#8c3c00!important;border-color:#e7a15b!important}.chart-view-btn.active{background:#d35400!important;color:#fff!important}
+.chart-card,.nakshatra-panel,.chart-item{background:#fffaf3!important;border-color:#e7a15b!important;color:#222!important}
+.chart-card .chart-asc,.chart-item>summary{color:#8c3c00!important}.nakshatra-panel th,#panchangOutput th{color:#9a4300!important}
+.chat-info,.support-note{color:#5b5148!important}#message,#walletMessage,#panchangMessage{background:#fff7ed!important;color:#8c3c00!important;border:1px solid #efc18f}
+.modal{background:rgba(25,18,12,.62)!important}.modal-box{background:#fff!important;border-color:#e7a15b!important;color:#222!important}
+#chatMessages{background:#fffaf3!important;border-color:#e4cdb7!important}.msg-bot{background:#fff0dc!important;color:#30251d}.msg-user{background:#e8f8f2!important;color:#193b31}
+#consultationBillingStatus{display:none!important}.support-link{background:#d35400!important;color:#fff!important}.support-link.whatsapp{background:#1f8f5f!important}
+.support-topics a{color:#9a4300!important;border-color:#e7a15b!important}.legal-details{background:#fffaf3!important;border-color:#e7a15b!important}
+footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.language-picker select{background:#fff!important;color:#222!important;border-color:#e7a15b!important}
+.wallet-bar,#guestLoginPanel{display:none!important}
+.main-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:760px;margin:14px auto 0;padding:0 14px}
+.main-tabs button{margin:0;padding:11px 5px;background:#fff!important;color:#8c3c00!important;border:1px solid #e7a15b;border-radius:10px;font-size:13px;line-height:1.25}
+.main-tabs button.active{background:#d35400!important;color:#fff!important;border-color:#d35400}.tab-panel[hidden]{display:none!important}
+@media(max-width:420px){.main-tabs{gap:5px}.main-tabs button{font-size:11px;padding:10px 3px}}
+</style>
 </head>
 <body>
   <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"><details class="app-folder" id="jyotishCalculationsFolder"><summary>📁 ज्योतिषीय गणनाएँ</summary><div id="jyotishCalculations"><p class="chat-info">पहले जन्म विवरण भरकर कुंडली बनाएँ। उसके बाद नवतारा, दशा और उपलब्ध गणनाएँ यहाँ खुलेंगी।</p></div></details></div></div></div></header>
@@ -105,7 +130,7 @@
     (function(){
       const picker=document.getElementById("preferredLanguage");
       if(!picker)return;
-      const supported=new Set(["en","hi","mr","pa","ur","fr","de","es","pt","ar","bn","gu","ta","te"]);
+      const supported=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt-BR","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
       let saved="en";
       try{saved=localStorage.getItem("astro_language")||"en";}catch(_){}
       picker.value=supported.has(saved)?saved:"en";
@@ -118,8 +143,14 @@
       document.documentElement.lang=picker.value;
     })();
   </script>
+<nav class="main-tabs" role="tablist" aria-label="मुख्य ज्योतिष अनुभाग">
+<button type="button" class="active" role="tab" aria-selected="true" data-tab="kundliTabPanel">जन्म कुंडली</button>
+<button type="button" role="tab" aria-selected="false" data-tab="savedTabPanel">मेरी कुंडलियाँ</button>
+<button type="button" role="tab" aria-selected="false" data-tab="panchangTabPanel">पंचांग</button>
+<button type="button" role="tab" aria-selected="false" data-tab="gocharTabPanel">गोचर</button></nav>
+<script>(function(){const tabs=[...document.querySelectorAll(".main-tabs [data-tab]")],ids=["kundliTabPanel","savedTabPanel","panchangTabPanel","gocharTabPanel"];function activate(id){ids.forEach(x=>{const p=document.getElementById(x);if(p)p.hidden=x!==id;});tabs.forEach(t=>{const a=t.dataset.tab===id;t.classList.toggle("active",a);t.setAttribute("aria-selected",String(a));});}tabs.forEach(t=>t.addEventListener("click",()=>activate(t.dataset.tab)));activate("kundliTabPanel");const ai=document.getElementById("aiConsultationPanel"),birth=document.getElementById("kundliTabPanel");if(ai&&birth)birth.appendChild(ai);})();</script>
   <main>
-    <section class="panel">
+    <section class="panel" id="guestLoginPanel" hidden>
       <h2>👤 गेस्ट लॉगिन</h2>
       <p id="loginState" class="chat-info">गेस्ट अकाउंट की स्थिति जाँची जा रही है…</p>
       <div id="guestConsentWrap">
@@ -131,7 +162,7 @@
       <button id="guestContinueButton" type="button">बिना OTP जारी रखें</button>
       <div id="authMessage" role="status" aria-live="polite"></div>
     </section>
-    <section class="panel">
+    <section class="panel tab-panel" id="kundliTabPanel">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
@@ -145,7 +176,7 @@
       <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" id="savedTabPanel" hidden>
       <h2>📚 मेरी सुरक्षित कुंडलियाँ</h2>
       <p class="chat-info">केवल वे कुंडलियाँ दिखेंगी जिन्हें बनाते समय आपने खाते में सुरक्षित करने की अनुमति दी थी।</p>
       <button type="button" id="loadKundliHistory" class="secondary">मेरी कुंडलियाँ देखें</button>
@@ -153,7 +184,7 @@
       <div id="savedKundliPreview" class="chat-info"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" id="panchangTabPanel" hidden>
       <h2>📅 दैनिक पंचांग और शुभ-अशुभ काल</h2>
       <p class="chat-info">तिथि, नक्षत्र, योग, करण, सूर्योदय-सूर्यास्त, राहुकाल, यमगण्ड, गुलिक काल, अभिजित और 24 होरा की गणना।</p>
       <form id="panchangForm">
@@ -169,7 +200,7 @@
       <div id="panchangOutput" aria-live="polite"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" id="gocharTabPanel" hidden>
       <h2>🪐 आज का ग्रह गोचर</h2>
       <label for="rashiSelect">अपनी चंद्र राशि चुनें</label>
       <select id="rashiSelect">
@@ -178,9 +209,9 @@
       <div id="rashiGocharOut" class="chat-info" aria-live="polite"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel" id="aiConsultationPanel">
       <h2>💬 AI ज्योतिष परामर्श</h2>
-      <p class="chat-info">अपनी कुंडली से जुड़े प्रश्न AI ज्योतिष सहायक से पूछें। हर अकाउंट को पहली बार केवल 1 मिनट मुफ्त मिलेगा। उसके बाद ₹5 प्रति मिनट वॉलेट से कटेंगे।</p>
+      <p class="chat-info">कुंडली के साथ या बिना कुंडली के, सीधे AI वैदिक ज्योतिष सहायक से अपना प्रश्न पूछें।</p>
       <button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">चैट शुरू करें</button>
       <div id="walletMessage" role="status" aria-live="polite"></div>
     </section>
@@ -225,7 +256,7 @@
   </main>
   <div id="chatModal" class="modal"><div class="modal-box">
     <div class="modal-head"><h2 id="chatTitle">AI वैदिक ज्योतिष परामर्श</h2><button type="button" class="close-button" onclick="closeChatBox()">बंद करें</button></div>
-    <p id="consultationBillingStatus" class="chat-info">पहली बार 1 मिनट मुफ्त। उसके बाद ₹5 प्रति मिनट।</p>
+    <p id="consultationBillingStatus" class="chat-info" hidden></p>
     <div id="chatMessages" aria-live="polite"></div>
     <label for="userMsgInput">अपना प्रश्न लिखें</label><textarea id="userMsgInput" placeholder="अपना ज्योतिष संबंधी प्रश्न लिखें..." maxlength="4000" rows="3"></textarea>
     <div class="chat-actions"><button type="button" onclick="sendUserMsg()">संदेश भेजें</button></div>
