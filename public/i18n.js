@@ -113,7 +113,7 @@
  window.googleTranslateElementInit=window.googleTranslateElementInit||function(){
    if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"en",autoDisplay:false},"google_translate_element");}
  };
-\n picker.addEventListener("change",()=>{setLanguage(picker.value);applyGoogleTranslation(picker.value);});
+picker.addEventListener("change",()=>{setLanguage(picker.value);applyGoogleTranslation(picker.value);});
  // Always open the app in English; users can choose another language after opening.
  picker.value="en";
  setLanguage("en");
