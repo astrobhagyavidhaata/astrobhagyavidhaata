@@ -27,7 +27,7 @@ function collectPrivateValues(value, output=[]){
   if(Array.isArray(value)){for(const item of value)collectPrivateValues(item,output);return output;}
   if(!value||typeof value!=="object")return output;
   for(const [key,item] of Object.entries(value)){
-    const normalized=key.replace(/[_\\s-]/g,"").toLowerCase();
+    const normalized=key.replace(/[_\s-]/g,"").toLowerCase();
     if(PRIVATE_FIELD_KEYS.has(normalized)&&typeof item==="string"&&item.trim().length>1)output.push(item.trim());
     else collectPrivateValues(item,output);
   }
@@ -38,8 +38,8 @@ function redactQuestion(question, rawChart){
   let clean=String(question||"");
   const values=[...new Set(collectPrivateValues(rawChart))].sort((a,b)=>b.length-a.length);
   for(const value of values)clean=clean.split(value).join("[निजी जानकारी हटाई गई]");
-  clean=clean.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi,"[ईमेल हटाया गया]");
-  clean=clean.replace(/(?:\\+?\\d[\\d\\s().-]{7,}\\d)/g,"[फोन नंबर हटाया गया]");
+  clean=clean.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,"[ईमेल हटाया गया]");
+  clean=clean.replace(/(?:\+?\d[\d\s().-]{7,}\d)/g,"[फोन नंबर हटाया गया]");
   return clean;
 }
 
