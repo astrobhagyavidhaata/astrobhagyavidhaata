@@ -15,6 +15,12 @@ export default {
     }
 
     if (env?.ASSETS && typeof env.ASSETS.fetch === "function") {
+      if (url.pathname === "/") {
+        return env.ASSETS.fetch(
+          new Request(new URL("/index.html", request.url), request)
+        );
+      }
+
       return env.ASSETS.fetch(request);
     }
 
