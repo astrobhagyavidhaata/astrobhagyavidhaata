@@ -486,7 +486,7 @@
     if(viewport&&slideTabs){
       const buttons=Array.from(slideTabs.querySelectorAll("[data-astro-slide-tab]"));
       const syncAstroTabOnScroll=()=>{const index=Math.max(0,Math.min(buttons.length-1,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));buttons.forEach((button,i)=>button.setAttribute("aria-selected",String(i===index)));buttons[index]?.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});};
-      buttons.forEach(button=>{button.onclick=()=>{const target=$(button.dataset.astroSlideTab);if(target)viewport.scrollTo({left:target.offsetLeft-viewport.offsetLeft,behavior:"smooth"});};});
+      buttons.forEach((button,index)=>{button.onclick=()=>viewport.scrollTo({left:viewport.clientWidth*index,behavior:"smooth"});});
       viewport.onscroll=()=>{if(viewport._astroSlideFrame)return;viewport._astroSlideFrame=requestAnimationFrame(()=>{viewport._astroSlideFrame=0;syncAstroTabOnScroll();});};
       viewport.scrollLeft=0;syncAstroTabOnScroll();
     }
