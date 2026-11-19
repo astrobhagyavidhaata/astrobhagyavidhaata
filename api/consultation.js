@@ -1,5 +1,6 @@
 "use strict";
 const { askGemini } = require("../lib/gemini");
+const { getAuthenticatedUser, activeConsultation } = require("../lib/supabase");
 const { buildLiveAstrologyContext } = require("../lib/consultation-context");
 const requestWindow = new Map();
 
@@ -61,8 +62,12 @@ module.exports = async function(req, res) {
     return res.status(405).json({ success: false, message: "केवल POST अनुरोध स्वीकार है।" });
   }
   if (!allowedSameOrigin(req)) return res.status(403).json({ success: false, message: "यह अनुरोध स्वीकार नहीं है।" });
-  if (!rateLimit(req)) return res.status(429).json({ success: false, message: "बहुत जल्दी-जल्दी प्रश्न भेजे जा रहे हैं। एक मिनट बाद फिर प्रयास करें।" });
   try {
+    const user = await getAuthenticatedUser(req, res);
+    if (!user) return res.status(401).json({ success: false, message: "Gemini ज्योतिष परामर्श के लिए पहले लॉगिन करें।" });
+    const consultation = await activeConsultation(user.id);
+    if (!consultation) return res.status(402).json({ success: false, message: "पहले ₹5 प्रति मिनट वाला ज्योतिष परामर्श शुरू करें।" });
+    if (!rateLimit(req)) return res.status(429).json({ success: false, message: "बहुत जल्दी-जल्दी प्रश्न भेजे जा रहे हैं। एक मिनट बाद फिर प्रयास करें।" });
     const body = req.body || {};
     const question = body.question || body.content;
     if (typeof question !== "string" || !question.trim()) return res.status(400).json({ success: false, message: "कृपया अपना प्रश्न लिखें।" });
