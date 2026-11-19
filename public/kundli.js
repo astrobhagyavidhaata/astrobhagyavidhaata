@@ -250,62 +250,6 @@
       const dates=document.createElement("p");dates.className="chat-info";
       dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—");
       dashaFolder.appendChild(dates);
-      const combined=document.createElement("section");combined.className="dasha-current-card";
-      const isEnglish=String(window.AstroLanguage?.get?.()||document.documentElement.lang||"en").split("-")[0]==="en";
-      const words=isEnglish
-        ?{title:"Combined Prediction",md:"Mahadasha lord:",ad:"Antardasha lord:",sign:"Sign",house:"House",nak:"Nakshatra",pada:"Pada",career:"Career",money:"Money",family:"Family",health:"Health",missing:"The planetary positions needed for this reading are not available.",fallback:"The combined period activates the themes shown by both planetary placements. Results depend on planetary strength, aspects and the full birth chart."}
-        :{title:"महादशा + अंतर्दशा का संयुक्त फलादेश",md:"महादशा स्वामी:",ad:"अंतर्दशा स्वामी:",sign:"राशि",house:"भाव",nak:"नक्षत्र",pada:"चरण",career:"करियर",money:"धन",family:"परिवार",health:"सेहत",missing:"इस फलादेश के लिए ग्रहों की आवश्यक स्थिति उपलब्ध नहीं है।",fallback:"यह संयुक्त अवधि दोनों ग्रहों की स्थिति से जुड़े विषयों को सक्रिय करती है। अंतिम फल ग्रहबल, दृष्टि और पूरी जन्मकुंडली पर निर्भर करेगा।"};
-      const combinedTitle=document.createElement("h4");combinedTitle.textContent=words.title;combined.appendChild(combinedTitle);
-      const planetPositions=chart.d1?.planets||{};
-      const mdPosition=planetPositions[activeMD],adPosition=planetPositions[activeAD];
-      const positionText=(label,planet,pos)=>{
-        const p=document.createElement("p");p.className="chat-info";
-        const house=Number(pos?.house);
-        const houseText=Number.isInteger(house)&&house>=1&&house<=12?(isEnglish?"House "+house:house+"वाँ भाव"):"—";
-        p.textContent=label+" "+localizeChartText(planet||"—")+" — "+words.sign+": "+localizeChartText(pos?.rashi||"—")+" | "+words.house+": "+houseText+" | "+words.nak+": "+localizeChartText(pos?.nakshatra||"—")+" | "+words.pada+": "+localizeChartText(pos?.pada||"—");
-        combined.appendChild(p);
-      };
-      positionText(words.md,activeMD,mdPosition);
-      positionText(words.ad,activeAD,adPosition);
-      const houseThemes=isEnglish?{
-        career:{1:"personal initiative",3:"effort and communication",6:"service and competition",9:"learning and guidance",10:"career and responsibility",11:"professional gains and networks",8:"career changes",12:"work behind the scenes or abroad"},
-        money:{2:"income and savings",5:"skills and considered investments",9:"long-term fortune",11:"gains",6:"debts and obligations",8:"unexpected costs",12:"expenses"},
-        family:{2:"family duties and speech",4:"home and domestic comfort",7:"partnerships",6:"disagreements to resolve",8:"emotional changes",12:"distance or extra expenses"},
-        health:{1:"vitality and self-care",6:"daily routine and minor health concerns",8:"the need for caution and timely check-ups",12:"sleep and rest"}
-      }:{
-        career:{1:"स्वयं के प्रयास",3:"परिश्रम और बातचीत",6:"सेवा और प्रतिस्पर्धा",9:"सीखने और मार्गदर्शन",10:"करियर और जिम्मेदारी",11:"काम में लाभ और संपर्क",8:"काम में बदलाव",12:"पर्दे के पीछे या विदेश से जुड़े काम"},
-        money:{2:"आय और बचत",5:"कौशल और सोच-समझकर निवेश",9:"दीर्घकालीन भाग्य",11:"लाभ",6:"ऋण और जिम्मेदारियाँ",8:"अचानक खर्च",12:"खर्च"},
-        family:{2:"परिवार की जिम्मेदारियाँ और वाणी",4:"घर और घरेलू सुख",7:"साझेदारी",6:"सुलझाने योग्य मतभेद",8:"भावनात्मक बदलाव",12:"दूरी या अतिरिक्त खर्च"},
-        health:{1:"जीवनशक्ति और अपनी देखभाल",6:"दिनचर्या और छोटी स्वास्थ्य समस्याएँ",8:"सावधानी और समय पर जाँच",12:"नींद और आराम"}
-      };
-      const makeTopicText=(topic)=>{
-        const placements=[{planet:activeMD,pos:mdPosition},{planet:activeAD,pos:adPosition}];
-        const details=placements.map(item=>{
-          const h=Number(item.pos?.house);
-          const theme=houseThemes[topic][h];
-          return theme?(isEnglish?theme:theme):"";
-        }).filter((value,index,array)=>value&&array.indexOf(value)===index);
-        if(!details.length)return words.fallback;
-        if(isEnglish){
-          if(topic==="career")return "Work matters are shaped by "+details.join(" and ")+". Steady planning and consistent effort will be important.";
-          if(topic==="money")return "Money matters highlight "+details.join(" and ")+". Keep savings planned and avoid impulsive financial decisions.";
-          if(topic==="family")return "Family life highlights "+details.join(" and ")+". Calm communication will help maintain understanding.";
-          return "Health calls for attention to "+details.join(" and ")+". Maintain a regular routine and seek medical advice for persistent symptoms.";
-        }
-        if(topic==="career")return "कामकाज में "+details.join(" और ")+" के विषय प्रमुख रहेंगे। नियमित प्रयास और सही योजना लाभदायक रहेगी।";
-        if(topic==="money")return "धन के मामले में "+details.join(" और ")+" पर ध्यान रहेगा। बचत की योजना रखें और जल्दबाजी में आर्थिक निर्णय न लें।";
-        if(topic==="family")return "परिवार में "+details.join(" और ")+" के विषय प्रमुख रहेंगे। शांत बातचीत से आपसी समझ बनी रहेगी।";
-        return "सेहत के लिए "+details.join(" और ")+" पर ध्यान दें। नियमित दिनचर्या रखें और लगातार परेशानी होने पर डॉक्टर से सलाह लें।";
-      };
-      const prediction=document.createElement("div");
-      if(mdPosition&&adPosition){
-        [[words.career,"career"],[words.money,"money"],[words.family,"family"],[words.health,"health"]].forEach(([label,key])=>{
-          const p=document.createElement("p");p.className="chat-info";p.textContent=label+": "+makeTopicText(key);prediction.appendChild(p);
-        });
-      }else{
-        const p=document.createElement("p");p.className="chat-info";p.textContent=words.missing;prediction.appendChild(p);
-      }
-      combined.appendChild(prediction);dashaFolder.appendChild(combined);
       const periodDate=value=>value?new Date(value).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en",{day:"2-digit",month:"short",year:"numeric"}):"—";
       const periodRange=(item)=>periodDate(item.start)+" से "+periodDate(item.end);
       const activeBox=document.createElement("div");activeBox.className="dasha-current-card";
@@ -380,20 +324,8 @@
         const chainNote=document.createElement("p");chainNote.className="chat-info";chainNote.textContent="ऊपर प्रत्येक दशा-स्वामी के जन्म नक्षत्र के स्वामी की राशि, भाव और नक्षत्र भी दिखाए गए हैं।";info.appendChild(chainNote);
         dashaFolder.appendChild(info);
         const md= currentLords[0], ad=currentLords[1];
-        if(md&&ad){
-          const result=document.createElement("div");result.className="nakshatra-panel";
-          const title=document.createElement("h4");title.textContent="महादशा–अंतरदशा का पारंपरिक फल-संकेत";result.appendChild(title);
-          const p=document.createElement("p");p.className="chat-info";
-          const mdTheme=planetThemes[md.planet]||"ग्रह के कारकत्व";
-          const adTheme=planetThemes[ad.planet]||"ग्रह के कारकत्व";
-          const mdHouse=md.house?houseThemes[md.house-1]:"भाव स्थिति उपलब्ध नहीं";
-          const adHouse=ad.house?houseThemes[ad.house-1]:"भाव स्थिति उपलब्ध नहीं";
-          p.textContent=md.planet+" महादशा में "+mdTheme+" प्रमुख विषय रहेंगे। इसका आधार जन्म-कुंडली में "+md.planet+" का "+md.sign+" राशि तथा "+mdHouse+" से संबंध है। "+ad.planet+" अंतरदशा इस अवधि में "+adTheme+" और "+adHouse+" के विषय सक्रिय करेगी। "+(md.nakLord!=="—"?"महादशा स्वामी "+md.nak+" नक्षत्र में है, जिसका स्वामी "+md.nakLord+" है। ":"")+(ad.nakLord!=="—"?"अंतरदशा स्वामी "+ad.nak+" नक्षत्र में है, जिसका स्वामी "+ad.nakLord+" है। ":"");
-          result.appendChild(p);
-          const caution=document.createElement("p");caution.className="chat-info";caution.textContent="यह प्रारंभिक कारकत्व-आधारित संकेत है। अंतिम फलादेश में लग्नानुसार भावेशत्व, ग्रह-दृष्टि, युति, अवस्था, बल, वर्ग कुंडली और नक्षत्र-स्वामी की स्थिति का संयुक्त विचार आवश्यक है।";result.appendChild(caution);
-          dashaFolder.appendChild(result);
-        }
       }
+
       const timeline=document.createElement("div");timeline.className="nakshatra-panel";
       const timelineTitle=document.createElement("h4");timelineTitle.textContent="विंशोत्तरी महादशा समय-रेखा";timelineTitle.style.cssText="color:#f5c66b;margin:4px 0 8px";timeline.appendChild(timelineTitle);
       const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
@@ -444,12 +376,11 @@
       const heading=dashaFolder.querySelector(":scope > h3");
       const nodes=Array.from(dashaFolder.children).filter(node=>node!==heading);
       const summaryNodes=nodes.slice(0,3);
-      const combinedPrediction=nodes.find(node=>node.classList.contains("nakshatra-panel") && /पारंपरिक फल-संकेत/.test(node.textContent));
       const activeBox=nodes.find(node=>node.classList.contains("dasha-current-card") && node!==summaryNodes[2]);
       const scheduleTitle=nodes.find(node=>node.tagName==="H4" && /पूरी महादशा/.test(node.textContent));
       const mahadashaNodes=nodes.filter(node=>node.classList.contains("dasha-period"));
       const timeline=nodes.find(node=>node.classList.contains("nakshatra-panel") && /विंशोत्तरी महादशा समय-रेखा/.test(node.textContent));
-      const extras=nodes.filter(node=>!summaryNodes.includes(node)&&node!==combinedPrediction&&node!==activeBox&&node!==scheduleTitle&&!mahadashaNodes.includes(node)&&node!==timeline);
+      const extras=nodes.filter(node=>!summaryNodes.includes(node)&&node!==activeBox&&node!==scheduleTitle&&!mahadashaNodes.includes(node)&&node!==timeline);
 
       const deckStyle=document.getElementById("dashaSlideStyle")||document.createElement("style");
       deckStyle.id="dashaSlideStyle";
@@ -463,7 +394,7 @@
       summaryNodes.forEach(node=>summarySlide.appendChild(node));
       if(extras.length){
         const detail=document.createElement("details");detail.className="chart-item";
-        const summary=document.createElement("summary");summary.textContent="ग्रह स्थिति और फलादेश का विस्तृत आधार देखने के लिए स्पर्श करें";
+        const summary=document.createElement("summary");summary.textContent="ग्रह स्थिति का विस्तृत आधार देखने के लिए स्पर्श करें";
         detail.appendChild(summary);extras.forEach(node=>detail.appendChild(node));summarySlide.appendChild(detail);
       }
       if(activeBox)mahadashaSlide.appendChild(activeBox);
@@ -482,7 +413,7 @@
 
       const tabs=document.createElement("div");tabs.className="chart-view-toolbar dasha-slide-tabs";tabs.setAttribute("role","tablist");tabs.setAttribute("aria-label","दशा विवरण चुनें");
       const viewport=document.createElement("div");viewport.className="dasha-slide-viewport";
-      const slides=[{label:"संयुक्त फलादेश",node:summarySlide},{label:"महादशा",node:mahadashaSlide},{label:"अंतर्दशा",node:antardashaSlide}];
+      const slides=[{label:"वर्तमान दशा",node:summarySlide},{label:"महादशा",node:mahadashaSlide},{label:"अंतर्दशा",node:antardashaSlide}];
       slides.forEach((item,index)=>{
         const button=document.createElement("button");button.type="button";button.className="chart-view-btn"+(index===0?" active":"");button.setAttribute("role","tab");button.setAttribute("aria-selected",String(index===0));button.textContent=item.label;
         button.addEventListener("click",()=>{viewport.scrollTo({left:viewport.clientWidth*index,behavior:"smooth"});tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});});
@@ -493,15 +424,7 @@
       dashaFolder.replaceChildren();
       if(heading)dashaFolder.appendChild(heading);
       dashaFolder.append(tabs,viewport);
-      if(combinedPrediction){
-        combinedPrediction.classList.add("dasha-combined-prediction");
-        const predictionTitle=combinedPrediction.querySelector("h4");
-        if(predictionTitle)predictionTitle.textContent="चयनित महादशा–अंतर्दशा का संयुक्त फलादेश";
-        dashaFolder.appendChild(combinedPrediction);
-      }
-    }
-
-    const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
+=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
     const av=chart.ashtakavarga;
     if(av?.validation?.passed && av.bhinna && av.sarva){
       const method=document.createElement("p");method.className="chat-info";
@@ -592,7 +515,7 @@
     root.replaceChildren();
     const detailTabs=$("kundliDetailTabs");if(detailTabs)detailTabs.replaceChildren();
     const heading=(host,label)=>{if(!host)return;const h=document.createElement("h3");h.textContent=label;host.appendChild(h);};
-    if(!dashaPage)heading(slide("slide-dasha"),"महादशा व फलादेश");
+    if(!dashaPage)heading(slide("slide-dasha"),"महादशा");
     if(!taraPage)heading(slide("slide-navtara"),"नवतारा चक्र (तारा बल)");
     if(!ashtakPage)heading(slide("slide-ashtakvarga"),"अष्टकवर्ग");
     if(!vargaFolder)heading(slide("slide-shodashvarga"),"षोडश वर्ग कुंडलियाँ (D2–D60)");
