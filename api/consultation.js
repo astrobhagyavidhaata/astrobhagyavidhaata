@@ -97,7 +97,20 @@ module.exports=async function(req,res,env={}){
     const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:env.GEMINI_API_KEY,model:env.GEMINI_MODEL});
     return res.status(200).json({success:true,answer});
   }catch(error){
-    console.error("Consultation API error:",error.message);
-    return res.status(503).json({success:false,message:"परामर्श सेवा अभी कॉन्फ़िगर नहीं है। कृपया बाद में प्रयास करें।"});
+    const message=String(error?.message||"Consultation failed");
+    console.error("Consultation API error:",message);
+    if(!env?.GEMINI_API_KEY){
+      return res.status(503).json({success:false,message:"Gemini API key Cloudflare Worker binding में उपलब्ध नहीं है।"});
+    }
+    if(/GEMINI_API_KEY/.test(message)){
+      return res.status(503).json({success:false,message:"Gemini API key उपलब्ध नहीं है या अमान्य है।"});
+    }
+    if(/quota|rate.?limit|resource.?exhausted/i.test(message)){
+      return res.status(429).json({success:false,message:"AI सेवा की अनुरोध सीमा पूरी हुई है। थोड़ी देर बाद पुनः प्रयास करें।"});
+    }
+    if(/API key not valid|invalid api key|unauthorized|permission denied/i.test(message)){
+      return res.status(502).json({success:false,message:"Gemini API key अस्वीकार हुई है। Cloudflare Secret की जाँच करें।"});
+    }
+    return res.status(502).json({success:false,message:"AI सेवा से उत्तर प्राप्त नहीं हुआ। कृपया पुनः प्रयास करें।"});
   }
 };
