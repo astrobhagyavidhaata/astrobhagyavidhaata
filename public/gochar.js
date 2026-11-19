@@ -19,7 +19,7 @@
     "Hasta":"हस्त","Chitra":"चित्रा","Swati":"स्वाति","Anuradha":"अनुराधा",
     "Jyeshtha":"ज्येष्ठा","Mula":"मूल","Purva Ashadha":"पूर्वाषाढ़ा","Uttara Ashadha":"उत्तराषाढ़ा",
     "Shravana":"श्रवण","Dhanishta":"धनिष्ठा","Shatabhisha":"शतभिषा",
-    "Uttara Bhadrapada":"उत्तराभाद्रपद","Revati":"रेवती","Planet":"ग्रह","Sign":"राशि","Nakshatra":"नक्षत्र"
+    "Uttara Bhadrapada":"उत्तराभाद्रपद","Revati":"रेवती","Planet":"ग्रह","Sign":"राशि","Nakshatra":"नक्षत्र","Retrograde":"वक्री","Direct":"मार्गी"
   };
   function localizeAstroText(text, lang) {
     let result=String(text??"");
@@ -115,6 +115,14 @@
     });
     table.append(tbody);scroller.append(table);section.append(scroller);host.append(section);
   }
+  function retriggerGoogleTranslation(lang) {
+    const base=String(lang||"hi").split("-")[0];
+    if(base==="hi")return;
+    const target=base;
+    document.cookie="googtrans=/hi/"+target+"; path=/; SameSite=Lax";
+    const combo=document.querySelector(".goog-te-combo");
+    if(combo){combo.value=target;combo.dispatchEvent(new Event("change",{bubbles:true}));}
+  }
   function render(data) {
     latest=data;
     const host=$("rashiGocharOut");if(!host)return;
@@ -132,6 +140,8 @@
     renderTable(host,data);
     const note=element("p",data.note||"");note.className="gochar-note";host.append(note);
     const ai=$("gocharAiPanel");if(ai)ai.hidden=false;
+    const selected=window.AstroLanguage?.get?.()||document.documentElement.lang||"hi";
+    window.setTimeout(()=>retriggerGoogleTranslation(selected),250);
   }
   async function loadGochar() {
     const select=$("rashiSelect");if(!select)return;
