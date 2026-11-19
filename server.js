@@ -23,6 +23,7 @@ app.get("/healthz",(req,res)=>res.status(200).json({status:"ok"}));
 
 const apiHandlers={
   kundli:require("./api/kundli"),
+  geocode:require("./api/geocode"),
   consultation:require("./api/consultation"),
   gochar:require("./api/gochar"),
   panchang:require("./api/panchang")
