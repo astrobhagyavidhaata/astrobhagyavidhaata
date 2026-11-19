@@ -588,7 +588,7 @@
       birthDate: details.date,
 
       birthTime: details.time,
-      saveToAccount: details.saveToAccount,
+      saveToAccount: false, // Chart persistence is handled locally in saved_kundalis.
 
       birthPlace: {
         name: location.name,
