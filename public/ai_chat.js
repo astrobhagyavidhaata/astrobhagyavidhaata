@@ -66,12 +66,12 @@
 
       await window.AstroWallet.ready;
       const started = await window.AstroWallet.startConsultation(
-        astroName || "AI वैदिक ज्योतिष सहायक"
+        astroName || "एस्ट्रो भाग्य विधाता ऐप AI"
       );
 
       if (!started) return false;
 
-      activeAstro = astroName || "AI वैदिक ज्योतिष सहायक";
+      activeAstro = astroName || "एस्ट्रो भाग्य विधाता ऐप AI";
       chatHistory = [];
 
       const modal = $("chatModal");
