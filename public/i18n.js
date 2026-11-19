@@ -102,7 +102,18 @@
    observer.observe(document.body,{subtree:true,childList:true,characterData:true});
  });
  function setLanguage(lang){current=supported.has(lang)?lang:"en";apply(current)}
- picker.addEventListener("change",()=>setLanguage(picker.value));
+ 
+ function applyGoogleTranslation(lang){
+   const base=String(lang||"en").split("-")[0];
+   if(base==="en"){document.cookie="googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";return;}
+   document.cookie="googtrans=/en/"+base+"; path=/; SameSite=Lax";
+   const combo=document.querySelector(".goog-te-combo");
+   if(combo){combo.value=base;combo.dispatchEvent(new Event("change"));}
+ }
+ window.googleTranslateElementInit=window.googleTranslateElementInit||function(){
+   if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"en",autoDisplay:false},"google_translate_element");}
+ };
+\n picker.addEventListener("change",()=>{setLanguage(picker.value);applyGoogleTranslation(picker.value);});
  // Always open the app in English; users can choose another language after opening.
  picker.value="en";
  setLanguage("en");
