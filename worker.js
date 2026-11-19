@@ -130,7 +130,7 @@ async function runGeminiConsultation(request, env = {}) {
     }
 
     const host = "generativelanguage.googleapis.com";
-    const modelCandidates = ["gemini-3.8-flash", "gemini-3.0-flash", "gemini-flash-latest"];
+    const modelCandidates = ["gemini-2.5-flash-lite", "gemini-2.0-flash"];
     const apiKeyQuery = "?key=" + encodeURIComponent(apiKey);
 
     const strictSystemPrompt = `
@@ -247,7 +247,7 @@ export default {
         return Response.json({
           success: true,
           configured: Boolean(bindings.GEMINI_API_KEY),
-          model: "gemini-3.8-flash"
+          model: "gemini-2.5-flash-lite"
         }, { headers: { "Cache-Control": "no-store" } });
       }
 
