@@ -37,7 +37,7 @@
     const wrap=element("section",undefined,"gochar-chart-wrap");
     wrap.append(element("h3","उत्तर भारतीय गोचर कुंडली"));
     const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
-    svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");
+    svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("preserveAspectRatio","xMidYMid meet");svg.setAttribute("role","img");
     svg.setAttribute("aria-label","उत्तर भारतीय गोचर कुंडली");
     const add=(tag,attrs,parent=svg)=>{const n=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));parent.appendChild(n);return n;};
     add("rect",{x:2,y:2,width:396,height:396,fill:"#fffaf2",stroke:"#9b6336","stroke-width":3});
