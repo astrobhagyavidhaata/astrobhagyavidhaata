@@ -100,7 +100,7 @@ module.exports=async function(req,res,env={}){
     const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
     const language=supportedLanguages.has(body.language)?body.language:"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.8-flash"});
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash-lite"});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
@@ -114,9 +114,6 @@ module.exports=async function(req,res,env={}){
     if(/quota|rate.?limit|resource.?exhausted/i.test(message)){
       return res.status(429).json({success:false,message:"AI सेवा की अनुरोध सीमा पूरी हुई है। थोड़ी देर बाद पुनः प्रयास करें।"});
     }
-    if(/API key not valid|invalid api key|unauthorized|permission denied/i.test(message)){
-      return res.status(502).json({success:false,message:"Gemini API key अस्वीकार हुई है। Cloudflare Secret की जाँच करें।"});
-    }
-    return res.status(502).json({success:false,message:"AI सेवा से उत्तर प्राप्त नहीं हुआ। कृपया पुनः प्रयास करें।"});
+    return res.status(502).json({success:false,message});
   }
 };
