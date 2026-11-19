@@ -256,7 +256,44 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><p class="chat-info">हर वर्ग कुंडली को अलग पेज में देखने के लिए टैब को साइड में स्लाइड करें।</p><div id="vargaCharts"></div></section></div><div id="kTxt" aria-hidden="true"></div></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck">
+        <div id="kundliDetailTabs" hidden></div><div id="jyotishCalculations" hidden></div>
+        <div class="astro-slide-wrapper" id="astroAnalysisDeck">
+          <div class="astro-slide-nav" id="astroSlideNav">
+            <button type="button" class="astro-tab-btn active" onclick="goAstroSlide(0)">1. महादशा व फलादेश</button>
+            <button type="button" class="astro-tab-btn" onclick="goAstroSlide(1)">2. नवतारा चक्र (तारा बल)</button>
+            <button type="button" class="astro-tab-btn" onclick="goAstroSlide(2)">3. षड्बल</button>
+            <button type="button" class="astro-tab-btn" onclick="goAstroSlide(3)">4. भाव बल</button>
+            <button type="button" class="astro-tab-btn" onclick="goAstroSlide(4)">5. अष्टकवर्ग</button>
+            <button type="button" class="astro-tab-btn" onclick="goAstroSlide(5)">6. षोडश वर्ग (D2–D60)</button>
+          </div>
+          <div class="astro-slide-viewport" id="astroSlideViewport" onscroll="syncAstroTabOnScroll()">
+            <div class="astro-slide-card" id="slide-dasha"></div>
+            <div class="astro-slide-card" id="slide-navtara"></div>
+            <div class="astro-slide-card" id="slide-shadbala"></div>
+            <div class="astro-slide-card" id="slide-bhavabala"></div>
+            <div class="astro-slide-card" id="slide-ashtakvarga"></div>
+            <div class="astro-slide-card" id="slide-shodashvarga"><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><div id="vargaCharts"></div></section></div>
+          </div>
+        </div>
+      </div>
+      <style>
+        .astro-slide-wrapper{width:100%;margin:14px 0;font-family:inherit}
+        .astro-slide-nav{display:flex;overflow-x:auto;gap:8px;padding:6px 4px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-bottom:2px solid #f3d5b5}
+        .astro-slide-nav::-webkit-scrollbar,.astro-slide-viewport::-webkit-scrollbar{display:none}
+        .astro-tab-btn{flex:0 0 auto!important;width:auto!important;margin:0!important;padding:9px 15px!important;border-radius:20px!important;border:1.5px solid #e07a16!important;background:#fff8f0!important;color:#8c3b00!important;font-weight:600!important;font-size:13.5px!important;cursor:pointer;white-space:nowrap}
+        .astro-tab-btn.active{background:linear-gradient(135deg,#e86f0c,#c85200)!important;color:#fff!important;border-color:#c85200!important}
+        .astro-slide-viewport{display:flex;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;scroll-behavior:smooth;width:100%;border-radius:12px;background:#fff;border:1px solid #f0d9c2;margin-top:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
+        .astro-slide-card{flex:0 0 100%;width:100%;min-width:100%;scroll-snap-align:start;padding:14px;box-sizing:border-box;height:auto;overflow:visible}
+        .astro-slide-card .calculation-page{display:block!important;margin:0;border:0;padding:0;background:transparent}
+        .astro-slide-card .calculation-page h3{margin:0 0 12px}
+        .astro-slide-card #kundliChartsFolder{margin:0;border:0;padding:0;background:transparent}
+        @media(max-width:600px){.astro-slide-card{padding:12px}}
+      </style>
+      <script>
+        function goAstroSlide(idx){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||idx<0||idx>=btns.length)return;vp.scrollTo({left:vp.clientWidth*idx,behavior:"smooth"});btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
+        function syncAstroTabOnScroll(){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||!vp.clientWidth)return;const idx=Math.max(0,Math.min(btns.length-1,Math.round(vp.scrollLeft/vp.clientWidth)));btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
+      </script><div id="kTxt" aria-hidden="true"></div></div>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
         <p class="chat-info">अपनी जन्म कुंडली के आधार पर AI ज्योतिषी से सीधे सवाल पूछें। सवाल पूछने के लिए लॉगिन या सक्रिय सत्र की आवश्यकता नहीं है।</p>
