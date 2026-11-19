@@ -101,7 +101,7 @@ module.exports=async function(req,res,env={}){
     const language=supportedLanguages.has(body.language)?body.language:"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
     const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash"});
-    return res.status(200).json({success:true,answer});
+    return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
     console.error("Consultation API error:",message);
