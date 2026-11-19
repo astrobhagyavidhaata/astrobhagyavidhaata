@@ -142,9 +142,11 @@
  document.documentElement.dir="ltr";
  if(document.body)document.body.dir="ltr";
  picker.addEventListener("change",()=>{setLanguage(picker.value);applyGoogleTranslation(picker.value);});
- // Always open the app in English; users can choose another language after opening.
- picker.value="en";
- setLanguage("en");
+ // Preserve the language selected by the user; apply it before rendering the chart.
+ const initialLanguage=supported.has(picker.value)?picker.value:"en";
+ picker.value=initialLanguage;
+ setLanguage(initialLanguage);
+ applyGoogleTranslation(initialLanguage);
  observer.observe(document.body,{subtree:true,childList:true,characterData:true});
  window.AstroLanguage={set:setLanguage,get:()=>current,translate:(value)=>translateAstroText(value,current)};
 })();
