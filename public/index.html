@@ -225,6 +225,12 @@
   
     #goog-te-banner-frame,.goog-te-banner-frame,.goog-te-menu-frame,.goog-te-gadget,#goog-gt-tt,.goog-tooltip{display:none!important;visibility:hidden!important;height:0!important}
     body{top:0!important}
+  
+    .calculation-tabs-with-arrows,.calculation-tabs{display:flex;align-items:center;gap:6px;overflow-x:auto;white-space:nowrap;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+    .calculation-tabs button,.calculation-tabs-with-arrows button{flex:0 0 auto;width:auto;margin:0;padding:10px 12px}
+    .calculation-tabs .calculation-tab-arrow,.calculation-tabs-with-arrows .calculation-tab-arrow{position:sticky;z-index:2;flex:0 0 auto;width:auto;min-width:36px;padding:8px 10px;font-size:20px;background:#e8b957;color:#211638}
+    .calculation-page{display:none;min-width:0;margin:12px 0;padding:12px;border:1px solid #66547f;border-radius:12px;background:#181326}
+    .calculation-page.active{display:block}
   </style>
 </head>
 <body>
