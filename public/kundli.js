@@ -833,7 +833,7 @@
   function readAstroSession(){
     try{return JSON.parse(localStorage.getItem(ASTRO_SAVED_SESSION_KEY)||"null");}catch(_){return null;}
   }
-  async function saveAstroSession(details, chart, location){
+  async function saveAstroSession(details, chart, location, preserveExistingChart=false){
     const old=readAstroSession();
     const same=old?.birthDetails&&old.birthDetails.name===details.name&&old.birthDetails.date===details.date&&old.birthDetails.time===details.time&&old.birthDetails.place===details.place;
     const savedLocation=location?{
@@ -844,7 +844,7 @@
       version:2,savedAt:new Date().toISOString(),
       birthDetails:{name:details.name||"",date:details.date||"",time:details.time||"",place:details.place||""},
       location:savedLocation,
-      chart:chart|| (same?old.chart:null)
+      chart:chart|| ((same||preserveExistingChart)?old.chart:null)
     };
     let localSaved=false;
     try{localStorage.setItem(ASTRO_SAVED_SESSION_KEY,JSON.stringify(record));localSaved=true;}
@@ -865,7 +865,7 @@
       date:String(data.get("dob")||""),
       time:String(data.get("birthTime")||""),
       place:String(data.get("birthPlace")||"").trim()
-    },null,null).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
+    },null,null,true).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
   }
   async function restoreAstroSession(form){
     // Restore the last generated chart as well as the birth form after navigation or refresh.
