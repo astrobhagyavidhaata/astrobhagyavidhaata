@@ -51,7 +51,8 @@
    const raw=node.nodeValue;
    if(!raw||!raw.trim())return;
    if(!original.has(node))original.set(node,raw);
-   let source=original.get(node);\n   if((localeTerms[lang]||String(lang||"").split("-")[0])==="hi"){source=source.replace(/कैto/g,"कैसे").replace(/AI ज्योतिषी\\s+to\\s+अपना सवाल पूछें/g,"AI ज्योतिषी से अपना सवाल पूछें");}
+   let source=original.get(node);
+   if((localeTerms[lang]||String(lang||"").split("-")[0])==="hi"){source=source.replace(/कैto/g,"कैसे").replace(/AI ज्योतिषी\s+to\s+अपना सवाल पूछें/g,"AI ज्योतिषी से अपना सवाल पूछें");}
    const base=localeTerms[lang]||String(lang||"en").split("-")[0];
    const map=dictionaries[base]||{};
    const trimmed=source.trim();
