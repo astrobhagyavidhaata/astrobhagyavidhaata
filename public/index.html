@@ -242,7 +242,7 @@
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="birthTime">जन्म समय</label><input id="birthTime" name="birthTime" type="time" required>
         <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
-        <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली मेरे लॉगिन खाते में सुरक्षित करें</label>
+        <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली इस ब्राउज़र में सुरक्षित करें</label>
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
@@ -261,7 +261,7 @@
 
     <section class="panel app-page-panel" data-app-page="saved">
       <h2>📚 मेरी सुरक्षित कुंडलियाँ</h2>
-      <p class="chat-info">केवल वे कुंडलियाँ दिखेंगी जिन्हें बनाते समय आपने खाते में सुरक्षित करने की अनुमति दी थी।</p>
+      <p class="chat-info">यहाँ इस ब्राउज़र में सुरक्षित की गई आपकी कुंडलियाँ दिखाई देंगी।</p>
       <button type="button" id="loadKundliHistory" class="secondary">मेरी कुंडलियाँ देखें</button>
       <div id="kundliHistoryList" class="chat-info" aria-live="polite"></div>
       <div id="savedKundliPreview" class="chat-info"></div>
