@@ -246,7 +246,7 @@
       const mdPosition=planetPositions[activeMD],adPosition=planetPositions[activeAD];
       const positionText=(label,planet,pos)=>{
         const p=document.createElement("p");p.className="chat-info";
-        p.textContent=label+" "+localizeChartText(planet||"—")+" — राशि: "+(pos?.rashi||"—")+" | भाव: "+(pos?.house?pos.house+"वाँ":"—")+" | नक्षत्र: "+(pos?.nakshatra||"—")+" | चरण: "+(pos?.pada||"—");
+        p.textContent=label+" "+localizeChartText(planet||"—")+" — राशि: "+localizeChartText(pos?.rashi||"—")+" | भाव: "+(pos?.house?localizeChartText(pos.house+"वाँ"):"—")+" | नक्षत्र: "+localizeChartText(pos?.nakshatra||"—")+" | चरण: "+localizeChartText(pos?.pada||"—");
         combined.appendChild(p);
       };
       positionText("महादशा स्वामी:",activeMD,mdPosition);
@@ -322,7 +322,7 @@
         const ni=Number.isInteger(Number(p.nakshatraIndex))?Number(p.nakshatraIndex):nakNames.indexOf(p.nakshatra);
         const lord=ni>=0?nakLords[ni%9]:"—";
         const house=Number(p.house);
-        return {planet,sign:p.rashi||signNames[Number(p.rashiIndex)]||"—",house:Number.isInteger(house)&&house>=1&&house<=12?house:null,nak:p.nakshatra||"—",pada:p.pada||"—",nakLord:lord,retrograde:!!p.retrograde};
+        return {planet,sign:localizeChartText(p.rashi||signNames[Number(p.rashiIndex)]||"—"),house:Number.isInteger(house)&&house>=1&&house<=12?house:null,nak:localizeChartText(p.nakshatra||"—"),pada:localizeChartText(p.pada||"—"),nakLord:lord,retrograde:!!p.retrograde};
       };
       const currentLords=[describeLord(active.mahadasha),describeLord(active.antardasha),describeLord(active.pratyantardasha)].filter(x=>x.planet&&x.planet!=="null");
       if(currentLords.length){
@@ -333,7 +333,7 @@
         const lordPlacement=(name)=>{
           const q=planetData[name]||{};
           const qHouse=Number(q.house);
-          return {sign:q.rashi||signNames[Number(q.rashiIndex)]||"—",house:Number.isInteger(qHouse)&&qHouse>=1&&qHouse<=12?qHouse:null,nak:q.nakshatra||"—",pada:q.pada||"—"};
+          return {sign:localizeChartText(q.rashi||signNames[Number(q.rashiIndex)]||"—"),house:Number.isInteger(qHouse)&&qHouse>=1&&qHouse<=12?qHouse:null,nak:localizeChartText(q.nakshatra||"—"),pada:localizeChartText(q.pada||"—")};
         };
         currentLords.forEach((x,index)=>{
           const nakLordInfo=lordPlacement(x.nakLord);
