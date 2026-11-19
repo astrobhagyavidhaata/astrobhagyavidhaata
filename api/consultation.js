@@ -1,86 +1,103 @@
 "use strict";
-const { askGemini } = require("../lib/gemini");
-const { buildLiveAstrologyContext } = require("../lib/consultation-context");
-const requestWindow = new Map();
 
-function allowedSameOrigin(req) {
-  const origin = req.headers.origin;
-  if (!origin) return true;
-  try { return new URL(origin).host === req.headers.host; }
-  catch (_) { return false; }
-}
-function rateLimit(req) {
-  const ip = String(req.headers["cf-connecting-ip"] || req.headers["x-forwarded-for"] || "unknown").split(",")[0].trim();
-  const now = Date.now();
-  const recent = (requestWindow.get(ip) || []).filter(t => now - t < 60000);
-  if (recent.length >= 8) return false;
-  recent.push(now);
-  if (requestWindow.size > 10000) requestWindow.clear();
-  requestWindow.set(ip, recent);
-  return true;
-}
+const {askGemini}=require("../lib/gemini");
+const {buildLiveAstrologyContext}=require("../lib/consultation-context");
+const recentRequests=new Map();
 
-function compactChartContext(source) {
-  if (!source || typeof source !== "object" || Array.isArray(source)) return {};
-  const d = source.dasha || {}, current = d.current || {};
-  const md = (d.mahadashas || []).find(x => x.planet === current.mahadasha);
-  const ad = (md?.antardashas || []).find(x => x.planet === current.antardasha);
-  const pd = (ad?.pratyantardashas || []).find(x => x.planet === current.pratyantardasha);
-  return {
-    calculation: source.calculation || {},
-    d1: source.d1 || null,
-    d9: source.d9 || null,
-    vargas: source.vargas || {},
-    relationships: source.relationships || {},
-    specialLagnas: source.specialLagnas || {},
-    kharaPoints: source.kharaPoints || {},
-    argala: source.argala || null,
-    drishti: source.drishti || null,
-    gochar: source.gochar || source.transits || null,
-    currentTaraBala: source.currentTaraBala || null,
-    taraChart: source.taraChart || [],
-    dasha: {
-      birthMoon: d.birthMoon || {},
-      startingMahadasha: d.startingMahadasha || null,
-      balanceAtBirthYears: d.balanceAtBirthYears || null,
-      current,
-      currentMahadasha: md ? { planet: md.planet, start: md.start, end: md.end } : null,
-      currentAntardasha: ad ? { planet: ad.planet, start: ad.start, end: ad.end } : null,
-      currentPratyantardasha: pd ? { planet: pd.planet, start: pd.start, end: pd.end } : null,
-      currentMahadashaAntardashas: (md?.antardashas || []).map(x => ({ planet: x.planet, start: x.start, end: x.end })),
-      currentAntardashaPratyantardashas: (ad?.pratyantardashas || []).map(x => ({ planet: x.planet, start: x.start, end: x.end }))
-    }
-  };
-}
+const PRIVATE_FIELD_KEYS = new Set([
+  "name", "fullname", "email", "phone", "mobile", "birthplace", "place",
+  "address", "latitude", "longitude", "lat", "lon", "coordinates",
+  "birthdate", "birthtime", "localdate", "utc", "timezone"
+]);
 
-module.exports = async function(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ success: false, message: "केवल POST अनुरोध स्वीकार है।" });
+function stripPersonalFields(value){
+  if(Array.isArray(value))return value.map(stripPersonalFields);
+  if(!value||typeof value!=="object")return value;
+  const clean={};
+  for(const [key,item] of Object.entries(value)){
+    const normalized=key.replace(/[_\s-]/g,"").toLowerCase();
+    if(PRIVATE_FIELD_KEYS.has(normalized))continue;
+    clean[key]=stripPersonalFields(item);
   }
-  if (!allowedSameOrigin(req)) return res.status(403).json({ success: false, message: "यह अनुरोध स्वीकार नहीं है।" });
-  try {
-    if (!rateLimit(req)) return res.status(429).json({ success: false, message: "बहुत जल्दी-जल्दी प्रश्न भेजे जा रहे हैं। एक मिनट बाद फिर प्रयास करें।" });
-    const body = req.body || {};
-    const question = body.question || body.content;
-    if (typeof question !== "string" || !question.trim()) return res.status(400).json({ success: false, message: "कृपया अपना प्रश्न लिखें।" });
-    if (question.length > 4000) return res.status(400).json({ success: false, message: "प्रश्न 4000 अक्षरों से छोटा रखें।" });
-    const sourceChart = body.chartContext && typeof body.chartContext === "object" && !Array.isArray(body.chartContext) ? body.chartContext : {};
-    const live = buildLiveAstrologyContext(sourceChart, new Date());
-    const chartContext = compactChartContext(live);
-    const history = Array.isArray(body.conversationHistory)
-      ? body.conversationHistory.slice(-12).map(item => ({
-          role: item.role === "assistant" ? "assistant" : "user",
-          content: String(item.content || item.text || "").slice(0, 4000)
-        })).filter(item => item.content.trim())
-      : [];
-    const supported = new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt-BR","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
-    const language = supported.has(body.language) ? body.language : "hi";
-    const answer = await askGemini({ question: question.trim(), chartContext, conversationHistory: history, language });
-    return res.status(200).json({ success: true, answer });
-  } catch (error) {
-    const message = String(error?.message || error || "अज्ञात सर्वर त्रुटि");
-    console.error("AI chat API error:", message);
-    return res.status(503).json({ success: false, message });
+  return clean;
+}
+
+function collectPrivateValues(value, output=[]){
+  if(Array.isArray(value)){for(const item of value)collectPrivateValues(item,output);return output;}
+  if(!value||typeof value!=="object")return output;
+  for(const [key,item] of Object.entries(value)){
+    const normalized=key.replace(/[_\s-]/g,"").toLowerCase();
+    if(PRIVATE_FIELD_KEYS.has(normalized)&&typeof item==="string"&&item.trim().length>1)output.push(item.trim());
+    else collectPrivateValues(item,output);
+  }
+  return output;
+}
+
+function redactQuestion(question, rawChart){
+  let clean=String(question||"");
+  const values=[...new Set(collectPrivateValues(rawChart))].sort((a,b)=>b.length-a.length);
+  for(const value of values)clean=clean.split(value).join("[निजी जानकारी हटाई गई]");
+  clean=clean.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,"[ईमेल हटाया गया]");
+  clean=clean.replace(/(?:\+?\d[\d\s().-]{7,}\d)/g,"[फोन नंबर हटाया गया]");
+  return clean;
+}
+
+function compactChartContext(source){
+  if(!source||typeof source!=="object"||Array.isArray(source))return {};
+  const d=source.dasha||{},current=d.current||{};
+  const md=(d.mahadashas||[]).find(x=>x.planet===current.mahadasha);
+  const ad=(md?.antardashas||[]).find(x=>x.planet===current.antardasha);
+  const pd=(ad?.pratyantardashas||[]).find(x=>x.planet===current.pratyantardasha);
+  return stripPersonalFields({
+    // Only calculated astrology data is sent to the answer engine.
+    d1:source.d1||null,
+    d9:source.d9||null,
+    vargas:source.vargas||{},
+    relationships:source.relationships||{},
+    specialLagnas:source.specialLagnas||{},
+    kharaPoints:source.kharaPoints||{},
+    argala:source.argala||null,
+    drishti:source.drishti||null,
+    gochar:source.gochar||source.transits||null,
+    dasha:{
+      birthMoon:d.birthMoon||{},
+      startingMahadasha:d.startingMahadasha||null,
+      balanceAtBirthYears:d.balanceAtBirthYears||null,
+      current,
+      currentMahadasha:md?{planet:md.planet,start:md.start,end:md.end}:null,
+      currentAntardasha:ad?{planet:ad.planet,start:ad.start,end:ad.end}:null,
+      currentPratyantardasha:pd?{planet:pd.planet,start:pd.start,end:pd.end}:null,
+      currentMahadashaAntardashas:(md?.antardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end})),
+      currentAntardashaPratyantardashas:(ad?.pratyantardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end}))
+    },
+    taraChart:source.taraChart||[],
+    currentTaraBala:source.currentTaraBala||null
+  });
+}
+
+module.exports=async function(req,res,env={}){
+  if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
+  try{
+    const body=req.body||{};
+    const question=body.question||body.content;
+    if(typeof question!=="string"||!question.trim())return res.status(400).json({success:false,message:"कृपया अपना प्रश्न लिखें।"});
+    if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
+    const forwarded=req.headers?.["x-forwarded-for"]||req.headers?.["x-real-ip"]||req.socket?.remoteAddress||"anonymous";
+    const clientKey=String(forwarded).split(",")[0].trim().slice(0,100)||"anonymous";
+    const now=Date.now(),last=recentRequests.get(clientKey)||0;
+    if(now-last<3000)return res.status(429).json({success:false,message:"अगला प्रश्न भेजने से पहले कुछ सेकंड रुकें।"});
+    recentRequests.set(clientKey,now);
+    if(recentRequests.size>5000){for(const [key,time] of recentRequests){if(now-time>60000)recentRequests.delete(key);}}
+    const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
+    const chartContext=compactChartContext(liveChartContext);
+    const history=Array.isArray(body.conversationHistory)?body.conversationHistory.slice(-10):[];
+    const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
+    const language=supportedLanguages.has(body.language)?body.language:"en";
+    const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:env.GEMINI_API_KEY,model:env.GEMINI_MODEL});
+    return res.status(200).json({success:true,answer});
+  }catch(error){
+    console.error("Consultation API error:",error.message);
+    return res.status(503).json({success:false,message:"परामर्श सेवा अभी कॉन्फ़िगर नहीं है। कृपया बाद में प्रयास करें।"});
   }
 };
