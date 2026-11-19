@@ -5,8 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#17112b">
   <title>Astro Bhagya Vidhata | वैदिक ज्योतिष</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    html,body{direction:ltr!important;text-align:left!important}
+
+    /* Urdu and Arabic: RTL text with LTR-safe application navigation/layout */
+    html[lang^="ur"],html[lang^="ar"],html[lang^="ur"] body,html[lang^="ar"] body{direction:rtl;text-align:right;font-family:"Noto Nastaliq Urdu",serif}
+    html[lang^="ur"] header,html[lang^="ar"] header,
+    html[lang^="ur"] .app-header,html[lang^="ar"] .app-header,
+    html[lang^="ur"] .app-page-tabs,html[lang^="ar"] .app-page-tabs,
+    html[lang^="ur"] .chart-view-toolbar,html[lang^="ar"] .chart-view-toolbar,
+    html[lang^="ur"] .calculation-tabs,html[lang^="ar"] .calculation-tabs,
+    html[lang^="ur"] .language-picker,html[lang^="ar"] .language-picker,
+    html[lang^="ur"] .support-actions,html[lang^="ar"] .support-actions,
+    html[lang^="ur"] .support-topics,html[lang^="ar"] .support-topics,
+    html[lang^="ur"] .dasha-current-grid,html[lang^="ar"] .dasha-current-grid,
+    html[lang^="ur"] .chat-actions,html[lang^="ar"] .chat-actions{direction:ltr;overflow-x:hidden}
+    html[lang^="ur"] input,html[lang^="ur"] textarea,html[lang^="ur"] select,
+    html[lang^="ar"] input,html[lang^="ar"] textarea,html[lang^="ar"] select{direction:rtl;text-align:right;font-family:"Noto Nastaliq Urdu",serif}
+    html[lang^="ur"] button,html[lang^="ar"] button{font-family:"Noto Nastaliq Urdu",serif}
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,sans-serif;background:#100d1c;color:#fff}
     header{background:#211638;border-bottom:1px solid #493568;padding:18px 14px;text-align:center}
@@ -175,7 +193,7 @@
   </style>
 </head>
 <body>
-  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>Vedic Astrology &amp; Personal Birth Chart</p></div><div class="language-picker"><label for="preferredLanguage">Language</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div></header>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>Vedic Astrology &amp; Personal Birth Chart</p></div><div class="language-picker notranslate"><label for="preferredLanguage">Language</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div></header>
   
   <main>
     <nav id="appPageTabs" class="app-page-tabs" aria-label="ऐप के पेज">
