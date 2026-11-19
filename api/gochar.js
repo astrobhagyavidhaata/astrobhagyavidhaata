@@ -15,7 +15,7 @@ function dms(value) {
   const degrees=Math.floor(totalSeconds/3600);
   const minutes=Math.floor((totalSeconds%3600)/60);
   const seconds=totalSeconds%60;
-  return {degrees,minutes,seconds,text:degrees+"° "+minutes+"' "+seconds+'" "'};
+  return {degrees,minutes,seconds,text:degrees+"° "+minutes+"' "+seconds+'"'};
 }
 function getState(name, planet, sunLongitude) {
   const distance=angularDistance(planet.longitude,sunLongitude);
