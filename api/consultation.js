@@ -75,7 +75,7 @@ function compactChartContext(source){
   });
 }
 
-module.exports=async function(req,res){
+module.exports=async function(req,res,env={}){
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
   try{
     const body=req.body||{};
@@ -94,7 +94,7 @@ module.exports=async function(req,res){
     const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
     const language=supportedLanguages.has(body.language)?body.language:"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language});
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:env.GEMINI_API_KEY});
     return res.status(200).json({success:true,answer});
   }catch(error){
     console.error("Consultation API error:",error.message);
