@@ -98,7 +98,7 @@
     const ascendantIndex=Number(chart.d1.ascendant.rashiIndex);
     const summary=$("chartBirthSummary")||document.createElement("p");
     summary.id="chartBirthSummary";summary.className="chart-birth-summary";
-    summary.textContent="जन्म लग्न: "+(Number.isInteger(ascendantIndex)?signs[ascendantIndex]:"—")+" | चंद्र राशि: "+(Number.isInteger(moonAsc)?signs[moonAsc]:"—");
+    summary.textContent=chartLocale().labels[0]+": "+(Number.isInteger(ascendantIndex)?signs[ascendantIndex]:"—")+" | "+chartLocale().labels[1]+": "+(Number.isInteger(moonAsc)?signs[moonAsc]:"—");
     if(host.parentNode)host.parentNode.insertBefore(summary,host);
     const moonPlanets=Object.fromEntries(Object.entries(chart.d1.planets||{}).map(([name,p])=>[name,{...p,house:((Number(p.rashiIndex)-moonAsc+12)%12)+1}]));
     const specs=[
@@ -156,9 +156,8 @@
         const rashiLord=Number.isInteger(rashiIndex)&&rashiIndex>=0&&rashiIndex<12?rashiLords[rashiIndex]:"—";
         const nakshatraIndex=Number(p.nakshatraIndex);
         const nakshatraLord=Number.isInteger(nakshatraIndex)&&nakshatraIndex>=0&&nakshatraIndex<27?nakshatraLords[nakshatraIndex%9]:"—";
-        const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};
-        const planetText=(selectedChartLanguage()==="hi"?(hindiPlanets[planet]||planet):planet)+(p.retrograde?" ℞":"");
-        const values=[planetText,localizeChartText(p.rashi||signs[p.rashiIndex]||"—"),rashiLord,houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
+        const planetText=localizeChartText(planet)+(p.retrograde?" ℞":"");
+        const values=[planetText,localizeChartText(p.rashi||signs[p.rashiIndex]||"—"),localizeChartText(rashiLord),houseText,degreeText,localizeChartText(p.nakshatra||"—"),padaText,localizeChartText(nakshatraLord)];
         const tr=document.createElement("tr");
         values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});
         tbody.appendChild(tr);
@@ -753,6 +752,12 @@
     }
 
     form.addEventListener("submit", handleSubmit);
+    const languagePicker=$("preferredLanguage");
+    if(languagePicker)languagePicker.addEventListener("change",()=>{
+      document.documentElement.lang=languagePicker.value;
+      const chart=window.AstroKundli;
+      if(chart){renderMainKundliChart(chart);renderVargaCharts(chart);renderAstrologyCalculations(chart);}
+    });
     const placeInput = $("birthPlace");
     if (placeInput) {
       placeInput.addEventListener("input", () => {
