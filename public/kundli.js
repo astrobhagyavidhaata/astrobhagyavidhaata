@@ -556,6 +556,31 @@
     box.append(heading, select, button);
   }
 
+  const SAVED_KUNDALIS_KEY = "saved_kundalis";
+
+  function saveKundliLocally(chart, details, location) {
+    const existing = JSON.parse(localStorage.getItem(SAVED_KUNDALIS_KEY) || "[]");
+    if (!Array.isArray(existing)) throw new Error("सेव की गई कुंडलियों की सूची सही नहीं है।");
+    const id = (window.crypto && typeof window.crypto.randomUUID === "function")
+      ? window.crypto.randomUUID()
+      : "kundli-" + Date.now() + "-" + Math.random().toString(36).slice(2, 9);
+    const record = {
+      id,
+      title: (details.name || "जन्म कुंडली") + " — " + details.date,
+      createdAt: new Date().toISOString(),
+      birthDetails: {
+        name: details.name, localDate: details.date, localTime: details.time,
+        place: [location.name, location.admin1, location.country].filter(Boolean).join(", "),
+        latitude: location.latitude, longitude: location.longitude
+      },
+      chart
+    };
+    existing.unshift(record);
+    localStorage.setItem(SAVED_KUNDALIS_KEY, JSON.stringify(existing));
+    document.dispatchEvent(new CustomEvent("astro:kundli-saved", { detail: record }));
+    return record;
+  }
+
   async function generateKundli(details, location) {
     const payload = {
       name: details.name,
@@ -625,9 +650,18 @@
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
 
-      showMessage((result.message || "Birth chart calculation completed.") + (result.savedKundliId ? " Your birth chart has been saved to your account." : (details.saveToAccount ? " The birth chart could not be saved. Check login and server settings." : "")));
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
-      if (result.savedKundliId && window.loadKundliHistory) window.loadKundliHistory();
+      if (details.saveToAccount) {
+        try {
+          saveKundliLocally(chart, details, location);
+          showMessage("आपकी कुंडली सफलतापूर्वक 'मेरी कुंडलियाँ' में सुरक्षित कर दी गई है!");
+          if (window.loadKundliHistory) window.loadKundliHistory();
+        } catch (saveError) {
+          showMessage("कुंडली बन गई, लेकिन इस ब्राउज़र में सेव नहीं हो सकी। डिवाइस की स्टोरेज खाली करके दोबारा प्रयास करें।", true);
+        }
+      } else {
+        showMessage(result.message || "जन्म कुंडली सफलतापूर्वक तैयार हो गई है।");
+      }
 
     } catch (error) {
       if (error instanceof TypeError) {
