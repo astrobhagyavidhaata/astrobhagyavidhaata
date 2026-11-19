@@ -251,9 +251,10 @@ export default {
         }, { headers: { "Cache-Control": "no-store" } });
       }
 
-      // AI consultation API — pass Worker bindings through unchanged.
+      // Route AI consultation through the shared Gemini handler so chart context,
+      // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        return await runGeminiConsultation(request, bindings);
+        return await runApi(consultationHandler, request, bindings);
       }
 
       // Kundli calculation API
