@@ -5,22 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#17112b">
   <title>Astro Bhagya Vidhata | वैदिक ज्योतिष</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
   <style>
+
+    /* Urdu and Arabic: RTL text with LTR-safe application navigation/layout */
+    html[lang^="ur"],html[lang^="ar"],html[lang^="ur"] body,html[lang^="ar"] body{direction:rtl;text-align:right;font-family:"Noto Nastaliq Urdu",serif}
+    html[lang^="ur"] header,html[lang^="ar"] header,
+    html[lang^="ur"] .app-header,html[lang^="ar"] .app-header,
+    html[lang^="ur"] .app-page-tabs,html[lang^="ar"] .app-page-tabs,
+    html[lang^="ur"] .chart-view-toolbar,html[lang^="ar"] .chart-view-toolbar,
+    html[lang^="ur"] .calculation-tabs,html[lang^="ar"] .calculation-tabs,
+    html[lang^="ur"] .language-picker,html[lang^="ar"] .language-picker,
+    html[lang^="ur"] .support-actions,html[lang^="ar"] .support-actions,
+    html[lang^="ur"] .support-topics,html[lang^="ar"] .support-topics,
+    html[lang^="ur"] .dasha-current-grid,html[lang^="ar"] .dasha-current-grid,
+    html[lang^="ur"] .chat-actions,html[lang^="ar"] .chat-actions{direction:ltr;overflow-x:hidden}
+    html[lang^="ur"] input,html[lang^="ur"] textarea,html[lang^="ur"] select,
+    html[lang^="ar"] input,html[lang^="ar"] textarea,html[lang^="ar"] select{direction:rtl;text-align:right;font-family:"Noto Nastaliq Urdu",serif}
+    html[lang^="ur"] button,html[lang^="ar"] button{font-family:"Noto Nastaliq Urdu",serif}
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,sans-serif;background:#100d1c;color:#fff}
     header{background:#211638;border-bottom:1px solid #493568;padding:18px 14px;text-align:center}
     header h1{color:#f5c66b;margin:0;font-size:24px}
     .app-header{position:relative;display:flex;align-items:center;justify-content:center;min-height:86px;padding:14px 56px}
     .header-title{text-align:center}
-    .header-menu{position:absolute;right:12px;top:12px}
-    .header-menu>button{width:42px;height:42px;margin:0;padding:0;border:1px solid #70558e;border-radius:10px;background:#2c2140;color:#f5d994;font-size:28px;line-height:1}
-    .header-menu-panel{position:absolute;right:0;top:49px;width:min(290px,calc(100vw - 24px));z-index:500;background:#181326;border:1px solid #70558e;border-radius:12px;padding:10px;box-shadow:0 12px 28px rgba(0,0,0,.45)}
-    .header-menu-panel[hidden]{display:none}
-    #menuChartFolderHost .app-folder{margin:0}
-    #menuChartFolderHost .app-folder>summary{list-style:none}
-    #menuChartFolderHost .app-folder>summary::-webkit-details-marker{display:none}
-    #menuChartFolderHost .app-folder>summary:before{content:"▸ ";color:#f5c66b}
-    #menuChartFolderHost .app-folder[open]>summary:before{content:"▾ "}
+
     header p{color:#d4c9e5;margin:8px 0 0;font-size:14px}
     .wallet-bar{max-width:650px;margin:14px auto 0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
     .wallet{background:#2c2140;border:1px solid #70558e;border-radius:10px;padding:11px 14px;color:#f5c66b;font-weight:bold}
@@ -44,9 +55,9 @@
     .chart-view-btn{flex:0 0 auto;width:auto;margin:0;padding:10px 13px;border:1px solid #70558e;border-radius:9px;background:#302342;color:#f5d994;font-size:13px}
     .chart-view-btn.active{background:#e8b957;color:#211638;border-color:#e8b957}
     .chart-cards{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 1px 12px;-webkit-overflow-scrolling:touch}
-    .chart-card{flex:0 0 min(78vw,290px);min-width:240px;scroll-snap-align:start;border:1px solid #70558e;border-radius:12px;padding:10px;background:#181326;overflow:hidden}
+    .chart-card{flex:0 0 min(88vw,400px);min-width:min(88vw,320px);scroll-snap-align:start;border:1px solid #70558e;border-radius:12px;padding:10px;background:#181326;overflow:hidden}
     .chart-card h3{margin:2px 0 8px;text-align:center;font-size:15px}
-    .chart-card svg{display:block;width:100%;height:auto;background:#fffaf0;border-radius:7px}
+    .chart-card svg{display:block;width:100%;max-width:400px;height:auto;aspect-ratio:1/1;margin:10px auto;background:#fffaf0;border-radius:7px}\n    #vargaCharts .chart-card{display:block;width:100%;max-width:440px;min-width:0;flex:none;scroll-snap-align:none}\n    #vargaCharts .chart-card>summary{display:block;text-align:center;padding:8px;color:#f5d994}
     .chart-card .chart-asc{margin:8px 0 0;text-align:center;color:#f5d994;font-size:12px}
     .nakshatra-panel{overflow-x:auto;margin:8px 0 12px;border:1px solid #70558e;border-radius:10px;padding:9px;background:#181326}
     .nakshatra-panel table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
@@ -57,6 +68,49 @@
     .chart-item>summary{cursor:pointer;color:#f5d994;font-weight:bold;list-style-position:inside}
     .chart-item[open]>summary{margin-bottom:10px}
     .chat-info{color:#d4c9e5;font-size:14px;line-height:1.6}
+
+    .kundli-detail-deck{margin-top:16px}
+    .calculation-tabs{display:flex;gap:7px;overflow-x:auto;white-space:nowrap;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding:8px 2px 12px;border-bottom:1px solid #66547f;position:sticky;top:0;background:#100d1c;z-index:20}
+    .calculation-tabs button{flex:0 0 auto;width:auto;margin:0;padding:11px 15px;border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:#d4c9e5;font-size:14px}
+    .calculation-tabs button[aria-selected="true"]{color:#f5c66b;border-bottom-color:#f5c66b}
+    .calculation-page{display:none;margin:14px 0;border:1px solid #66547f;border-radius:12px;padding:14px;background:#181326}
+    .calculation-page.active{display:block}
+    .calculation-page h3{margin:0 0 12px}
+
+
+    .app-page-tabs{display:flex;gap:7px;overflow-x:auto;white-space:nowrap;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding:8px 2px 12px;margin:0 0 14px;border-bottom:1px solid #66547f;position:sticky;top:0;background:#100d1c;z-index:30}
+    .app-page-tabs button{flex:0 0 auto;width:auto;margin:0;padding:11px 15px;border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:#d4c9e5;font-size:14px}
+    .app-page-tabs button[aria-selected="true"]{color:#f5c66b;border-bottom-color:#f5c66b}
+    .app-page-panel{display:none}
+    .app-page-panel.active{display:block}
+    .dasha-current-card{margin:12px 0;padding:13px;border:1px solid #8a6b37;border-radius:12px;background:linear-gradient(135deg,#30243b,#1b1728)}
+    .dasha-current-card h4{margin:0 0 10px;color:#f5d994}
+    .dasha-current-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .dasha-current-item{min-width:0;padding:10px 7px;border-radius:9px;background:#211a32;text-align:center}
+    .dasha-current-item strong,.dasha-current-item span,.dasha-current-item small{display:block}
+    .dasha-current-item strong{font-size:12px;color:#c8b8df}
+    .dasha-current-item span{font-size:17px;font-weight:700;color:#f5c66b;margin:5px 0}
+    .dasha-current-item small{font-size:10px;color:#d4c9e5;line-height:1.4}
+    .dasha-period,.dasha-subperiod{margin:8px 0;border:1px solid #59476f;border-radius:9px;background:#211a32}
+    .dasha-period>summary,.dasha-subperiod>summary{padding:11px;color:#f5d994;font-weight:600;cursor:pointer;line-height:1.5}
+    .dasha-subperiod-list{padding:0 9px 9px}
+    .dasha-date-table{width:100%;border-collapse:collapse;font-size:12px}
+    .dasha-date-table th,.dasha-date-table td{padding:8px 5px;border-bottom:1px solid #493568;text-align:left}
+    .dasha-date-table th{color:#f5c66b}
+    .dasha-active-row{background:#49351d;color:#ffe3a3;font-weight:700}
+    .calculation-tabs{position:sticky;top:0;z-index:20}
+    #kundliDetailDeck{scroll-margin-top:12px}
+    @media(max-width:380px){.dasha-current-grid{grid-template-columns:1fr}.dasha-current-item{display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:left}.dasha-current-item small{grid-column:1/-1}}
+
+    #kundliChartsFolder{margin-top:16px}
+.varga-tabs{margin:8px 0 12px}
+    .varga-pages{min-width:0}
+    .varga-page{display:none;width:100%;max-width:100%;min-width:0;flex:none;scroll-snap-align:none}
+    .varga-page.active{display:block}
+    .varga-page h4{margin:2px 0 8px;text-align:center;color:#f5c66b}
+    .varga-page svg{max-width:min(100%,420px)}
+    @media(max-width:420px){.calculation-tabs button{padding:10px 12px;font-size:13px}}
+
     .modal{display:none;position:fixed;left:0;right:0;top:var(--chat-vtop,0px);height:calc(var(--chat-vh,100dvh) - var(--chat-lift,0px));z-index:1000;background:rgba(0,0,0,.82);padding:10px;overflow:hidden;box-sizing:border-box}
     .modal.keyboard-lift{--chat-lift:120px}
     .modal-box{display:flex;flex-direction:column;width:100%;max-width:520px;height:100%;max-height:100%;min-height:0;margin:0 auto;padding:12px;border-radius:14px;background:#211a32;border:1px solid #70558e;box-sizing:border-box;overflow:hidden}
@@ -89,102 +143,132 @@
     .support-topics a{display:block;text-align:center;text-decoration:none;padding:11px 8px;border:1px solid #66547f;border-radius:8px;color:#f5d994;font-size:13px}
     @media(max-width:360px){.support-actions,.support-topics{grid-template-columns:1fr}}
     footer{text-align:center;padding:20px 14px;color:#a99bbd;font-size:12px;line-height:1.7}
-    .language-picker{display:flex;align-items:center;gap:8px;margin:8px 0}.language-picker label{color:#f5c66b;font-size:13px}.language-picker select{max-width:190px;padding:8px 10px;border:1px solid #806b9b;border-radius:8px;background:#151020;color:#fff;font-size:14px}
+
+    .ai-astrologer{margin:22px 0 10px;padding:16px;border:1px solid #f0c7a8;border-radius:12px;background:#fffaf6}
+    .ai-astrologer h2{margin-top:0;color:#dc5705!important}
+    .ai-chat-messages{max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin:12px 0}
+    .ai-chat-message{padding:10px 12px;border-radius:10px;white-space:pre-wrap;line-height:1.55}
+    .ai-chat-message.user{background:#fff0e5;align-self:flex-end;max-width:92%}
+    .ai-chat-message.assistant{background:#f2f2f2;align-self:stretch}
+    #aiAstrologerQuestion{width:100%;box-sizing:border-box;margin:8px 0}
+    #aiAstrologerStatus{min-height:1.3em;font-size:13px;color:#666}
+.language-picker{display:flex;align-items:center;gap:8px;margin:8px 0}.language-picker label{color:#f5c66b;font-size:13px}.language-picker select{min-width:115px;max-width:190px;padding:6px 10px;border:1px solid #806b9b;border-radius:8px;background:#151020;color:#fff;font-size:14px}
     @media(max-width:420px){header h1{font-size:21px}.panel{padding:15px}#chatMessages{height:300px}}
-      .goog-te-banner-frame.skiptranslate, .skiptranslate > iframe, #goog-gt-tt, .goog-te-balloon-frame, .goog-tooltip {
+
+    :root{color-scheme:light;--app-orange:#f36b12;--app-orange-dark:#dc5705;--app-ink:#252525;--app-muted:#666;--app-line:#dedede;--app-soft:#f4f4f4}
+    body{background:#fff!important;color:var(--app-ink)!important;overflow-x:hidden}
+    header,.app-header{background:#fff!important;color:var(--app-ink)!important;border-bottom:1px solid var(--app-line)!important;box-shadow:0 2px 7px rgba(0,0,0,.06)}
+    header h1,h2,h3,.app-header h1{color:var(--app-orange-dark)!important}
+    header p,.chat-info,label{color:var(--app-muted)!important}
+    .wallet-bar{background:#fff}
+    .wallet{background:#fff4eb!important;border:1px solid #f3b17e!important;color:var(--app-orange-dark)!important}
+    button,.support-link{background:var(--app-orange)!important;color:#fff!important;border-radius:8px!important}
+    button.secondary{background:#777!important;color:#fff!important}
+    input,select,textarea{background:#fff!important;color:#222!important;border:1px solid #cfcfcf!important}
+    main{max-width:none;width:100%;margin:0 auto;padding:0 0 12px!important}
+    .app-page-tabs{position:relative!important;top:auto!important;display:flex;gap:0;overflow-x:auto;white-space:nowrap;background:#fff!important;border-bottom:1px solid var(--app-line)!important;padding:0 8px!important;margin:0!important;scrollbar-width:none}
+    .app-page-tabs::-webkit-scrollbar{display:none}
+    .app-page-tabs button{flex:0 0 auto!important;width:auto!important;margin:0!important;padding:15px 16px!important;background:#fff!important;color:#777!important;border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;font-size:14px!important}
+    .app-page-tabs button[aria-current="page"]{color:var(--app-orange-dark)!important;border-bottom-color:var(--app-orange)!important}
+    .app-swipe-deck{display:flex;width:100%;height:calc(100dvh - 210px);min-height:480px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none}
+    .app-swipe-deck::-webkit-scrollbar{display:none}
+    .app-page-panel{display:block!important;visibility:visible!important;flex:0 0 100%;width:100%;height:100%;min-width:100%;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start;scroll-snap-stop:always;margin:0!important;padding:22px 18px 28px!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
+    .app-page-panel h2{font-size:21px;color:var(--app-orange-dark)!important;border-bottom:1px solid #f2d0b8;padding-bottom:12px}
+    .app-folder,.chart-card,.chart-item,.calculation-page,.dasha-period,.dasha-subperiod,.dasha-current-card,.nakshatra-panel{background:#fff!important;color:#252525!important;border:1px solid #e2e2e2!important;border-radius:8px!important;box-shadow:none!important}
+    .chart-card svg{background:#fffaf0!important}
+    .calculation-tabs,.chart-view-toolbar{background:#fff!important;border-color:#e4e4e4!important}
+    .calculation-tabs button,.chart-view-btn{background:#fff!important;color:#555!important;border:1px solid #ddd!important}
+    .calculation-tabs button[aria-selected="true"],.chart-view-btn.active{background:#fff0e5!important;color:var(--app-orange-dark)!important;border-bottom-color:var(--app-orange)!important}
+    .dasha-current-item{background:#fff4eb!important;color:#333!important}
+    .dasha-current-item strong,.dasha-current-item span,.dasha-current-item small{color:#333!important}
+    .dasha-period>summary,.dasha-subperiod>summary,.app-folder>summary,.chart-item>summary{color:var(--app-orange-dark)!important}
+    .dasha-date-table th,.nakshatra-panel th{color:var(--app-orange-dark)!important}
+    .dasha-date-table th,.dasha-date-table td,.nakshatra-panel th,.nakshatra-panel td{border-color:#e5e5e5!important}
+    #message,#walletMessage,#panchangMessage{background:#fff4eb!important;color:#333!important}
+    #chatMessages{background:#f7f7f7!important;color:#222!important}
+    .msg-bot{background:#fff0e5!important;color:#222!important}.msg-user{background:#f0f0f0!important;color:#222!important}
+    footer{background:#fff!important;color:#777!important}
+    @media(max-width:600px){.app-swipe-deck{height:calc(100dvh - 195px);min-height:430px}.app-page-panel{padding:18px 14px 24px!important}.app-page-tabs button{padding:14px 13px!important}}
+
+  
+    .gochar-chart-wrap,.gochar-table-wrap{margin:16px 0;padding:12px;border:1px solid #e5e5e5;border-radius:10px;background:#fff}
+    .gochar-chart-wrap h3,.gochar-table-wrap h3{margin:4px 0 12px;color:#dc5705;text-align:center}
+    .gochar-chart-wrap{overflow:visible}
+    .gochar-chart-wrap svg{display:block;width:100%;max-width:380px;height:auto;margin:0 auto;background:#fffaf2;border-radius:8px;overflow:visible}
+    .gochar-chart-wrap p,.gochar-meta,.gochar-note{font-size:12px;line-height:1.7;color:#666;overflow-wrap:anywhere}
+    .gochar-table-scroll{width:100%;max-width:100%;overflow-x:hidden}
+    .gochar-table{table-layout:fixed;width:100%;border-collapse:collapse;font-size:13px;color:#292929;word-wrap:break-word}
+    .gochar-table th,.gochar-table td{padding:8px 4px;border-bottom:1px solid #e6e6e6;text-align:left;white-space:normal;overflow-wrap:anywhere;word-break:break-word;vertical-align:top}
+    .gochar-table th{background:#fff3e9;color:#a94408}
+    .nature-good{color:#16834a;font-weight:700}.nature-bad{color:#b42318;font-weight:700}.nature-mixed{color:#9a6700;font-weight:700}
+    .gochar-ai-panel{margin:18px 0;padding:15px;border:1px solid #f0c7a8;border-radius:12px;background:#fff8f2}
+    .gochar-ai-panel h2{font-size:18px;color:#dc5705}
+    .gochar-ai-output{margin-top:12px;padding:12px;border-radius:9px;background:#fff;color:#252525;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+    .gochar-ai-panel[hidden]{display:none}
+
+    /* Hide Google Translate banner, tooltip and translation-rating popup */
+    .goog-te-banner-frame.skiptranslate,
+    .goog-te-balloon-frame,
+    #goog-gt-tt,
+    .goog-tooltip,
+    .goog-tooltip:hover {
       display: none !important;
       visibility: hidden !important;
     }
-    body { top: 0px !important; position: static !important; }
-  
-/* Saffron-white theme */
-:root{color-scheme:light}body{background:#f2f4f8!important;color:#252525!important;padding-bottom:28px}
-header{background:#fff!important;border-bottom:3px solid #e67e22!important;box-shadow:0 2px 9px rgba(0,0,0,.08)}
-.header-title h1,header h1{color:#d35400!important}header p{color:#5b5148!important}
-.header-menu>button{background:#fff7ed!important;color:#9a4300!important;border-color:#e7a15b!important}
-.header-menu-panel{background:#fff!important;border-color:#e7a15b!important}
-.app-folder{background:#fffaf3!important;border-color:#e7a15b!important}.app-folder>summary,.legal-details summary{color:#9a4300!important}
-main{max-width:760px}.panel{background:#fff!important;color:#252525!important;border:1px solid #ead7c4!important;border-radius:14px!important;box-shadow:0 3px 12px rgba(74,45,20,.08)!important}
-h2,h3{color:#9a4300!important}label{color:#4b4038!important}input,select,textarea{background:#fff!important;color:#222!important;border-color:#d8c5b2!important}
-button{background:#e67e22!important;color:#fff!important}button.secondary,.secondary{background:#1a1a2e!important;color:#fff!important}
-.chart-view-btn{background:#fff1df!important;color:#8c3c00!important;border-color:#e7a15b!important}.chart-view-btn.active{background:#d35400!important;color:#fff!important}
-.chart-card,.nakshatra-panel,.chart-item{background:#fffaf3!important;border-color:#e7a15b!important;color:#222!important}
-.chart-card .chart-asc,.chart-item>summary{color:#8c3c00!important}.nakshatra-panel th,#panchangOutput th{color:#9a4300!important}
-.chat-info,.support-note{color:#5b5148!important}#message,#walletMessage,#panchangMessage{background:#fff7ed!important;color:#8c3c00!important;border:1px solid #efc18f}
-.modal{background:rgba(25,18,12,.62)!important}.modal-box{background:#fff!important;border-color:#e7a15b!important;color:#222!important}
-#chatMessages{background:#fffaf3!important;border-color:#e4cdb7!important}.msg-bot{background:#fff0dc!important;color:#30251d}.msg-user{background:#e8f8f2!important;color:#193b31}
-#consultationBillingStatus{display:none!important}.support-link{background:#d35400!important;color:#fff!important}.support-link.whatsapp{background:#1f8f5f!important}
-.support-topics a{color:#9a4300!important;border-color:#e7a15b!important}.legal-details{background:#fffaf3!important;border-color:#e7a15b!important}
-footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.language-picker select{background:#fff!important;color:#222!important;border-color:#e7a15b!important}
-.wallet-bar,#guestLoginPanel{display:none!important}
-.main-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:760px;margin:14px auto 0;padding:0 14px}
-.main-tabs button{margin:0;padding:11px 5px;background:#fff!important;color:#8c3c00!important;border:1px solid #e7a15b;border-radius:10px;font-size:13px;line-height:1.25}
-.main-tabs button.active{background:#d35400!important;color:#fff!important;border-color:#d35400}.tab-panel[hidden]{display:none!important}
-@media(max-width:420px){.main-tabs{gap:5px}.main-tabs button{font-size:11px;padding:10px 3px}}
-</style>
+    .goog-text-highlight {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+    body { top: 0px !important; }
+    #ai-response-box { user-select:text; }
+    #message.message-success{background:#eaf7ef!important;color:#16834a!important;border:1px solid #b7e4c7!important}
+  </style>
 </head>
 <body>
-  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत कुंडली परामर्श</p></div><div class="language-picker"><label for="preferredLanguage">Language / भाषा</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिंदी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div><div class="header-menu"><button type="button" id="appMenuButton" aria-label="ऐप मेन्यू" aria-expanded="false" aria-controls="appMenuPanel">⋮</button><div id="appMenuPanel" class="header-menu-panel" hidden><div id="menuChartFolderHost"><details class="app-folder" id="jyotishCalculationsFolder"><summary>📁 ज्योतिषीय गणनाएँ</summary><div id="jyotishCalculations"><p class="chat-info">पहले जन्म विवरण भरकर कुंडली बनाएँ। उसके बाद नवतारा, दशा और उपलब्ध गणनाएँ यहाँ खुलेंगी।</p></div></details></div></div></div></header>
-  <div class="wallet-bar"><div class="wallet">वॉलेट: ₹<span id="bal">0.00</span></div><button type="button" onclick="addMoney(100)">₹100 रिचार्ज</button></div>
-  <script>
-    (function(){
-      const picker=document.getElementById("preferredLanguage");
-      if(!picker)return;
-      const supported=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt-BR","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
-      let saved="en";
-      try{saved=localStorage.getItem("astro_language")||"en";}catch(_){}
-      picker.value=supported.has(saved)?saved:"en";
-      picker.addEventListener("change",()=>{
-        try{localStorage.setItem("astro_language",picker.value);}catch(_){}
-        document.documentElement.lang=picker.value;
-        const notice=document.getElementById("languageNotice");
-        if(notice)notice.textContent="Prediction language: "+picker.options[picker.selectedIndex].text;
-      });
-      document.documentElement.lang=picker.value;
-    })();
-  </script>
-<nav class="main-tabs" role="tablist" aria-label="मुख्य ज्योतिष अनुभाग">
-<button type="button" class="active" role="tab" aria-selected="true" data-tab="kundliTabPanel">जन्म कुंडली</button>
-<button type="button" role="tab" aria-selected="false" data-tab="savedTabPanel">मेरी कुंडलियाँ</button>
-<button type="button" role="tab" aria-selected="false" data-tab="panchangTabPanel">पंचांग</button>
-<button type="button" role="tab" aria-selected="false" data-tab="gocharTabPanel">गोचर</button></nav>
-<script>document.addEventListener("DOMContentLoaded",function(){const tabs=[...document.querySelectorAll(".main-tabs [data-tab]")],ids=["kundliTabPanel","savedTabPanel","panchangTabPanel","gocharTabPanel"];function activate(id){ids.forEach(x=>{const p=document.getElementById(x);if(p)p.hidden=x!==id;});tabs.forEach(t=>{const a=t.dataset.tab===id;t.classList.toggle("active",a);t.setAttribute("aria-selected",String(a));});}tabs.forEach(t=>t.addEventListener("click",()=>activate(t.dataset.tab)));activate("kundliTabPanel");const ai=document.getElementById("aiConsultationPanel"),birth=document.getElementById("kundliTabPanel");if(ai&&birth)birth.appendChild(ai);},{once:true});</script>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>Vedic Astrology &amp; Personal Birth Chart</p></div><div class="language-picker notranslate"><label for="preferredLanguage">Language</label><select id="preferredLanguage" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div></header>
+  
   <main>
-    <section class="panel" id="guestLoginPanel" hidden>
-      <h2>👤 गेस्ट लॉगिन</h2>
-      <p id="loginState" class="chat-info">गेस्ट अकाउंट की स्थिति जाँची जा रही है…</p>
-      <div id="guestConsentWrap">
-        <label style="display:flex;align-items:flex-start;gap:9px;line-height:1.6">
-          <input id="guestConsent" type="checkbox" style="width:auto;flex:0 0 auto;margin-top:4px">
-          <span>मैं <a href="/TERMS.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Terms &amp; Conditions</a> और <a href="/PRIVACY.md" target="_blank" rel="noopener noreferrer" style="color:#f5c66b">Privacy Policy</a> से सहमत हूँ।</span>
-        </label>
-      </div>
-      <button id="guestContinueButton" type="button">बिना OTP जारी रखें</button>
-      <div id="authMessage" role="status" aria-live="polite"></div>
-    </section>
-    <section class="panel tab-panel" id="kundliTabPanel">
+    <nav id="appPageTabs" class="app-page-tabs" aria-label="ऐप के पेज">
+      <button type="button" data-app-tab="kundli">जन्म कुंडली</button>
+      <button type="button" data-app-tab="saved">मेरी कुंडलियाँ</button>
+      <button type="button" data-app-tab="panchang">पंचांग</button>
+      <button type="button" data-app-tab="gochar">गोचर</button>
+      <button type="button" data-app-tab="help">सहायता</button>
+    </nav>
+    <div id="appSwipeDeck" class="app-swipe-deck">
+    <section class="panel app-page-panel" data-app-page="kundli">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
-        <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="dob">जन्म तारीख</label><input id="dob" name="dob" type="date" required>
+        <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="birthTime">जन्म समय</label><input id="birthTime" name="birthTime" type="time" required>
         <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
-        <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली मेरे लॉगिन खाते में सुरक्षित करें</label>
+        <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली इस ब्राउज़र में सुरक्षित करें</label>
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">AI ज्योतिष सहायक से बात करें</button></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><p class="chat-info">हर वर्ग कुंडली को अलग पेज में देखने के लिए टैब को साइड में स्लाइड करें।</p><div id="vargaCharts"></div></section></div><div id="kTxt" aria-hidden="true"></div></div>
+      <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
+        <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
+        <p class="chat-info">अपनी जन्म कुंडली के आधार पर AI ज्योतिषी से सीधे सवाल पूछें। सवाल पूछने के लिए लॉगिन या सक्रिय सत्र की आवश्यकता नहीं है।</p>
+        <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
+        <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
+        <textarea id="aiAstrologerQuestion" rows="3" maxlength="4000" placeholder="उदाहरण: मेरी नौकरी और करियर के योग कैसे हैं?"></textarea>
+        <button id="aiAstrologerSend" type="button">सवाल भेजें</button>
+        <p id="aiAstrologerStatus" role="status" aria-live="polite"></p>
+      </section>
+</div>
     </section>
 
-    <section class="panel tab-panel" id="savedTabPanel" hidden>
+    <section class="panel app-page-panel" data-app-page="saved">
       <h2>📚 मेरी सुरक्षित कुंडलियाँ</h2>
-      <p class="chat-info">केवल वे कुंडलियाँ दिखेंगी जिन्हें बनाते समय आपने खाते में सुरक्षित करने की अनुमति दी थी।</p>
+      <p class="chat-info">यहाँ इस ब्राउज़र में सुरक्षित की गई आपकी कुंडलियाँ दिखाई देंगी।</p>
       <button type="button" id="loadKundliHistory" class="secondary">मेरी कुंडलियाँ देखें</button>
       <div id="kundliHistoryList" class="chat-info" aria-live="polite"></div>
       <div id="savedKundliPreview" class="chat-info"></div>
     </section>
 
-    <section class="panel tab-panel" id="panchangTabPanel" hidden>
+    <section class="panel app-page-panel" data-app-page="panchang">
       <h2>📅 दैनिक पंचांग और शुभ-अशुभ काल</h2>
       <p class="chat-info">तिथि, नक्षत्र, योग, करण, सूर्योदय-सूर्यास्त, राहुकाल, यमगण्ड, गुलिक काल, अभिजित और 24 होरा की गणना।</p>
       <form id="panchangForm">
@@ -200,23 +284,24 @@ footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.l
       <div id="panchangOutput" aria-live="polite"></div>
     </section>
 
-    <section class="panel tab-panel" id="gocharTabPanel" hidden>
+    <section class="panel app-page-panel" data-app-page="gochar">
       <h2>🪐 आज का ग्रह गोचर</h2>
-      <label for="rashiSelect">अपनी चंद्र राशि चुनें</label>
+      <p class="chat-info">वर्तमान समय के नौ ग्रहों की राशि, अंश, नक्षत्र, चरण और जन्म लग्न से गोचर भाव।</p>
+      <label for="rashiSelect">जन्म चंद्र राशि (कुंडली बनने पर अपने-आप भरेगी)</label>
       <select id="rashiSelect">
         <option value="मेष">मेष</option><option value="वृषभ">वृषभ</option><option value="मिथुन">मिथुन</option><option value="कर्क">कर्क</option><option value="सिंह">सिंह</option><option value="कन्या">कन्या</option><option value="तुला">तुला</option><option value="वृश्चिक">वृश्चिक</option><option value="धनु">धनु</option><option value="मकर">मकर</option><option value="कुंभ">कुंभ</option><option value="मीन">मीन</option>
       </select>
       <div id="rashiGocharOut" class="chat-info" aria-live="polite"></div>
+      <section id="gocharAiPanel" class="gochar-ai-panel" hidden>
+        <h2>आज के गोचर का आपके जीवन पर प्रभाव (AI विश्लेषण)</h2>
+        <p class="chat-info">Gemini को केवल ग्रहों की गोचर स्थिति और जन्म लग्न/चंद्र राशि भेजी जाएगी; आपका नाम या निजी पहचान नहीं भेजी जाएगी।</p>
+        <button type="button" id="gocharAiButton">आज के गोचर का विश्लेषण करें</button>
+        <div id="gocharAiOutput" class="gochar-ai-output" role="status" aria-live="polite"></div>
+      </section>
     </section>
 
-    <section class="panel" id="aiConsultationPanel">
-      <h2>💬 AI ज्योतिष परामर्श</h2>
-      <p class="chat-info">कुंडली के साथ या बिना कुंडली के, सीधे AI वैदिक ज्योतिष सहायक से अपना प्रश्न पूछें।</p>
-      <button type="button" onclick="openChatBox('AI वैदिक ज्योतिष सहायक',5)">चैट शुरू करें</button>
-      <div id="walletMessage" role="status" aria-live="polite"></div>
-    </section>
 
-    <section class="panel" id="customerCare"><details class="app-folder" id="customerCareFolder"><summary>📁 Customer Care / Help Centre</summary>
+    <section class="panel app-page-panel" data-app-page="help" id="customerCare"><details class="app-folder" id="customerCareFolder"><summary>📁 Customer Care / Help Centre</summary>
       <p class="support-note">Contact us for payment deductions, wallet balance, login, birth chart, chat, or any app-related issue. You can also share your suggestions.</p>
       <p class="support-note"><strong>Support:</strong> <a href="tel:8208091073" style="color:#f5c66b;text-decoration:none">8208091073</a> (Call and WhatsApp)</p>
       <p class="support-note"><strong>Email:</strong> <a href="mailto:amitdiksha975695@gmail.com" style="color:#f5c66b;text-decoration:none">amitdiksha975695@gmail.com</a></p>
@@ -253,88 +338,30 @@ footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.l
     </section>
 
 
+    </div>
   </main>
-  <div id="chatModal" class="modal"><div class="modal-box">
-    <div class="modal-head"><h2 id="chatTitle">AI वैदिक ज्योतिष परामर्श</h2><button type="button" class="close-button" onclick="closeChatBox()">बंद करें</button></div>
-    <p id="consultationBillingStatus" class="chat-info" hidden></p>
-    <div id="chatMessages" aria-live="polite"></div>
-    <label for="userMsgInput">अपना प्रश्न लिखें</label><textarea id="userMsgInput" placeholder="अपना ज्योतिष संबंधी प्रश्न लिखें..." maxlength="4000" rows="3"></textarea>
-    <div class="chat-actions"><button type="button" onclick="sendUserMsg()">संदेश भेजें</button></div>
-  </div></div>
   <div id="google_translate_element" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"></div>
   <footer>© 2026 Astro Bhagya Vidhata<br>AI Vedic Astrology Consultation<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।</footer>
+
   <script>
     (function(){
-      const chatModal=document.getElementById('chatModal');
-      function fitChatToKeyboard(){
-        if(!chatModal) return;
-        const viewport=window.visualViewport;
-        const height=viewport ? viewport.height : window.innerHeight;
-        const top=viewport ? viewport.offsetTop : 0;
-        chatModal.style.setProperty('--chat-vh',Math.max(220,height)+'px');
-        chatModal.style.setProperty('--chat-vtop',Math.max(0,top)+'px');
+      const deck=document.getElementById("appSwipeDeck"),tabs=document.getElementById("appPageTabs");
+      if(!deck||!tabs)return;
+      const pages=[...deck.querySelectorAll("[data-app-page]")],buttons=[...tabs.querySelectorAll("[data-app-tab]")];
+      const names=pages.map(page=>page.dataset.appPage);
+      function activate(index){
+        const name=names[index];
+        buttons.forEach(button=>{const active=button.dataset.appTab===name;button.setAttribute("aria-current",active?"page":"false");if(active)button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});});
       }
-      fitChatToKeyboard();
-      if(window.visualViewport){
-        window.visualViewport.addEventListener('resize',fitChatToKeyboard);
-        window.visualViewport.addEventListener('scroll',fitChatToKeyboard);
-      }
-      window.addEventListener('resize',fitChatToKeyboard);
-      const chatInput=document.getElementById('userMsgInput');
-      if(chatInput){
-        chatInput.addEventListener('focus',()=>{
-          chatModal.classList.add('keyboard-lift');
-          fitChatToKeyboard();
-          setTimeout(()=>chatInput.scrollIntoView({block:'nearest'}),80);
-        });
-        chatInput.addEventListener('blur',()=>chatModal.classList.remove('keyboard-lift'));
-      }
-    })();
-    (function(){
-      const btn=document.getElementById('appMenuButton');
-      const panel=document.getElementById('appMenuPanel');
-      if(btn && panel){
-        btn.addEventListener('click',function(){
-          const opening=panel.hidden;
-          panel.hidden=!opening;
-          btn.setAttribute('aria-expanded',String(opening));
-        });
-        document.addEventListener('click',function(event){
-          if(!event.target.closest('.header-menu')){
-            panel.hidden=true;
-            btn.setAttribute('aria-expanded','false');
-          }
-        });
-      }
+      buttons.forEach(button=>button.addEventListener("click",()=>{
+        const index=names.indexOf(button.dataset.appTab);
+        if(index>=0)deck.scrollTo({left:deck.clientWidth*index,behavior:"smooth"});
+      }));
+      let scrollTimer;
+      deck.addEventListener("scroll",()=>{clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>activate(Math.max(0,Math.min(pages.length-1,Math.round(deck.scrollLeft/deck.clientWidth)))),70);},{passive:true});
+      activate(0);
     })();
   </script>
-  <script src="kundli.js"></script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="wallet.js"></script><script src="auth.js"></script><script src="kundli-history.js"></script><script src="ai_chat.js"></script><script src="panchang.js"></script><script src="gochar.js"></script>
-<script>
-window.googleTranslateElementInit = function () {
-  if (window.google && google.translate) {
-    new google.translate.TranslateElement({pageLanguage:"en",includedLanguages:"en,hi,mr,pa,ur,fr,de,es,pt,ar,bn,gu,ta,te,kn,ml,or,as",autoDisplay:false}, "google_translate_element");
-  }
-};
-(function(){
-  const map={"en-CA":"en","fr-CA":"fr","pt-BR":"pt","ar-SA":"ar"};
-  function applySelectedLanguage(){
-    const select=document.getElementById("preferredLanguage");
-    if(!select)return;
-    const target=map[select.value]||select.value;
-    let attempts=0;
-    function apply(){
-      const combo=document.querySelector(".goog-te-combo");
-      if(combo){combo.value=target;combo.dispatchEvent(new Event("change"));return;}
-      if(++attempts<30)setTimeout(apply,250);
-    }
-    apply();
-  }
-  document.addEventListener("DOMContentLoaded",function(){
-    document.getElementById("preferredLanguage")?.addEventListener("change",applySelectedLanguage);
-  });
-  window.applyAstroGoogleTranslation=applySelectedLanguage;
-})();
-</script>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+  <script src="kundli.js"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="ai-chat.js"></script><script>window.googleTranslateElementInit=function(){if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"hi",includedLanguages:"en,hi,mr,pa,ur,fr,de,es,pt,ar,bn,gu,ta,te,kn,ml,or,as",autoDisplay:false}, "google_translate_element");}};</script><script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
 </body>
 </html>
