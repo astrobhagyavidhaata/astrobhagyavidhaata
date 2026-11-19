@@ -15,7 +15,55 @@
   const signNames = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
   const $ = (id) => document.getElementById(id);
-  const selectedChartLanguage = () => document.getElementById("preferredLanguage")?.value || "en";
+  const CHART_TRANSLATIONS = {
+    en:{labels:["Birth ascendant","Moon sign","House","Planet","Sign","Nakshatra","Pada","Ascendant","Nakshatra lord"],planets:["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"],signs:["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]},
+    hi:{labels:["जन्म लग्न","चंद्र राशि","भाव","ग्रह","राशि","नक्षत्र","चरण","लग्न","नक्षत्र स्वामी"],planets:["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि","राहु","केतु"],signs:["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"]},
+    pa:{labels:["ਜਨਮ ਲਗਨ","ਚੰਦਰ ਰਾਸ਼ੀ","ਭਾਵ","ਗ੍ਰਹਿ","ਰਾਸ਼ੀ","ਨਕਸ਼ਤਰ","ਚਰਨ","ਲਗਨ","ਨਕਸ਼ਤਰ ਸਵਾਮੀ"],planets:["ਸੂਰਜ","ਚੰਦਰਮਾ","ਮੰਗਲ","ਬੁੱਧ","ਗੁਰੂ","ਸ਼ੁੱਕਰ","ਸ਼ਨੀ","ਰਾਹੂ","ਕੇਤੂ"],signs:["ਮੇਖ","ਬ੍ਰਿਖ","ਮਿਥੁਨ","ਕਰਕ","ਸਿੰਘ","ਕੰਨਿਆ","ਤੁਲਾ","ਬ੍ਰਿਸ਼ਚਕ","ਧਨੁ","ਮਕਰ","ਕੁੰਭ","ਮੀਨ"]},
+    mr:{labels:["जन्म लग्न","चंद्र राशी","भाव","ग्रह","राशी","नक्षत्र","चरण","लग्न","नक्षत्र स्वामी"],planets:["सूर्य","चंद्र","मंगळ","बुध","गुरू","शुक्र","शनी","राहू","केतू"],signs:["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तूळ","वृश्चिक","धनु","मकर","कुंभ","मीन"]},
+    gu:{labels:["જન્મ લગ્ન","ચંદ્ર રાશિ","ભાવ","ગ્રહ","રાશિ","નક્ષત્ર","ચરણ","લગ્ન","નક્ષત્ર સ્વામી"],planets:["સૂર્ય","ચંદ્ર","મંગળ","બુધ","ગુરુ","શુક્ર","શનિ","રાહુ","કેતુ"],signs:["મેષ","વૃષભ","મિથુન","કર્ક","સિંહ","કન્યા","તુલા","વૃશ્ચિક","ધનુ","મકર","કુંભ","મીન"]},
+    bn:{labels:["জন্মলগ্ন","চন্দ্ররাশি","ভাব","গ্রহ","রাশি","নক্ষত্র","পদ","লগ্ন","নক্ষত্র অধিপতি"],planets:["সূর্য","চন্দ্র","মঙ্গল","বুধ","বৃহস্পতি","শুক্র","শনি","রাহু","কেতু"],signs:["মেষ","বৃষ","মিথুন","কর্কট","সিংহ","কন্যা","তুলা","বৃশ্চিক","ধনু","মকর","কুম্ভ","মীন"]},
+    ta:{labels:["பிறப்பு லக்னம்","சந்திர ராசி","பாவம்","கிரகம்","ராசி","நட்சத்திரம்","பாதம்","லக்னம்","நட்சத்திர அதிபதி"],planets:["சூரியன்","சந்திரன்","செவ்வாய்","புதன்","குரு","சுக்கிரன்","சனி","ராகு","கேது"],signs:["மேஷம்","ரிஷபம்","மிதுனம்","கடகம்","சிம்மம்","கன்னி","துலாம்","விருச்சிகம்","தனுசு","மகரம்","கும்பம்","மீனம்"]},
+    te:{labels:["జన్మ లగ్నం","చంద్ర రాశి","భావం","గ్రహం","రాశి","నక్షత్రం","పాదం","లగ్నం","నక్షత్ర అధిపతి"],planets:["సూర్యుడు","చంద్రుడు","కుజుడు","బుధుడు","గురుడు","శుక్రుడు","శని","రాహు","కేతు"],signs:["మేషం","వృషభం","మిథునం","కర్కాటకం","సింహం","కన్య","తుల","వృశ్చికం","ధనుస్సు","మకరం","కుంభం","మీనం"]},
+    kn:{labels:["ಜನ್ಮ ಲಗ್ನ","ಚಂದ್ರ ರಾಶಿ","ಭಾವ","ಗ್ರಹ","ರಾಶಿ","ನಕ್ಷತ್ರ","ಪಾದ","ಲಗ್ನ","ನಕ್ಷತ್ರ ಅಧಿಪತಿ"],planets:["ಸೂರ್ಯ","ಚಂದ್ರ","ಮಂಗಳ","ಬುಧ","ಗುರು","ಶುಕ್ರ","ಶನಿ","ರಾಹು","ಕೇತು"],signs:["ಮೇಷ","ವೃಷಭ","ಮಿಥುನ","ಕರ್ಕಾಟಕ","ಸಿಂಹ","ಕನ್ಯಾ","ತುಲಾ","ವೃಶ್ಚಿಕ","ಧನು","ಮಕರ","ಕುಂಭ","ಮೀನ"]},
+    ml:{labels:["ജന്മ ലഗ്നം","ചന്ദ്ര രാശി","ഭാവം","ഗ്രഹം","രാശി","നക്ഷത്രം","പാദം","ലഗ്നം","നക്ഷത്രാധിപൻ"],planets:["സൂര്യൻ","ചന്ദ്രൻ","ചൊവ്വ","ബുധൻ","വ്യാഴം","ശുക്രൻ","ശനി","രാഹു","കേതു"],signs:["മേടം","ഇടവം","മിഥുനം","കർക്കടകം","ചിങ്ങം","കന്നി","തുലാം","വൃശ്ചികം","ധനു","മകരം","കുംഭം","മീനം"]},
+    ur:{labels:["پیدائشی لگن","قمری برج","بھاؤ","سیارہ","برج","نکشتر","پد","لگن","نکشتر کا حاکم"],planets:["سورج","چاند","مریخ","عطارد","مشتری","زہرہ","زحل","راہو","کیتو"],signs:["حمل","ثور","جوزا","سرطان","اسد","سنبلہ","میزان","عقرب","قوس","جدی","دلو","حوت"]},
+    fr:{labels:["Ascendant natal","Signe lunaire","Maison","Planète","Signe","Nakshatra","Pada","Ascendant","Maître du nakshatra"],planets:["Soleil","Lune","Mars","Mercure","Jupiter","Vénus","Saturne","Rahu","Ketu"],signs:["Bélier","Taureau","Gémeaux","Cancer","Lion","Vierge","Balance","Scorpion","Sagittaire","Capricorne","Verseau","Poissons"]},
+    "fr-CA":{labels:["Ascendant natal","Signe lunaire","Maison","Planète","Signe","Nakshatra","Pada","Ascendant","Maître du nakshatra"],planets:["Soleil","Lune","Mars","Mercure","Jupiter","Vénus","Saturne","Rahu","Ketu"],signs:["Bélier","Taureau","Gémeaux","Cancer","Lion","Vierge","Balance","Scorpion","Sagittaire","Capricorne","Verseau","Poissons"]},
+    de:{labels:["Geburtsaszendent","Mondzeichen","Haus","Planet","Zeichen","Nakshatra","Pada","Aszendent","Nakshatra-Herrscher"],planets:["Sonne","Mond","Mars","Merkur","Jupiter","Venus","Saturn","Rahu","Ketu"],signs:["Widder","Stier","Zwillinge","Krebs","Löwe","Jungfrau","Waage","Skorpion","Schütze","Steinbock","Wassermann","Fische"]},
+    es:{labels:["Ascendente natal","Signo lunar","Casa","Planeta","Signo","Nakshatra","Pada","Ascendente","Regente del nakshatra"],planets:["Sol","Luna","Marte","Mercurio","Júpiter","Venus","Saturno","Rahu","Ketu"],signs:["Aries","Tauro","Géminis","Cáncer","Leo","Virgo","Libra","Escorpio","Sagitario","Capricornio","Acuario","Piscis"]},
+    "pt-BR":{labels:["Ascendente natal","Signo lunar","Casa","Planeta","Signo","Nakshatra","Pada","Ascendente","Regente do nakshatra"],planets:["Sol","Lua","Marte","Mercúrio","Júpiter","Vênus","Saturno","Rahu","Ketu"],signs:["Áries","Touro","Gêmeos","Câncer","Leão","Virgem","Libra","Escorpião","Sagitário","Capricórnio","Aquário","Peixes"]},
+    "ar-SA":{labels:["الطالع الأصلي","البرج القمري","البيت","الكوكب","البرج","الناكشاترا","بادا","الطالع","حاكم الناكشاترا"],planets:["الشمس","القمر","المريخ","عطارد","المشتري","الزهرة","زحل","راهو","كيتو"],signs:["الحمل","الثور","الجوزاء","السرطان","الأسد","العذراء","الميزان","العقرب","القوس","الجدي","الدلو","الحوت"]},
+    or:{labels:["ଜନ୍ମ ଲଗ୍ନ","ଚନ୍ଦ୍ର ରାଶି","ଭାବ","ଗ୍ରହ","ରାଶି","ନକ୍ଷତ୍ର","ପାଦ","ଲଗ୍ନ","ନକ୍ଷତ୍ର ଅଧିପତି"],planets:["ସୂର୍ଯ୍ୟ","ଚନ୍ଦ୍ର","ମଙ୍ଗଳ","ବୁଧ","ବୃହସ୍ପତି","ଶୁକ୍ର","ଶନି","ରାହୁ","କେତୁ"],signs:["ମେଷ","ବୃଷ","ମିଥୁନ","କର୍କଟ","ସିଂହ","କନ୍ୟା","ତୁଳା","ବିଛା","ଧନୁ","ମକର","କୁମ୍ଭ","ମୀନ"]},
+    as:{labels:["জন্ম লগ্ন","চন্দ্ৰ ৰাশি","ভাৱ","গ্ৰহ","ৰাশি","নক্ষত্ৰ","পদ","লগ্ন","নক্ষত্ৰৰ অধিপতি"],planets:["সূৰ্য","চন্দ্ৰ","মঙ্গল","বুধ","বৃহস্পতি","শুক্ৰ","শনি","ৰাহু","কেতু"],signs:["মেষ","বৃষ","মিথুন","কৰ্কট","সিংহ","কন্যা","তুলা","বৃশ্চিক","ধনু","মকৰ","কুম্ভ","মীন"]},
+    "en-CA":{labels:["Birth ascendant","Moon sign","House","Planet","Sign","Nakshatra","Pada","Ascendant","Nakshatra lord"],planets:["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"],signs:["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]}
+  };
+  const PLANET_KEYS=["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
+  const PLANET_HINDI=["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि","राहु","केतु"];
+  const SIGN_KEYS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  const SIGN_HINDI=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+  function selectedChartLanguage() {
+    return String(window.AstroLanguage?.get?.() || $("preferredLanguage")?.value || document.documentElement.lang || "en");
+  }
+  function chartLocale() {
+    const language=selectedChartLanguage();
+    return CHART_TRANSLATIONS[language] || CHART_TRANSLATIONS[language.split("-")[0]] || CHART_TRANSLATIONS.en;
+  }
+  function localizeChartText(value) {
+    const locale=chartLocale();
+    let result=String(value ?? "");
+    for(let i=0;i<PLANET_KEYS.length;i++) {
+      result=result.replace(new RegExp("\\b"+PLANET_KEYS[i]+"\\b","gi"),locale.planets[i]);
+      result=result.split(PLANET_HINDI[i]).join(locale.planets[i]);
+    }
+    for(let i=0;i<SIGN_KEYS.length;i++) {
+      result=result.replace(new RegExp("\\b"+SIGN_KEYS[i]+"\\b","gi"),locale.signs[i]);
+      result=result.split(SIGN_HINDI[i]).join(locale.signs[i]);
+    }
+    const common={House:locale.labels[2],Planet:locale.labels[3],Sign:locale.labels[4],Nakshatra:locale.labels[5],Pada:locale.labels[6],Ascendant:locale.labels[7]};
+    for(const [word,translation] of Object.entries(common)) result=result.replace(new RegExp("\\b"+word+"\\b","gi"),translation);
+    return result;
+  }
+
   function triggerChartTranslation() {
     const language = selectedChartLanguage();
     if (language === "hi") { document.documentElement.lang = "hi"; return; }
@@ -44,7 +92,7 @@
     const host=$("chartCards"), nav=$("mainChartSlot");
     if(!host||!nav||!chart?.d1?.ascendant||!chart?.d9?.ascendant)return;
     host.replaceChildren();
-    const signs=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+    const signs=chartLocale().signs;
     const moon=chart.d1.planets?.चंद्र || chart.d1.planets?.Moon || Object.entries(chart.d1.planets||{}).find(([name])=>/moon|चंद्र/i.test(name))?.[1];
     const moonAsc=Number(moon?.rashiIndex);
     const ascendantIndex=Number(chart.d1.ascendant.rashiIndex);
@@ -64,7 +112,7 @@
       const heading=document.createElement("h3");heading.textContent=spec.title;card.appendChild(heading);
       const occupants={};
       const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};
-      for(const [planet,p] of Object.entries(spec.planets)){const house=Number(p.house);if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||=[]).push(selectedChartLanguage()==="hi"?(hindiPlanets[planet]||planet):planet);}
+      for(const [planet,p] of Object.entries(spec.planets)){const house=Number(p.house);if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||=[]).push(localizeChartText(planet));}
       const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
       svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");svg.setAttribute("aria-label",spec.title);
       const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
@@ -91,7 +139,7 @@
       note.style.cssText="margin:0 0 10px;color:#d4c9e5;font-size:12px;line-height:1.5";
       panel.append(heading,note);
       const table=document.createElement("table"),thead=document.createElement("thead"),trh=document.createElement("tr");
-      ["ग्रह","राशि","राशि स्वामी","भाव","अंश","नक्षत्र","चरण","नक्षत्र स्वामी"].forEach(label=>{const th=document.createElement("th");th.textContent=label;trh.appendChild(th);});
+      [chartLocale().labels[3],chartLocale().labels[4],chartLocale().labels[8],chartLocale().labels[2],"°",chartLocale().labels[5],chartLocale().labels[6],chartLocale().labels[8]].forEach(label=>{const th=document.createElement("th");th.textContent=label;trh.appendChild(th);});
       thead.appendChild(trh);table.appendChild(thead);
       const tbody=document.createElement("tbody");
       const nakshatraLords=["केतु","शुक्र","सूर्य","चंद्र","मंगल","राहु","गुरु","शनि","बुध"];
@@ -110,7 +158,7 @@
         const nakshatraLord=Number.isInteger(nakshatraIndex)&&nakshatraIndex>=0&&nakshatraIndex<27?nakshatraLords[nakshatraIndex%9]:"—";
         const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};
         const planetText=(selectedChartLanguage()==="hi"?(hindiPlanets[planet]||planet):planet)+(p.retrograde?" ℞":"");
-        const values=[planetText,p.rashi||signs[p.rashiIndex]||"—",rashiLord,houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
+        const values=[planetText,localizeChartText(p.rashi||signs[p.rashiIndex]||"—"),rashiLord,houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
         const tr=document.createElement("tr");
         values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});
         tbody.appendChild(tr);
@@ -339,19 +387,19 @@
       card.className="chart-item";
       card.style.cssText="border:1px solid rgba(220,190,130,.35);border-radius:12px;padding:12px;min-width:0;background:rgba(20,16,32,.45)";
       const title=document.createElement("summary");
-      title.textContent=key+" — "+varga.name+" | Ascendant "+signNames[varga.ascendant.rashiIndex];
+      title.textContent=key+" — "+varga.name+" | Ascendant "+chartLocale().signs[varga.ascendant.rashiIndex];
       const grid=document.createElement("div");
       grid.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px";
       const occupants={};
       for(const [planetName,position] of Object.entries(varga.planets||{})){
-        (occupants[position.house]||(occupants[position.house]=[])).push((selectedChartLanguage()==="hi"?({Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"}[planetName]||planetName):planetName)+(position.retrograde?" ℞":""));
+        (occupants[position.house]||(occupants[position.house]=[])).push(localizeChartText(planetName)+(position.retrograde?" ℞":""));
       }
       for(let house=1;house<=12;house++){
         const signIndex=(varga.ascendant.rashiIndex+house-1)%12;
         const cell=document.createElement("div");
         cell.style.cssText="min-height:72px;padding:6px;border-radius:7px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);font-size:12px;overflow-wrap:anywhere";
         const signLabel=document.createElement("div");
-        signLabel.textContent=signNames[signIndex];
+        signLabel.textContent=chartLocale().signs[signIndex];
         const planetLabel=document.createElement("div");
         planetLabel.style.cssText="margin-top:4px;color:#f5d994";
         planetLabel.textContent=(occupants[house]||[]).join(", ")||"—";
