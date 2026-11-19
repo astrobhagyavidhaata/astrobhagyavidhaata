@@ -60,8 +60,7 @@ export default {
 
     // The Node server handles kundli, gochar, panchang and all other API routes.
     if (env?.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
-    if (env?.GEMINI_MODEL) process.env.GEMINI_MODEL = env.GEMINI_MODEL;
-    else if (!process.env.GEMINI_MODEL) process.env.GEMINI_MODEL = "gemini-3.8-flash";
+    process.env.GEMINI_MODEL = "gemini-3.8-flash";
     const pathname = new URL(request.url).pathname;
     if (pathname === "/healthz" || pathname === "/api" || pathname.startsWith("/api/")) {
       return nodeHandler.fetch(request, env, ctx);
