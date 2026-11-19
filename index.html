@@ -186,6 +186,18 @@
     .gochar-ai-output{margin-top:12px;padding:12px;border-radius:9px;background:#fff;color:#252525;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
     .gochar-ai-panel[hidden]{display:none}
 
+  
+    .astro-slide-shell{margin:14px 0 8px;min-width:0}
+    .astro-slide-tabs{display:flex;gap:7px;overflow-x:auto;white-space:nowrap;padding:7px 2px 10px;margin:0 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-bottom:1px solid #66547f}
+    .astro-slide-tabs::-webkit-scrollbar{display:none}
+    .astro-slide-tabs button{flex:0 0 auto;width:auto;margin:0;padding:10px 13px;border:1px solid #70558e;border-radius:9px;background:#302342;color:#f5d994;font-size:13px}
+    .astro-slide-tabs button[aria-selected="true"]{background:#e8b957;color:#211638;border-color:#e8b957}
+    .astro-slide-viewport{display:flex;width:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
+    .astro-slide-viewport::-webkit-scrollbar{display:none}
+    .astro-slide-card{flex:0 0 100%;width:100%;min-width:100%;max-height:58vh;min-height:220px;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start;scroll-snap-stop:always;padding:12px;border:1px solid #70558e;border-radius:12px;background:#181326}
+    .astro-slide-card>section,.astro-slide-card>.app-folder{margin:0;border:0;background:transparent;padding:0}
+    .astro-slide-card h3:first-child{margin-top:0}
+
   </style>
 </head>
 <body>
@@ -211,7 +223,30 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><p class="chat-info">हर वर्ग कुंडली को अलग पेज में देखने के लिए टैब को साइड में स्लाइड करें।</p><div id="vargaCharts"></div></section></div><div id="kTxt" aria-hidden="true"></div></div></div>
+      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div>
+<div class="astro-slide-shell">
+  <nav id="astroSlideTabs" class="astro-slide-tabs" role="tablist" aria-label="ज्योतिषीय गणना स्लाइड">
+    <button type="button" data-astro-slide-tab="slide-dasha" aria-selected="true">महादशा व संयुक्त फलादेश</button>
+    <button type="button" data-astro-slide-tab="slide-navtara" aria-selected="false">नवतारा चक्र</button>
+    <button type="button" data-astro-slide-tab="slide-shadbala" aria-selected="false">षड्बल</button>
+    <button type="button" data-astro-slide-tab="slide-bhavabala" aria-selected="false">भाव बल</button>
+    <button type="button" data-astro-slide-tab="slide-ashtakvarga" aria-selected="false">अष्टकवर्ग</button>
+    <button type="button" data-astro-slide-tab="slide-shodashvarga" aria-selected="false">षोडश वर्ग (D2–D60)</button>
+  </nav>
+  <div id="astroSlideViewport" class="astro-slide-viewport">
+    <section id="slide-dasha" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-navtara" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-shadbala" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-bhavabala" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-ashtakvarga" class="astro-slide-card" role="tabpanel"></section>
+    <section id="slide-shodashvarga" class="astro-slide-card" role="tabpanel"></section>
+  </div>
+</div>
+<div id="kundliDetailTabs" hidden></div>
+<div id="jyotishCalculations" hidden></div>
+<section class="app-folder" id="kundliChartsFolder"><div id="vargaCharts"></div></section>
+<div id="aiInitialSummary" class="chat-info" role="status" aria-live="polite"></div>
+<div id="kTxt" aria-hidden="true"></div></div></div>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ ज्योतिषी से अपना सवाल पूछें</h2>
         <p class="chat-info">अपनी जन्म कुंडली के आधार पर सीधे सवाल पूछें। सवाल पूछने के लिए लॉगिन की आवश्यकता नहीं है।</p>
