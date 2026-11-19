@@ -25,6 +25,7 @@ const apiHandlers={
   kundli:require("./api/kundli"),
   consultation:require("./api/consultation"),
   gochar:require("./api/gochar"),
+  "gochar-prediction":require("./api/gochar-prediction"),
   panchang:require("./api/panchang")
 };
 
