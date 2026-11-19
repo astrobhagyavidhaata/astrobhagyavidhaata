@@ -81,8 +81,8 @@
    const base=active.split("-")[0];
    const hasPack=Boolean(dictionaries[base]) || base==="en";
    document.documentElement.lang=active;
-   document.documentElement.dir="ltr";
-   if(document.body)document.body.dir="ltr";
+   document.documentElement.dir=(base==="ur"||base==="ar")?"rtl":"ltr";
+   if(document.body)document.body.dir=(base==="ur"||base==="ar")?"rtl":"ltr";
    document.title=base==="fr"?"Astro Bhagya Vidhata | Astrologie védique":base==="pa"?"Astro Bhagya Vidhata | ਵੈਦਿਕ ਜੋਤਿਸ਼":"Astro Bhagya Vidhata | Vedic Astrology";
    document.body.childNodes.forEach(node=>translateElement(node,base));
    const notice=document.getElementById("languageNotice");
@@ -106,20 +106,36 @@
  
  function applyGoogleTranslation(lang){
    const base=String(lang||"en").split("-")[0];
-   document.cookie="googtrans=/hi/"+base+"; path=/; SameSite=Lax";
-   document.documentElement.dir="ltr";
-   if(document.body)document.body.dir="ltr";
-   const combo=document.querySelector(".goog-te-combo");
-   if(combo){combo.value=base;combo.dispatchEvent(new Event("change"));}
+   // Hindi is the source language of the app's original interface.
+   const target=base==="ar"?"ar":base;
+   const cookieValue="/hi/"+target;
+   document.cookie="googtrans="+cookieValue+"; path=/; SameSite=Lax";
+   try{localStorage.setItem("googtrans",cookieValue)}catch(_){}
+   const rtl=target==="ur"||target==="ar";
+   document.documentElement.dir=rtl?"rtl":"ltr";
+   if(document.body)document.body.dir=rtl?"rtl":"ltr";
+   const trigger=()=>{
+     const combo=document.querySelector(".goog-te-combo");
+     if(combo){combo.value=target;combo.dispatchEvent(new Event("change",{bubbles:true}));return true;}
+     return false;
+   };
+   if(!trigger()){
+     const waitForWidget=new MutationObserver(()=>{
+       if(trigger())waitForWidget.disconnect();
+     });
+     waitForWidget.observe(document.body,{childList:true,subtree:true});
+     window.setTimeout(()=>waitForWidget.disconnect(),12000);
+   }
  }
  window.googleTranslateElementInit=window.googleTranslateElementInit||function(){
-   if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"en",autoDisplay:false},"google_translate_element");}
+   if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"hi",includedLanguages:"en,hi,mr,pa,ur,fr,de,es,pt,ar,bn,gu,ta,te,kn,ml,or,as",autoDisplay:false},"google_translate_element");}
  };
-// Google Translate may try to switch the page direction for Urdu/Arabic.
- // Keep the application shell LTR while allowing translated Arabic/Urdu text itself.
+// Keep document direction aligned with the selected language without fighting Google Translate.
  const directionGuard=new MutationObserver(()=>{
-   if(document.documentElement.dir!=="ltr")document.documentElement.dir="ltr";
-   if(document.body&&document.body.dir!=="ltr")document.body.dir="ltr";
+   const rtl=current==="ur"||current==="ar-SA"||current==="ar";
+   const wanted=rtl?"rtl":"ltr";
+   if(document.documentElement.dir!==wanted)document.documentElement.dir=wanted;
+   if(document.body&&document.body.dir!==wanted)document.body.dir=wanted;
  });
  directionGuard.observe(document.documentElement,{attributes:true,attributeFilter:["dir"]});
  if(document.body)directionGuard.observe(document.body,{attributes:true,attributeFilter:["dir"]});
