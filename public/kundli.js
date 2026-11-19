@@ -803,6 +803,16 @@
     }
 
     form.addEventListener("submit", handleSubmit);
+    const languagePicker = $("preferredLanguage");
+    if (languagePicker) {
+      languagePicker.addEventListener("change", () => {
+        const chart = window.AstroKundli;
+        if (!chart) return;
+        // Rebuild SVG charts immediately so Hindi is applied even when language changes after calculation.
+        renderMainKundliChart(chart);
+        renderVargaCharts(chart);
+      });
+    }
     const placeInput = $("birthPlace");
     if (placeInput) {
       placeInput.addEventListener("input", () => {
