@@ -68,7 +68,7 @@ module.exports=async function(req,res){
         });
       }catch(saveError){console.warn("User message save skipped:",saveError.message);}
     }
-    const supportedLanguages=new Set(["en","hi","mr","pa","ur","fr","de","es","pt","ar","bn","gu","ta","te"]);
+    const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
     const language=supportedLanguages.has(body.language)?body.language:"en";
     const answer=await askGemini({question:question.trim(),chartContext,conversationHistory:history,language});
     if(active){
