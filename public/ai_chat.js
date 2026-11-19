@@ -50,7 +50,7 @@
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
       if (typeof data.answer !== "string" || !data.answer.trim()) throw new Error("AI से उत्तर प्राप्त नहीं हुआ।");
-      addMessage(data.answer, "assistant");
+      addMessage("Astro Bhagya Vidhata\n" + data.answer, "assistant");
       history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
       if (status) status.textContent = "";
     } catch (error) {
