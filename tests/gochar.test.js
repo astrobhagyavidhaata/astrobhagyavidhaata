@@ -18,14 +18,17 @@ function mockResponse() {
 }
 
 test("Gochar API returns nine grahas, both house references and transit drishti", async () => {
-  const before = Date.now();\n  const req = { method: "GET", query: { rashi: "तुला", lagna: "मेष" } };
+  const before = Date.now();
+  const req = { method: "GET", query: { rashi: "तुला", lagna: "मेष" } };
   const res = mockResponse();
 
   await gocharHandler(req, res);
 
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.success, true);
-  const calculatedAt = Date.parse(res.body.asOf);\n  assert.ok(Number.isFinite(calculatedAt));\n  assert.ok(calculatedAt >= before && calculatedAt <= Date.now());
+  const calculatedAt = Date.parse(res.body.asOf);
+  assert.ok(Number.isFinite(calculatedAt));
+  assert.ok(calculatedAt >= before && calculatedAt <= Date.now());
   assert.equal(res.body.basisRashi, "तुला");
   assert.equal(res.body.basisLagna, "मेष");
   assert.equal(res.body.planets.length, 9);
