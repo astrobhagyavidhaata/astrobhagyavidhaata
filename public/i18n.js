@@ -29,16 +29,9 @@
    const dict=astroTerms[base]||astroTerms.en;
    let out=String(value??"");
    const keys=Object.keys(dict).sort((a,b)=>b.length-a.length);
-   // Match complete Hindi terms only; substring replacement corrupts words such as "प्रभाव".
+   // Match complete terms only; do not replace a planet name inside unrelated words.
    if(keys.length){
-     const pattern=new RegExp("(?<![\\p{L}\\p{N}])(?:"+keys.map(k=>k.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\function translateAstroText(value,locale){
-   const base=localeTerms[locale]||String(locale||"en").split("-")[0];
-   const dict=astroTerms[base]||astroTerms.en;
-   let out=String(value??"");
-   const keys=Object.keys(dict).sort((a,b)=>b.length-a.length);
-   for(const key of keys) out=out.split(key).join(dict[key]);
-   return out;
- }")).join("|")+")(?![\\p{L}\\p{N}])","gu");
+     const pattern=new RegExp("(?<![\\p{L}\\p{N}])(?:"+keys.join("|")+")(?![\\p{L}\\p{N}])","gu");
      out=out.replace(pattern,match=>dict[match]??match);
    }
    return out;
