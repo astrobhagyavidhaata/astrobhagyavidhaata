@@ -7,6 +7,7 @@
   const API = "/api/gochar";
   const rashis = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
   const $ = id => document.getElementById(id);
+  const tr = value => window.AstroLanguage?.translate ? window.AstroLanguage.translate(value) : String(value ?? "");
 
   async function request(url) {
     const response = await fetch(url, { credentials:"same-origin", cache:"no-store", headers:{Accept:"application/json"} });
@@ -33,18 +34,18 @@
     output.replaceChildren();
 
     const heading = document.createElement("b");
-    heading.textContent = data.basisRashi + " राशि से आज का गोचर";
+    heading.textContent = tr(data.basisRashi + " राशि से आज का गोचर");
     const stamp = document.createElement("p");
-    stamp.textContent = "गणना समय: " + new Date(data.asOf).toLocaleString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en") +
-      " | अयनांश: " + data.ayanamsa;
+    stamp.textContent = tr("गणना समय: ") + new Date(data.asOf).toLocaleString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en") +
+      " | " + tr("अयनांश: ") + tr(data.ayanamsa);
     output.append(heading,stamp);
 
     const table = document.createElement("div");
     table.style.overflowX = "auto";
-    const rows = [["ग्रह","राशि और अंश","नक्षत्र / चरण","नवांश","भाव","गति"]];
+    const rows = [["ग्रह","राशि और अंश","नक्षत्र / चरण","नवांश","भाव","गति"].map(tr)];
     for (const p of data.planets || []) {
-      rows.push([p.name, p.rashi + " " + p.degree.text, p.nakshatra + " / " + p.pada,
-        p.navamsa, String(p.house), p.retrograde ? "वक्री" : "मार्गी"]);
+      rows.push([tr(p.name), tr(p.rashi) + " " + p.degree.text, tr(p.nakshatra) + " / " + p.pada,
+        tr(p.navamsa), String(p.house), tr(p.retrograde ? "वक्री" : "मार्गी")]);
     }
     const t = document.createElement("table");
     t.style.cssText = "width:100%;border-collapse:collapse;min-width:540px;font-size:13px";
@@ -74,31 +75,31 @@
 
       const houseHeading = document.createElement("p");
       houseHeading.className = "chat-info";
-      houseHeading.textContent = "भावों पर दृष्टि";
+      houseHeading.textContent = tr("भावों पर दृष्टि");
       folder.appendChild(houseHeading);
       const houseList = document.createElement("ul");
       for (const aspect of details.houseAspects || []) {
         const item = document.createElement("li");
-        item.textContent = aspect.from + " की " + (aspect.full ? "पूर्ण" : aspect.aspectStrength + "%") +
-          " दृष्टि — " + aspect.targetHouse + "वाँ भाव (" + aspect.targetSign + ")";
+        item.textContent = tr(aspect.from) + " " + tr("की") + " " + (aspect.full ? tr("पूर्ण") : aspect.aspectStrength + "%") +
+          " " + tr("दृष्टि") + " — " + aspect.targetHouse + tr("वाँ भाव") + " (" + tr(aspect.targetSign) + ")";
         houseList.appendChild(item);
       }
       folder.appendChild(houseList);
 
       const planetHeading = document.createElement("p");
       planetHeading.className = "chat-info";
-      planetHeading.textContent = "दूसरे गोचर ग्रहों पर दृष्टि";
+      planetHeading.textContent = tr("दूसरे गोचर ग्रहों पर दृष्टि");
       folder.appendChild(planetHeading);
       const planetList = document.createElement("ul");
       for (const aspect of details.planetAspects || []) {
         const item = document.createElement("li");
-        item.textContent = aspect.from + " की " + (aspect.full ? "पूर्ण" : aspect.aspectStrength + "%") +
-          " दृष्टि " + aspect.to + " पर";
+        item.textContent = tr(aspect.from) + " " + tr("की") + " " + (aspect.full ? tr("पूर्ण") : aspect.aspectStrength + "%") +
+          " " + tr("दृष्टि") + " " + tr(aspect.to) + " " + tr("पर");
         planetList.appendChild(item);
       }
       if (!planetList.children.length) {
         const item = document.createElement("li");
-        item.textContent = "इस दृष्टि-योजना के अनुसार कोई ग्रह-दृष्टि दर्ज नहीं हुई।";
+        item.textContent = tr("इस दृष्टि-योजना के अनुसार कोई ग्रह-दृष्टि दर्ज नहीं हुई।");
         planetList.appendChild(item);
       }
       folder.appendChild(planetList);
@@ -106,8 +107,8 @@
     }
 
     if (data.drishti) {
-      appendDrishti("चंद्र राशि से गोचर ग्रहों की दृष्टि", data.drishti.fromMoon);
-      appendDrishti("लग्न से गोचर ग्रहों की दृष्टि", data.drishti.fromLagna);
+      appendDrishti(tr("चंद्र राशि से गोचर ग्रहों की दृष्टि"), data.drishti.fromMoon);
+      appendDrishti(tr("लग्न से गोचर ग्रहों की दृष्टि"), data.drishti.fromLagna);
     }
     output.appendChild(note);
   }
@@ -116,14 +117,14 @@
     const select = $("rashiSelect");
     if (!select) return;
     const rashi = select.value;
-    if (!rashis.includes(rashi)) return showMessage("त्रुटि","कृपया सही राशि चुनें।",true);
-    showMessage("आज का गोचर","ग्रहों की स्थिति निकाली जा रही है...");
+    if (!rashis.includes(rashi)) return showMessage(tr("त्रुटि"),tr("कृपया सही राशि चुनें।"),true);
+    showMessage(tr("आज का गोचर"),tr("ग्रहों की स्थिति निकाली जा रही है..."));
     try {
       const data = await request(API + "?rashi=" + encodeURIComponent(rashi));
-      if (!Array.isArray(data.planets)) throw new Error("सर्वर से ग्रहों की पूरी सूची नहीं मिली।");
+      if (!Array.isArray(data.planets)) throw new Error(tr("सर्वर से ग्रहों की पूरी सूची नहीं मिली।"));
       render(data);
     } catch (error) {
-      showMessage("गोचर उपलब्ध नहीं",error.message,true);
+      showMessage(tr("गोचर उपलब्ध नहीं"),tr(error.message),true);
     }
   }
 
