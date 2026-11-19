@@ -48,6 +48,7 @@ app.post("/api/payments/webhook",readRequestBody,require("./api/payment-webhook"
 app.use(jsonBody);
 
 app.get("/healthz",(req,res)=>res.status(200).json({status:"ok"}));
+app.get("/api/consultation/health",(req,res)=>res.set("Cache-Control","no-store").json({success:true,configured:Boolean(process.env.GEMINI_API_KEY),model:process.env.GEMINI_MODEL||"gemini-2.5-flash"}));
 
 const apiHandlers={
   kundli:require("./api/kundli"),
