@@ -130,7 +130,8 @@ async function runGeminiConsultation(request, env = {}) {
     }
 
     const host = "generativelanguage.googleapis.com";
-    const modelCandidates = [...new Set([String(env?.GEMINI_MODEL || "gemini-3.8-flash"), "gemini-3.0-flash", "gemini-flash-latest"])];
+    const preferredModel = String(env?.GEMINI_MODEL || "gemini-3.8-flash");
+    const modelCandidates = [...new Set([preferredModel, "gemini-3.0-flash", "gemini-flash-latest"])];
     const apiKeyQuery = "?key=" + encodeURIComponent(apiKey);
 
     const strictSystemPrompt = `
