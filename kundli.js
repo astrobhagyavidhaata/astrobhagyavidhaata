@@ -106,14 +106,31 @@
     const root=$("jyotishCalculations");
     if(!root)return;
     root.replaceChildren();
-    const makeFolder=(title,id)=>{const d=document.createElement("details");d.className="chart-item";const s=document.createElement("summary");s.textContent=title;d.id=id;d.appendChild(s);root.appendChild(d);return d;};
+    const layout=document.createElement("div");layout.className="calculation-slider-layout";root.appendChild(layout);
+    const main=document.createElement("div");main.className="calculation-main";layout.appendChild(main);
+    const side=document.createElement("aside");side.className="calculation-side-slider";side.setAttribute("aria-label","वर्तमान दशा स्वामियों की कुंडली स्थिति");layout.appendChild(side);
+    const makeFolder=(title,id)=>{const d=document.createElement("details");d.className="chart-item";const s=document.createElement("summary");s.textContent=title;d.id=id;d.appendChild(s);main.appendChild(d);return d;};
     const addNote=(host,message)=>{const p=document.createElement("p");p.className="chat-info";p.textContent=message;host.appendChild(p);};
-    const dashaFolder=makeFolder("1. विंशोत्तरी महादशा, अंतर्दशा और प्रत्यंतर दशा","vimshottariFolder");
-    const vargaFolder=makeFolder("2. षोडश वर्ग कुंडलियाँ (D2 से D60)","shodashvargaFolder");
-    const strength=makeFolder("3. षड्बल और भाव बल (Shadbala & Bhava Bala)","shadbalaFolder");
-    const tara=makeFolder("4. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");
-    const ashtak=makeFolder("5. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
+    const dashaFolder=makeFolder("1. महादशा – अंतर्दशा – प्रत्यंतर दशा","vimshottariFolder");
+    const tara=makeFolder("2. नवतारा चक्र (तारा बल)","navtaraFolder");
+    const strength=makeFolder("3. षड्बल और भाव बल","shadbalaFolder");
+    const ashtak=makeFolder("4. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
+    const vargaFolder=makeFolder("5. षोडश वर्ग कुंडलियाँ (D2 से D60)","shodashvargaFolder");
     renderVargaCharts(chart,vargaFolder);
+    const currentDasha=chart.dasha?.current||{},positions=chart.d1?.planets||{};
+    const meanings={"सूर्य":"आत्मविश्वास, नेतृत्व और प्रतिष्ठा","चंद्र":"मन, भावनाएँ और जनसंपर्क","मंगल":"ऊर्जा, साहस और प्रतिस्पर्धा","बुध":"बुद्धि, संवाद और व्यापार","गुरु":"ज्ञान, शिक्षा और विस्तार","शुक्र":"संबंध, कला और सुख-सुविधा","शनि":"अनुशासन, श्रम और जिम्मेदारी","राहु":"महत्वाकांक्षा, तकनीक और असामान्य अवसर","केतु":"शोध, वैराग्य और आध्यात्मिकता"};
+    const sideTitle=document.createElement("h4");sideTitle.textContent="वर्तमान दशा स्वामी — स्थिति व संकेत";side.appendChild(sideTitle);
+    const addInsight=(planet,label)=>{
+      const p=positions[planet],card=document.createElement("section");card.className="dasha-insight-card";
+      const title=document.createElement("strong");title.textContent=label+" : "+planet;card.appendChild(title);
+      if(!p){addNote(card,"इस ग्रह की D1 स्थिति उपलब्ध नहीं है।");side.appendChild(card);return;}
+      const detail=document.createElement("p");detail.textContent="भाव "+(p.house||"—")+" | राशि "+(p.rashi||"—")+" | नक्षत्र "+(p.nakshatra||"—")+" | चरण "+(p.pada||"—")+(p.retrograde?" | वक्री":"");card.appendChild(detail);
+      const factor=document.createElement("p");factor.textContent="मुख्य कारकत्व: "+(meanings[planet]||"ग्रह के स्वाभाविक कारकत्व");card.appendChild(factor);
+      const reading=document.createElement("p");reading.textContent="संक्षिप्त संकेत: इस दशा में भाव "+(p.house||"—")+" से जुड़े विषय सक्रिय होंगे। राशि और नक्षत्र के स्वामी परिणामों का स्वर तय करेंगे। अंतिम फलादेश के लिए भावेशत्व, दृष्टि, युति, नवांश और संयुक्त दशा भी देखना आवश्यक है; इसे अकेले निश्चित शुभ-अशुभ न मानें।";card.appendChild(reading);side.appendChild(card);
+    };
+    if(currentDasha.mahadasha)addInsight(currentDasha.mahadasha,"महादशा स्वामी");
+    if(currentDasha.antardasha&&currentDasha.antardasha!==currentDasha.mahadasha)addInsight(currentDasha.antardasha,"अंतर्दशा स्वामी");
+    if(!currentDasha.mahadasha)addNote(side,"कुंडली बनने पर वर्तमान महादशा व अंतर्दशा स्वामी यहाँ दिखेंगे।");
     const current=chart.currentTaraBala;
     if(current){
       const p=document.createElement("p");p.className="chat-info";
