@@ -130,9 +130,8 @@ async function runGeminiConsultation(request, env = {}) {
     }
 
     const host = "generativelanguage.googleapis.com";
-    const path = "/v1beta/models/gemini-2.5-flash:generateContent";
-    const apiUrl =
-      "https://" + host + path + "?key=" + encodeURIComponent(apiKey);
+    const modelCandidates = ["gemini-3.8-flash", "gemini-3.0-flash", "gemini-flash-latest"];
+    const apiKeyQuery = "?key=" + encodeURIComponent(apiKey);
 
     const strictSystemPrompt = `
 तुम "Astro vidhata AI" हो। इन नियमों का पालन करो:
@@ -159,35 +158,34 @@ Google या Gemini का नाम अपनी पहचान के रू
 में स्पष्ट, सटीक और सम्मानजनक उत्तर दो।
 `;
 
-    const aiRes = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: strictSystemPrompt }]
-        },
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                text:
-                  "संपूर्ण उपलब्ध कुंडली डेटा (D1, D9, ग्रह, नक्षत्र, चरण, भाव, दशा, अंतर्दशा, तारा बल, षड्बल और गोचर):\n" +
-                  JSON.stringify(completeChartData).slice(0, 28000) +
-                  "\n\nग्राहक का प्रश्न: " +
-                  userQuestion
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.1,
-          maxOutputTokens: 1800
-        }
-      })
-    });
-
-    const aiJson = await aiRes.json();
+    const requestBody = {
+      systemInstruction: { parts: [{ text: strictSystemPrompt }] },
+      contents: [{
+        role: "user",
+        parts: [{
+          text:
+            "संपूर्ण उपलब्ध कुंडली डेटा (D1, D9, ग्रह, नक्षत्र, चरण, भाव, दशा, अंतर्दशा, तारा बल, षड्बल और गोचर):\\n" +
+            JSON.stringify(completeChartData).slice(0, 28000) +
+            "\\n\\nग्राहक का प्रश्न: " + userQuestion
+        }]
+      }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 1800 }
+    };
+    let aiRes;
+    let aiJson;
+    for (const candidateModel of modelCandidates) {
+      const apiUrl = "https://" + host + "/v1beta/models/" + candidateModel + ":generateContent" + apiKeyQuery;
+      aiRes = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+      });
+      aiJson = await aiRes.json();
+      if (aiRes.ok) break;
+      const apiMessage = String(aiJson?.error?.message || "");
+      const unavailable = aiRes.status === 404 || /model[^.]{0,80}(not found|does not exist|not supported|unsupported)/i.test(apiMessage);
+      if (!unavailable || candidateModel === modelCandidates[modelCandidates.length - 1]) break;
+    }
 
     if (!aiRes.ok) {
       return Response.json(
@@ -249,13 +247,14 @@ export default {
         return Response.json({
           success: true,
           configured: Boolean(bindings.GEMINI_API_KEY),
-          model: bindings.GEMINI_MODEL || "gemini-2.5-flash"
+          model: "gemini-3.8-flash"
         }, { headers: { "Cache-Control": "no-store" } });
       }
 
-      // AI consultation API — pass Worker bindings through unchanged.
+      // Route AI consultation through the shared Gemini handler so chart context,
+      // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        return await runGeminiConsultation(request, bindings);
+        return await runApi(consultationHandler, request, bindings);
       }
 
       // Kundli calculation API
