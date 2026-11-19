@@ -267,12 +267,12 @@
       const schedule=Array.isArray(dasha.mahadashas)?dasha.mahadashas:[];
       if(schedule.length){
         schedule.forEach(mdItem=>{
-          const mdDetails=document.createElement("details");mdDetails.className="dasha-period";
+          const mdDetails=document.createElement("details");mdDetails.className="dasha-period";mdDetails.open=false;
           const mdSummary=document.createElement("summary");mdSummary.textContent=localizeChartText(mdItem.planet)+" महादशा  •  "+periodRange(mdItem)+(mdItem.planet===activeMD?"  |  अभी चल रही":"");
           mdDetails.appendChild(mdSummary);
           const adList=document.createElement("div");adList.className="dasha-subperiod-list";
           (mdItem.antardashas||[]).forEach(adItem=>{
-            const adDetails=document.createElement("details");adDetails.className="dasha-subperiod";
+            const adDetails=document.createElement("details");adDetails.className="dasha-subperiod";adDetails.open=false;
             const adSummary=document.createElement("summary");adSummary.textContent=localizeChartText(mdItem.planet)+" / "+localizeChartText(adItem.planet)+"  •  "+periodRange(adItem)+(mdItem.planet===activeMD&&adItem.planet===activeAD?"  |  वर्तमान":"");
             adDetails.appendChild(adSummary);
             const pdTable=document.createElement("table");pdTable.className="dasha-date-table";
