@@ -1,141 +1,156 @@
-/*
- * ASTRO BHAGYA VIDHATA
- * Daily sidereal gochar display
- */
+/* Astro Bhagya Vidhata — live sidereal Gochar */
 (() => {
   "use strict";
-  const API = "/api/gochar";
-  const rashis = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
-  const $ = id => document.getElementById(id);
-  const tr = value => window.AstroLanguage?.translate ? window.AstroLanguage.translate(value) : String(value ?? "");
+  const API="/api/gochar";
+  const SIGNS=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+  const BENEFICS=new Set(["गुरु","शुक्र"]);
+  const MALEFICS=new Set(["सूर्य","मंगल","शनि","राहु","केतु"]);
+  const $=id=>document.getElementById(id);
+  const tr=value=>window.AstroLanguage?.translate?window.AstroLanguage.translate(value):String(value??"");
+  let latest=null;
 
-  async function request(url) {
-    const response = await fetch(url, { credentials:"same-origin", cache:"no-store", headers:{Accept:"application/json"} });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.message || "गोचर जानकारी प्राप्त नहीं हो सकी।");
+  async function getJSON(url,options={}) {
+    const response=await fetch(url,{credentials:"same-origin",cache:"no-store",headers:{Accept:"application/json",...(options.headers||{})},...options});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.message||"गोचर जानकारी प्राप्त नहीं हो सकी।");
     return data;
   }
-
-  function showMessage(title, message, isError=false) {
-    const output = $("rashiGocharOut");
-    if (!output) return;
-    output.replaceChildren();
-    const h = document.createElement("b");
-    h.textContent = title;
-    const p = document.createElement("p");
-    p.textContent = message;
-    output.append(h,p);
-    output.style.color = isError ? "#ffb4ab" : "";
+  function element(tag,text,className) {
+    const node=document.createElement(tag);
+    if(text!==undefined)node.textContent=text;
+    if(className)node.className=className;
+    return node;
   }
-
-  function render(data) {
-    const output = $("rashiGocharOut");
-    if (!output) return;
-    output.replaceChildren();
-
-    const heading = document.createElement("b");
-    heading.textContent = tr(data.basisRashi + " राशि से आज का गोचर");
-    const stamp = document.createElement("p");
-    stamp.textContent = tr("गणना समय: ") + new Date(data.asOf).toLocaleString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en") +
-      " | " + tr("अयनांश: ") + tr(data.ayanamsa);
-    output.append(heading,stamp);
-
-    const table = document.createElement("div");
-    table.style.overflowX = "auto";
-    const rows = [["ग्रह","राशि और अंश","नक्षत्र / चरण","नवांश","भाव","गति"].map(tr)];
-    for (const p of data.planets || []) {
-      rows.push([tr(p.name), tr(p.rashi) + " " + p.degree.text, tr(p.nakshatra) + " / " + p.pada,
-        tr(p.navamsa), String(p.house), tr(p.retrograde ? "वक्री" : "मार्गी")]);
+  function message(title,text,isError=false) {
+    const host=$("rashiGocharOut");if(!host)return;
+    host.replaceChildren();
+    host.append(element("strong",tr(title)),element("p",tr(text)));
+    host.style.color=isError?"#a12b20":"";
+  }
+  function statusNature(name) {
+    if(BENEFICS.has(name))return "शुभ";
+    if(MALEFICS.has(name))return "अशुभ";
+    return "मिश्रित";
+  }
+  function drawChart(host,data,lagnaIndex) {
+    if(!Number.isInteger(lagnaIndex)||lagnaIndex<0||lagnaIndex>11)return;
+    const wrap=element("section",undefined,"gochar-chart-wrap");
+    wrap.append(element("h3","उत्तर भारतीय गोचर कुंडली"));
+    const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");
+    svg.setAttribute("aria-label","उत्तर भारतीय गोचर कुंडली");
+    const add=(tag,attrs,parent=svg)=>{const n=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));parent.appendChild(n);return n;};
+    add("rect",{x:2,y:2,width:396,height:396,fill:"#fffaf2",stroke:"#9b6336","stroke-width":3});
+    add("line",{x1:2,y1:2,x2:398,y2:398,stroke:"#9b6336","stroke-width":2});
+    add("line",{x1:398,y1:2,x2:2,y2:398,stroke:"#9b6336","stroke-width":2});
+    add("line",{x1:200,y1:2,x2:398,y2:200,stroke:"#9b6336","stroke-width":2});
+    add("line",{x1:398,y1:200,x2:200,y2:398,stroke:"#9b6336","stroke-width":2});
+    add("line",{x1:200,y1:398,x2:2,y2:200,stroke:"#9b6336","stroke-width":2});
+    add("line",{x1:2,y1:200,x2:200,y2:2,stroke:"#9b6336","stroke-width":2});
+    const coords=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
+    const byHouse={};
+    for(const p of data.planets||[]){const h=Number(p.lagnaHouse);if(h>=1&&h<=12)(byHouse[h]||=[]).push(p.name);}
+    for(let house=1;house<=12;house++){
+      const [x,y]=coords[house-1],sign=SIGNS[(lagnaIndex+house-1)%12];
+      add("text",{x,y:y-14,"text-anchor":"middle","font-size":10,fill:"#80502b","font-weight":"600"}).textContent=tr("भाव")+" "+house;
+      add("text",{x,y:y-1,"text-anchor":"middle","font-size":11,fill:"#3b3028"}).textContent=tr(sign);
+      const names=(byHouse[house]||[]).map(n=>tr(n)).join(" ");
+      const t=add("text",{x,y:y+15,"text-anchor":"middle","font-size":10,fill:"#c04d0b","font-weight":"700"});
+      const chunks=names.match(/.{1,18}/gu)||[];
+      chunks.slice(0,2).forEach((part,i)=>{const span=add("tspan",{x,dy:i===0?0:11},t);span.textContent=part;});
     }
-    const t = document.createElement("table");
-    t.style.cssText = "width:100%;border-collapse:collapse;min-width:540px;font-size:13px";
-    rows.forEach((row,index) => {
-      const tr = document.createElement("tr");
-      row.forEach(value => {
-        const cell = document.createElement(index===0 ? "th" : "td");
-        cell.textContent = value;
-        cell.style.cssText = "padding:9px 7px;border-bottom:1px solid #66547f;text-align:left";
-        tr.appendChild(cell);
-      });
-      t.appendChild(tr);
+    wrap.append(svg);
+    const legend=element("p","लग्न स्थिर: "+tr(SIGNS[lagnaIndex])+" | भाव राशि-आधारित Whole Sign पद्धति से।");
+    wrap.append(legend);host.append(wrap);
+  }
+  function renderTable(host,data) {
+    const section=element("section",undefined,"gochar-table-wrap");
+    section.append(element("h3","आज के गोचर ग्रह"));
+    const scroller=element("div",undefined,"gochar-table-scroll");
+    const table=element("table");table.className="gochar-table";
+    const headers=["ग्रह","गोचर राशि","नक्षत्र (चरण)","जन्म लग्न से भाव","स्थिति (शुभ/अशुभ)","अवस्था"];
+    const thead=element("thead"),headRow=element("tr");
+    headers.forEach(h=>headRow.append(element("th",tr(h))));
+    thead.append(headRow);table.append(thead);
+    const tbody=element("tbody");
+    (data.planets||[]).forEach(p=>{
+      const row=element("tr");
+      const values=[
+        tr(p.name),
+        tr(p.rashi)+" "+p.degree.text,
+        tr(p.nakshatra)+" ("+tr("चरण")+" "+p.pada+")",
+        p.lagnaHouse==null?"—":String(p.lagnaHouse),
+        tr(statusNature(p.name)),
+        tr(p.state|| (p.retrograde?"वक्री":"मार्गी"))
+      ];
+      values.forEach((value,i)=>row.append(element("td",value,i===4?(statusNature(p.name)==="शुभ"?"nature-good":statusNature(p.name)==="अशुभ"?"nature-bad":"nature-mixed"):"")));
+      tbody.append(row);
     });
-    table.appendChild(t);
-    const note = document.createElement("p");
-    note.style.cssText = "font-size:12px;line-height:1.6;color:#d4c9e5";
-    note.textContent = data.note || "";
-    output.append(table);
-
-    function appendDrishti(title, details) {
-      if (!details) return;
-      const folder = document.createElement("details");
-      folder.className = "chart-item";
-      const summary = document.createElement("summary");
-      summary.textContent = title;
-      folder.appendChild(summary);
-
-      const houseHeading = document.createElement("p");
-      houseHeading.className = "chat-info";
-      houseHeading.textContent = tr("भावों पर दृष्टि");
-      folder.appendChild(houseHeading);
-      const houseList = document.createElement("ul");
-      for (const aspect of details.houseAspects || []) {
-        const item = document.createElement("li");
-        item.textContent = tr(aspect.from) + " " + tr("की") + " " + (aspect.full ? tr("पूर्ण") : aspect.aspectStrength + "%") +
-          " " + tr("दृष्टि") + " — " + aspect.targetHouse + tr("वाँ भाव") + " (" + tr(aspect.targetSign) + ")";
-        houseList.appendChild(item);
-      }
-      folder.appendChild(houseList);
-
-      const planetHeading = document.createElement("p");
-      planetHeading.className = "chat-info";
-      planetHeading.textContent = tr("दूसरे गोचर ग्रहों पर दृष्टि");
-      folder.appendChild(planetHeading);
-      const planetList = document.createElement("ul");
-      for (const aspect of details.planetAspects || []) {
-        const item = document.createElement("li");
-        item.textContent = tr(aspect.from) + " " + tr("की") + " " + (aspect.full ? tr("पूर्ण") : aspect.aspectStrength + "%") +
-          " " + tr("दृष्टि") + " " + tr(aspect.to) + " " + tr("पर");
-        planetList.appendChild(item);
-      }
-      if (!planetList.children.length) {
-        const item = document.createElement("li");
-        item.textContent = tr("इस दृष्टि-योजना के अनुसार कोई ग्रह-दृष्टि दर्ज नहीं हुई।");
-        planetList.appendChild(item);
-      }
-      folder.appendChild(planetList);
-      output.appendChild(folder);
-    }
-
-    if (data.drishti) {
-      appendDrishti(tr("चंद्र राशि से गोचर ग्रहों की दृष्टि"), data.drishti.fromMoon);
-      appendDrishti(tr("लग्न से गोचर ग्रहों की दृष्टि"), data.drishti.fromLagna);
-    }
-    output.appendChild(note);
+    table.append(tbody);scroller.append(table);section.append(scroller);host.append(section);
   }
-
-  async function loadRashiGochar() {
-    const select = $("rashiSelect");
-    if (!select) return;
-    const rashi = select.value;
-    if (!rashis.includes(rashi)) return showMessage(tr("त्रुटि"),tr("कृपया सही राशि चुनें।"),true);
-    showMessage(tr("आज का गोचर"),tr("ग्रहों की स्थिति निकाली जा रही है..."));
+  function render(data) {
+    latest=data;
+    const host=$("rashiGocharOut");if(!host)return;
+    host.replaceChildren();
+    const title=element("h3","आज के ग्रह गोचर — "+new Date(data.asOf).toLocaleString(window.AstroLanguage?.get?.()||document.documentElement.lang||"hi"));
+    host.append(title);
+    const meta=element("p","जन्म लग्न: "+(data.basisLagna?tr(data.basisLagna):"उपलब्ध नहीं")+" | चंद्र राशि: "+(data.basisRashi?tr(data.basisRashi):"उपलब्ध नहीं")+" | अयनांश: "+data.ayanamsa+" ("+data.ayanamsaDegrees+"°)");
+    meta.className="gochar-meta";host.append(meta);
+    const chartHost=element("div");
+    const chart=window.AstroKundli;
+    const lagnaIndex=Number(chart?.d1?.ascendant?.rashiIndex);
+    if(Number.isInteger(lagnaIndex)&&lagnaIndex>=0&&lagnaIndex<12)drawChart(chartHost,data,lagnaIndex);
+    else chartHost.append(element("p","उत्तर भारतीय गोचर कुंडली दिखाने के लिए पहले जन्म विवरण भरकर अपनी जन्म कुंडली बनाएं।"));
+    host.append(chartHost);
+    renderTable(host,data);
+    const note=element("p",data.note||"");note.className="gochar-note";host.append(note);
+    const ai=$("gocharAiPanel");if(ai)ai.hidden=false;
+  }
+  async function loadGochar() {
+    const select=$("rashiSelect");if(!select)return;
+    const chart=window.AstroKundli;
+    const lagnaIndex=Number(chart?.d1?.ascendant?.rashiIndex);
+    const lagna=Number.isInteger(lagnaIndex)&&lagnaIndex>=0&&lagnaIndex<12?SIGNS[lagnaIndex]:"";
+    const rashi=select.value;
+    message("आज का गोचर","वर्तमान समय के नौ ग्रहों की गणना हो रही है...");
     try {
-      const data = await request(API + "?rashi=" + encodeURIComponent(rashi));
-      if (!Array.isArray(data.planets)) throw new Error(tr("सर्वर से ग्रहों की पूरी सूची नहीं मिली।"));
+      const query=new URLSearchParams();
+      if(rashi)query.set("rashi",rashi);
+      if(lagna)query.set("lagna",lagna);
+      const data=await getJSON(API+"?"+query.toString());
+      if(!Array.isArray(data.planets)||data.planets.length!==9)throw new Error("सर्वर से सभी नौ ग्रहों का डेटा नहीं मिला।");
       render(data);
-    } catch (error) {
-      showMessage(tr("गोचर उपलब्ध नहीं"),tr(error.message),true);
-    }
+    } catch(error) {message("गोचर उपलब्ध नहीं",error.message,true);}
   }
-
-  function initialize() {
-    const select = $("rashiSelect");
-    if (select) {
-      select.addEventListener("change",loadRashiGochar);
-      loadRashiGochar();
-    }
+  async function askPrediction() {
+    const button=$("gocharAiButton"),output=$("gocharAiOutput"),language=window.AstroLanguage?.get?.()||document.documentElement.lang||"hi";
+    if(!latest||!Array.isArray(latest.planets))return;
+    if(!button||!output)return;
+    button.disabled=true;button.textContent=tr("AI विश्लेषण तैयार हो रहा है...");
+    output.textContent=tr("Gemini से गोचर फलादेश प्राप्त किया जा रहा है...");
+    try {
+      const result=await getJSON("/api/gochar-prediction",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({gochar:latest,language})
+      });
+      output.textContent=result.answer||tr("विश्लेषण उपलब्ध नहीं है।");
+    } catch(error) {output.textContent=tr(error.message);}
+    finally {button.disabled=false;button.textContent=tr("आज के गोचर का विश्लेषण करें");}
   }
-  window.loadRashiGochar = loadRashiGochar;
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",initialize,{once:true});
-  else initialize();
+  function init() {
+    const select=$("rashiSelect");
+    if(select) {
+      const chart=window.AstroKundli;
+      const moonIndex=Number(chart?.d1?.planets?.चंद्र?.rashiIndex);
+      if(Number.isInteger(moonIndex)&&moonIndex>=0&&moonIndex<12)select.value=SIGNS[moonIndex];
+      select.addEventListener("change",loadGochar);
+    }
+    $("gocharAiButton")?.addEventListener("click",askPrediction);
+    document.querySelector('[data-app-tab="gochar"]')?.addEventListener("click",()=>{if(window.AstroKundli)setTimeout(loadGochar,120);});
+    document.addEventListener("astro:kundli-ready",()=>{const chart=window.AstroKundli;const moonIndex=Number(chart?.d1?.planets?.चंद्र?.rashiIndex);if(select&&Number.isInteger(moonIndex))select.value=SIGNS[moonIndex];loadGochar();});
+    if(window.AstroKundli)setTimeout(loadGochar,0);
+    else message("गोचर कुंडली","पहले जन्म विवरण भरकर अपनी जन्म कुंडली बनाएं। फिर आपके जन्म लग्न और चंद्र राशि से आज के गोचर भाव अपने-आप निकलेंगे।");
+  }
+  window.loadRashiGochar=loadGochar;
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
