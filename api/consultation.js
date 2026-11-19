@@ -94,7 +94,7 @@ module.exports=async function(req,res,env={}){
     const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
     const language=supportedLanguages.has(body.language)?body.language:"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:env.GEMINI_API_KEY,model:env.GEMINI_MODEL});
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:env.GEMINI_API_KEY,model:"gemini-2.5-flash"});
     return res.status(200).json({success:true,answer});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
