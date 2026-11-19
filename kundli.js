@@ -255,6 +255,7 @@
       root.appendChild(p);return;
     }
     for(const [key,varga] of entries){
+      if(key==="D1")continue;
       if(!varga?.ascendant||!Number.isInteger(Number(varga.ascendant.rashiIndex)))continue;
       const card=document.createElement("details");
       card.className="chart-card";
