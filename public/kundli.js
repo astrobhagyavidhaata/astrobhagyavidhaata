@@ -38,6 +38,13 @@
     as:{labels:["জন্ম লগ্ন","চন্দ্ৰ ৰাশি","ভাৱ","গ্ৰহ","ৰাশি","নক্ষত্ৰ","পদ","লগ্ন","নক্ষত্ৰৰ অধিপতি"],planets:["সূৰ্য","চন্দ্ৰ","মঙ্গল","বুধ","বৃহস্পতি","শুক্ৰ","শনি","ৰাহু","কেতু"],signs:["মেষ","বৃষ","মিথুন","কৰ্কট","সিংহ","কন্যা","তুলা","বৃশ্চিক","ধনু","মকৰ","কুম্ভ","মীন"]},
     "en-CA":{labels:["Birth ascendant","Moon sign","House","Planet","Sign","Nakshatra","Pada","Ascendant","Nakshatra lord"],planets:["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"],signs:["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]}
   };
+  const I18N_DICT = {
+    en: {
+      nakshatras: {"अश्विनी":"Ashwini","भरणी":"Bharani","कृत्तिका":"Krittika","रोहिणी":"Rohini","मृगशिरा":"Mrigashira","मृगशीर्ष":"Mrigashira","आर्द्रा":"Ardra","पुनर्वसु":"Punarvasu","पुष्य":"Pushya","आश्लेषा":"Ashlesha","मघा":"Magha","पूर्वा फाल्गुनी":"Purva Phalguni","पूर्वाफाल्गुनी":"Purva Phalguni","उत्तरा फाल्गुनी":"Uttara Phalguni","उत्तराफाल्गुनी":"Uttara Phalguni","हस्त":"Hasta","चित्रा":"Chitra","स्वाति":"Swati","स्वाती":"Swati","विशाखा":"Vishakha","अनुराधा":"Anuradha","ज्येष्ठा":"Jyeshtha","मूल":"Mula","पूर्वाषाढ़ा":"Purva Ashadha","उत्तराषाढ़ा":"Uttara Ashadha","श्रवण":"Shravana","धनिष्ठा":"Dhanishta","शतभिषा":"Shatabhisha","पूर्वाभाद्रपद":"Purva Bhadrapada","उत्तराभाद्रपद":"Uttara Bhadrapada","रेवती":"Revati"},
+      words: {"लग्न":"Ascendant","नक्षत्र":"Nakshatra","चरण":"Pada","महादशा":"Mahadasha","अंतर्दशा":"Antardasha","अंतरदशा":"Antardasha","प्रत्यंतरदशा":"Pratyantardasha","भाव":"House","राशि":"Sign","ग्रह":"Planet","वर्तमान":"Current","आरंभ":"Start","समाप्ति":"End","से":"to"}
+    }
+  };
+
   const PLANET_KEYS=["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
   const PLANET_HINDI=["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि","राहु","केतु"];
   const SIGN_KEYS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
@@ -51,17 +58,26 @@
   }
   function localizeChartText(value) {
     const locale=chartLocale();
+    const language=selectedChartLanguage().split("-")[0];
     let result=String(value ?? "");
     for(let i=0;i<PLANET_KEYS.length;i++) {
-      result=result.replace(new RegExp("\\b"+PLANET_KEYS[i]+"\\b","gi"),locale.planets[i]);
+      result=result.replace(new RegExp("\\\\b"+PLANET_KEYS[i]+"\\\\b","gi"),locale.planets[i]);
       result=result.split(PLANET_HINDI[i]).join(locale.planets[i]);
     }
     for(let i=0;i<SIGN_KEYS.length;i++) {
-      result=result.replace(new RegExp("\\b"+SIGN_KEYS[i]+"\\b","gi"),locale.signs[i]);
+      result=result.replace(new RegExp("\\\\b"+SIGN_KEYS[i]+"\\\\b","gi"),locale.signs[i]);
       result=result.split(SIGN_HINDI[i]).join(locale.signs[i]);
     }
+    if(language==="en") {
+      for(const [source,target] of Object.entries(I18N_DICT.en.nakshatras)) result=result.split(source).join(target);
+      for(const [source,target] of Object.entries(I18N_DICT.en.words)) result=result.split(source).join(target);
+      result=result.replace(/चरण\\s*(\\d+)/g,"Pada $1");
+      result=result.replace(/(\\d+)वाँ/g,(_,n)=>{const v=Number(n),suffix=v%100>=11&&v%100<=13?"th":v%10===1?"st":v%10===2?"nd":v%10===3?"rd":"th";return v+suffix;});
+    } else if(window.AstroLanguage?.translate) {
+      result=window.AstroLanguage.translate(result);
+    }
     const common={House:locale.labels[2],Planet:locale.labels[3],Sign:locale.labels[4],Nakshatra:locale.labels[5],Pada:locale.labels[6],Ascendant:locale.labels[7]};
-    for(const [word,translation] of Object.entries(common)) result=result.replace(new RegExp("\\b"+word+"\\b","gi"),translation);
+    for(const [word,translation] of Object.entries(common)) result=result.replace(new RegExp("\\\\b"+word+"\\\\b","gi"),translation);
     return result;
   }
 
@@ -137,9 +153,9 @@
         const degree=Number(p.degreeInRashi);
         const degreeText=Number.isFinite(degree)?degree.toFixed(2)+"°":"—";
         const pada=Number(p.pada);
-        const padaText=Number.isInteger(pada)&&pada>=1&&pada<=4?"चरण "+pada:"—";
+        const padaText=Number.isInteger(pada)&&pada>=1&&pada<=4?localizeChartText("चरण "+pada):"—";
         const house=Number(p.house);
-        const houseText=Number.isInteger(house)&&house>=1&&house<=12?house+"वाँ":"—";
+        const houseText=Number.isInteger(house)&&house>=1&&house<=12?localizeChartText(house+"वाँ"):"—";
         const nakshatraIndex=Number(p.nakshatraIndex);
         const nakshatraLord=Number.isInteger(nakshatraIndex)&&nakshatraIndex>=0&&nakshatraIndex<27?nakshatraLords[nakshatraIndex%9]:"—";
         const planetText=localizeChartText(planet)+(p.retrograde?" ℞":"");
@@ -292,7 +308,7 @@
             adDetails.appendChild(pdTable);adList.appendChild(adDetails);
           });
           mdDetails.appendChild(adList);
-          if(mdItem.planet===activeMD){mdDetails.open=true;const currentAd=Array.from(adList.children).find((el)=>el.querySelector("summary")?.textContent.startsWith(activeMD+" / "+activeAD));if(currentAd)currentAd.open=true;}
+          mdDetails.open=false;\n          adList.querySelectorAll("details").forEach(adDetails=>{adDetails.open=false;});
           dashaFolder.appendChild(mdDetails);
         });
       } else addNote(dashaFolder,"विंशोत्तरी दशा की पूरी समय-सारणी उपलब्ध नहीं है।");
@@ -961,6 +977,13 @@
     }
   }
 
+  window.changeAppLanguage = function(language) {
+    if(window.AstroLanguage?.set) window.AstroLanguage.set(language);
+    else { document.documentElement.lang=language; try{localStorage.setItem("astro_language",language);}catch(_){} }
+    const chart=window.AstroKundli;
+    if(chart){renderMainKundliChart(chart);renderVargaCharts(chart);renderAstrologyCalculations(chart);}
+  };
+
   function initialize() {
     const form = $("kundliForm");
 
@@ -983,6 +1006,7 @@
         // Rebuild SVG charts immediately so Hindi is applied even when language changes after calculation.
         renderMainKundliChart(chart);
         renderVargaCharts(chart);
+        renderAstrologyCalculations(chart);
       });
     }
     const placeInput = $("birthPlace");
