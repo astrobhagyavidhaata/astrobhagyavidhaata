@@ -24,7 +24,7 @@
   function localizeAstroText(text, lang) {
     let result=String(text??"");
     for(const [eng,hin] of Object.entries(astroHindiMap).sort((a,b)=>b[0].length-a[0].length)){
-      const escaped=eng.replace(/[.*+?^${}()|[\]\\]/g,"\\  const $=id=>document.getElementById(id);");
+      result=result.replace(new RegExp("\\b"+eng+"\\b","gi"),hin);
       result=result.replace(new RegExp("(?<![\\p{L}\\p{N}])"+escaped+"(?![\\p{L}\\p{N}])","giu"),hin);
     }
     if(String(lang||"hi").split("-")[0]==="hi")return result;
