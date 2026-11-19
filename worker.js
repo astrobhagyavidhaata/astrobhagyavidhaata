@@ -199,7 +199,7 @@ Google या Gemini का नाम अपनी पहचान के रू
         }
         const available = (listJson.models || [])
           .filter(item => Array.isArray(item.supportedGenerationMethods) && item.supportedGenerationMethods.includes("generateContent") && typeof item.name === "string")
-          .map(item => item.name.replace(/^models\\//, ""))
+          .map(item => item.name.replace(/^models\//, ""))
           .filter(name => !modelCandidates.includes(name))
           .sort((a, b) => Number(/flash/i.test(b)) - Number(/flash/i.test(a)));
         for (const candidateModel of available) {
