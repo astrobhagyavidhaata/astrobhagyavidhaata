@@ -60,6 +60,7 @@
      const lead=source.match(/^\s*/)?.[0]||"",trail=source.match(/\s*$/)?.[0]||"";
      node.nodeValue=lead+map[trimmed]+trail;
    }else node.nodeValue=translateAstroText(source,lang);
+   if(node.nodeValue){node.nodeValue=node.nodeValue.replace(/कैto/g,"कैसे").replace(/AI ज्योतिषी\s+to\s+अपना सवाल पूछें/g,"AI ज्योतिषी से अपना सवाल पूछें");}
  }
  function translateElement(el,lang){
    if(el.nodeType===Node.TEXT_NODE){translateTextNode(el,lang);return;}
@@ -71,7 +72,7 @@
        if(!el.hasAttribute(key))el.setAttribute(key,el.getAttribute(attr));
        const base=localeTerms[lang]||String(lang||"en").split("-")[0];
        const source=el.getAttribute(key),value=(dictionaries[base]||{})[source]||translateAstroText(source,lang);
-       el.setAttribute(attr,value||source);
+       el.setAttribute(attr,(value||source).replace(/कैto/g,"कैसे").replace(/AI ज्योतिषी\s+to\s+अपना सवाल पूछें/g,"AI ज्योतिषी से अपना सवाल पूछें"));
      }
    }
    if(el.tagName==="OPTION"&&el.parentElement?.id==="preferredLanguage")return;
