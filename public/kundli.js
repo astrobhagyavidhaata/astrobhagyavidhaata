@@ -16,6 +16,39 @@
 
   const $ = (id) => document.getElementById(id);
 
+  const HINDI_ASTRO_TRANSLATIONS = {
+    House:"भाव", Sun:"सूर्य", Moon:"चंद्र", Mars:"मंगल", Mercury:"बुध",
+    Jupiter:"गुरु", Venus:"शुक्र", Saturn:"शनि", Rahu:"राहु", Ketu:"केतु",
+    Aries:"मेष", Taurus:"वृषभ", Gemini:"मिथुन", Cancer:"कर्क",
+    Leo:"सिंह", Virgo:"कन्या", Libra:"तुला", Scorpio:"वृश्चिक",
+    Sagittarius:"धनु", Capricorn:"मकर", Aquarius:"कुंभ", Pisces:"मीन",
+    Ashwini:"अश्विनी", Bharani:"भरणी", Krittika:"कृत्तिका", Rohini:"रोहिणी",
+    Mrigashira:"मृगशिरा", Ardra:"आर्द्रा", Punarvasu:"पुनर्वसु", Pushya:"पुष्य",
+    Ashlesha:"आश्लेषा", Magha:"मघा", "Purva Phalguni":"पूर्वा फाल्गुनी",
+    "Uttara Phalguni":"उत्तरा फाल्गुनी", Hasta:"हस्त", Chitra:"चित्रा", Swati:"स्वाती",
+    Vishakha:"विशाखा", Anuradha:"अनुराधा", Jyeshtha:"ज्येष्ठा", Mula:"मूल",
+    "Purva Ashadha":"पूर्वाषाढ़ा", "Uttara Ashadha":"उत्तराषाढ़ा", Shravana:"श्रवण",
+    Dhanishta:"धनिष्ठा", Shatabhisha:"शतभिषा", "Purva Bhadrapada":"पूर्वाभाद्रपद",
+    "Uttara Bhadrapada":"उत्तराभाद्रपद", Revati:"रेवती",
+    Pada:"चरण", Planet:"ग्रह", Sign:"राशि", Nakshatra:"नक्षत्र",
+    Retrograde:"वक्री", Direct:"मार्गी"
+  };
+  function isHindiSelected() {
+    const language = String(window.AstroLanguage?.get?.() || $("preferredLanguage")?.value || document.documentElement.lang || "en");
+    return language.toLowerCase().startsWith("hi");
+  }
+  function localizeChartText(value) {
+    let result = String(value ?? "");
+    if (!isHindiSelected()) return result;
+    for (const [english, hindi] of Object.entries(HINDI_ASTRO_TRANSLATIONS).sort((a,b)=>b[0].length-a[0].length)) {
+      const escaped = english.replace(/[.*+?^${}()|[\]\\]/g, "\\  const $ = (id) => document.getElementById(id);
+");
+      result = result.replace(new RegExp("\\b" + escaped + "\\b", "gi"), hindi);
+    }
+    return result;
+  }
+
+
   function showMessage(message, error = false) {
     const box = $("message");
     if (!box) return;
@@ -53,12 +86,12 @@
       const pos=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
       for(let house=1;house<=12;house++){
         const [x,y]=pos[house-1],sign=(spec.asc+house-1)%12,g=document.createElementNS(ns,"g");
-        const s=document.createElementNS(ns,"text");s.setAttribute("x",x);s.setAttribute("y",y-9);s.setAttribute("text-anchor","middle");s.setAttribute("font-size","12");s.setAttribute("font-weight","bold");s.setAttribute("fill","#4b2d16");s.textContent=signs[sign]+" "+(sign+1);
+        const s=document.createElementNS(ns,"text");s.setAttribute("x",x);s.setAttribute("y",y-9);s.setAttribute("text-anchor","middle");s.setAttribute("font-size","12");s.setAttribute("font-weight","bold");s.setAttribute("fill","#4b2d16");s.textContent=localizeChartText(signs[sign])+" "+(sign+1);
         const ptext=document.createElementNS(ns,"text");ptext.setAttribute("x",x);ptext.setAttribute("y",y+9);ptext.setAttribute("text-anchor","middle");ptext.setAttribute("font-size","10");ptext.setAttribute("font-weight","600");ptext.setAttribute("fill","#9a421d");
-        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=names.slice(i,i+2).join(" ");ptext.appendChild(span);}
+        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=localizeChartText(names.slice(i,i+2).join(" "));ptext.appendChild(span);}
         g.append(s,ptext);svg.appendChild(g);
       }
-      card.appendChild(svg);const asc=document.createElement("p");asc.className="chart-asc";asc.textContent="लग्न: "+signs[spec.asc]+" ("+(spec.asc+1)+")";card.appendChild(asc);host.appendChild(card);
+      card.appendChild(svg);const asc=document.createElement("p");asc.className="chart-asc";asc.textContent="लग्न: "+localizeChartText(signs[spec.asc])+" ("+(spec.asc+1)+")";card.appendChild(asc);host.appendChild(card);
     }
     const panel=$("planetNakshatra");
     if(panel){
@@ -85,8 +118,8 @@
         const houseText=Number.isInteger(house)&&house>=1&&house<=12?house+"वाँ":"—";
         const nakshatraIndex=Number(p.nakshatraIndex);
         const nakshatraLord=Number.isInteger(nakshatraIndex)&&nakshatraIndex>=0&&nakshatraIndex<27?nakshatraLords[nakshatraIndex%9]:"—";
-        const planetText=planet+(p.retrograde?" ℞":"");
-        const values=[planetText,p.rashi||signs[p.rashiIndex]||"—",houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
+        const planetText=localizeChartText(planet)+(p.retrograde?" ℞":"");
+        const values=[planetText,localizeChartText(p.rashi||signs[p.rashiIndex]||"—"),houseText,degreeText,localizeChartText(p.nakshatra||"—"),padaText,localizeChartText(nakshatraLord)];
         const tr=document.createElement("tr");
         values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});
         tbody.appendChild(tr);
@@ -175,7 +208,7 @@
       const activeGrid=document.createElement("div");activeGrid.className="dasha-current-grid";
       [[ "महादशा",activeMD,active.mahadashaStart,active.mahadashaEnd ],["अंतरदशा",activeAD,active.antardashaStart,active.antardashaEnd],["प्रत्यंतरदशा",activePD,active.pratyantardashaStart,active.pratyantardashaEnd]].forEach(([label,planet,start,end])=>{
         const item=document.createElement("div");item.className="dasha-current-item";
-        const name=document.createElement("strong");name.textContent=label;const value=document.createElement("span");value.textContent=planet||"—";
+        const name=document.createElement("strong");name.textContent=label;const value=document.createElement("span");value.textContent=localizeChartText(planet||"—");
         const range=document.createElement("small");range.textContent=periodDate(start)+" – "+periodDate(end);
         item.append(name,value,range);activeGrid.appendChild(item);
       });
@@ -185,18 +218,18 @@
       if(schedule.length){
         schedule.forEach(mdItem=>{
           const mdDetails=document.createElement("details");mdDetails.className="dasha-period";
-          const mdSummary=document.createElement("summary");mdSummary.textContent=mdItem.planet+" महादशा  •  "+periodRange(mdItem)+(mdItem.planet===activeMD?"  |  अभी चल रही":"");
+          const mdSummary=document.createElement("summary");mdSummary.textContent=localizeChartText(mdItem.planet)+" महादशा  •  "+periodRange(mdItem)+(mdItem.planet===activeMD?"  |  अभी चल रही":"");
           mdDetails.appendChild(mdSummary);
           const adList=document.createElement("div");adList.className="dasha-subperiod-list";
           (mdItem.antardashas||[]).forEach(adItem=>{
             const adDetails=document.createElement("details");adDetails.className="dasha-subperiod";
-            const adSummary=document.createElement("summary");adSummary.textContent=mdItem.planet+" / "+adItem.planet+"  •  "+periodRange(adItem)+(mdItem.planet===activeMD&&adItem.planet===activeAD?"  |  वर्तमान":"");
+            const adSummary=document.createElement("summary");adSummary.textContent=localizeChartText(mdItem.planet)+" / "+localizeChartText(adItem.planet)+"  •  "+periodRange(adItem)+(mdItem.planet===activeMD&&adItem.planet===activeAD?"  |  वर्तमान":"");
             adDetails.appendChild(adSummary);
             const pdTable=document.createElement("table");pdTable.className="dasha-date-table";
             const head=document.createElement("tr");["प्रत्यंतरदशा","आरंभ","समाप्ति"].forEach(label=>{const th=document.createElement("th");th.textContent=label;head.appendChild(th);});pdTable.appendChild(head);
             (adItem.pratyantardashas||[]).forEach(pdItem=>{
               const row=document.createElement("tr");
-              [pdItem.planet,periodDate(pdItem.start),periodDate(pdItem.end)].forEach((value,index)=>{const cell=document.createElement("td");cell.textContent=value;row.appendChild(cell);});
+              [localizeChartText(pdItem.planet),periodDate(pdItem.start),periodDate(pdItem.end)].forEach((value,index)=>{const cell=document.createElement("td");cell.textContent=value;row.appendChild(cell);});
               if(mdItem.planet===activeMD&&adItem.planet===activeAD&&pdItem.planet===activePD)row.className="dasha-active-row";
               pdTable.appendChild(row);
             });
@@ -271,7 +304,7 @@
           const segment=document.createElement("div");
           const share=Math.max(5,((period.endMs-period.startMs)/total)*100);
           segment.style.cssText="flex:0 0 "+share+"%;min-width:64px;max-width:220px;box-sizing:border-box;padding:7px 5px;border:1px solid #80633d;border-radius:6px;background:#30243e;text-align:center;white-space:normal";
-          const planet=document.createElement("strong");planet.textContent=period.planet||"—";planet.style.cssText="display:block;color:#f5d994;font-size:11px";
+          const planet=document.createElement("strong");planet.textContent=localizeChartText(period.planet||"—");planet.style.cssText="display:block;color:#f5d994;font-size:11px";
           const dates=document.createElement("small");dates.textContent=fmt(period.start)+" – "+fmt(period.end);dates.style.cssText="display:block;color:#d4c9e5;font-size:9px;margin-top:3px";
           segment.append(planet,dates);track.appendChild(segment);
         });
@@ -280,14 +313,14 @@
       appendPeriodBar(timeline,dasha.mahadashas||[],"महादशाओं की दृश्य समय-रेखा");
       (dasha.mahadashas||[]).forEach(md=>{
         const row=document.createElement("tr");
-        [md.planet,fmt(md.start),fmt(md.end),(md.antardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:7px;border-top:1px solid #493568";row.appendChild(td);});table.appendChild(row);
+        [localizeChartText(md.planet),fmt(md.start),fmt(md.end),(md.antardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:7px;border-top:1px solid #493568";row.appendChild(td);});table.appendChild(row);
         const item=document.createElement("details");item.className="chart-item";
-        const sum=document.createElement("summary");sum.textContent=md.planet+" महादशा की अंतर्दशा और प्रत्यंतरदशा";item.appendChild(sum);
+        const sum=document.createElement("summary");sum.textContent=localizeChartText(md.planet)+" महादशा की अंतर्दशा और प्रत्यंतरदशा";item.appendChild(sum);
         const sub=document.createElement("div");sub.style.cssText="overflow-x:auto";
         appendPeriodBar(sub,md.antardashas||[],"इस महादशा की अंतर्दशाएँ");
         const subTable=document.createElement("table");subTable.style.cssText="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap";
         const subHead=document.createElement("tr");["अंतर्दशा","आरंभ","समाप्ति","प्रत्यंतरदशाएँ"].forEach(v=>{const th=document.createElement("th");th.textContent=v;th.style.cssText="text-align:left;padding:6px;color:#f5d994";subHead.appendChild(th);});subTable.appendChild(subHead);
-        (md.antardashas||[]).forEach(ad=>{const ar=document.createElement("tr");[ad.planet,fmt(ad.start),fmt(ad.end),(ad.pratyantardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:6px;border-top:1px solid #493568";ar.appendChild(td);});subTable.appendChild(ar);
+        (md.antardashas||[]).forEach(ad=>{const ar=document.createElement("tr");[localizeChartText(ad.planet),fmt(ad.start),fmt(ad.end),(ad.pratyantardashas||[]).length+" अवधि"].forEach(v=>{const td=document.createElement("td");td.textContent=String(v);td.style.cssText="padding:6px;border-top:1px solid #493568";ar.appendChild(td);});subTable.appendChild(ar);
           const pd=document.createElement("tr");const cell=document.createElement("td");cell.colSpan=4;cell.style.cssText="padding:6px 10px;color:#d4c9e5;white-space:normal";
           const pdLabel=document.createElement("p");pdLabel.textContent="प्रत्यंतरदशाएँ";pdLabel.style.cssText="margin:2px 0;color:#f5d994;font-weight:700";cell.appendChild(pdLabel);
           appendPeriodBar(cell,ad.pratyantardashas||[],"प्रत्यंतरदशा क्रम");
@@ -392,7 +425,7 @@
       const occupants={};
       for(const [planetName,position] of Object.entries(varga.planets||{})){
         const house=Number(position.house);
-        if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||(occupants[house]=[])).push(planetName+(position.retrograde?" ℞":""));
+        if(Number.isInteger(house)&&house>=1&&house<=12)(occupants[house]||(occupants[house]=[])).push(localizeChartText(planetName)+(position.retrograde?" ℞":""));
       }
       const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
       svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");svg.setAttribute("aria-label",key+" उत्तर भारतीय शैली की 12 भाव वाली कुंडली");svg.setAttribute("data-chart-layout","north-indian");
@@ -403,13 +436,13 @@
       const pos=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
       for(let house=1;house<=12;house++){
         const [x,y]=pos[house-1],sign=(Number(varga.ascendant.rashiIndex)+house-1)%12,group=document.createElementNS(ns,"g");
-        const signText=document.createElementNS(ns,"text");signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");signText.textContent=signNames[sign];
+        const signText=document.createElementNS(ns,"text");signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");signText.textContent=localizeChartText(signNames[sign]);
         const planetText=document.createElementNS(ns,"text");planetText.setAttribute("x",x);planetText.setAttribute("y",y+9);planetText.setAttribute("text-anchor","middle");planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
-        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=names.slice(i,i+2).join(" ");planetText.appendChild(span);}
+        const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=localizeChartText(names.slice(i,i+2).join(" "));planetText.appendChild(span);}
         group.append(signText,planetText);svg.appendChild(group);
       }
       card.appendChild(svg);
-      const caption=document.createElement("p");caption.className="chart-asc";caption.textContent="लग्न: "+signNames[Number(varga.ascendant.rashiIndex)];card.appendChild(caption);
+      const caption=document.createElement("p");caption.className="chart-asc";caption.textContent="लग्न: "+localizeChartText(signNames[Number(varga.ascendant.rashiIndex)]);card.appendChild(caption);
       button.addEventListener("click",()=>{pages.querySelectorAll(".varga-page").forEach(page=>page.classList.toggle("active",page===card));toolbar.querySelectorAll("button").forEach(tab=>tab.setAttribute("aria-selected",String(tab===button)));button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});});
       toolbar.appendChild(button);pages.appendChild(card);
     });
