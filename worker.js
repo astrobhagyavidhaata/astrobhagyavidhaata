@@ -160,7 +160,7 @@ async function runGeminiConsultation(request, env = {}) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        system_instruction: {
+        systemInstruction: {
           parts: [{ text: strictSystemPrompt }]
         },
         contents: [
@@ -169,9 +169,9 @@ async function runGeminiConsultation(request, env = {}) {
             parts: [
               {
                 text:
-                  "संपूर्ण उपलब्ध कुंडली डेटा (D1, D9, ग्रह, नक्षत्र, चरण, भाव, दशा, अंतर्दशा, तारा बल, षड्बल और गोचर):\\n" +
+                  "संपूर्ण उपलब्ध कुंडली डेटा (D1, D9, ग्रह, नक्षत्र, चरण, भाव, दशा, अंतर्दशा, तारा बल, षड्बल और गोचर):\n" +
                   JSON.stringify(completeChartData).slice(0, 28000) +
-                  "\\n\\nग्राहक का प्रश्न: " +
+                  "\n\nग्राहक का प्रश्न: " +
                   userQuestion
               }
             ]
@@ -202,7 +202,7 @@ async function runGeminiConsultation(request, env = {}) {
       aiJson?.candidates?.[0]?.content?.parts || []
     )
       .map(part => part.text || "")
-      .join("\\n")
+      .join("\n")
       .trim();
 
     if (!replyText) {
