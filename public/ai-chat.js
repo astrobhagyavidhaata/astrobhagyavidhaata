@@ -3,7 +3,7 @@
  const $=id=>document.getElementById(id);
  const history=[];
  function addMessage(role,text){
-   const host=$("aiAstrologerMessages");if(!host)return;
+   const host=$("ai-response-box");if(!host)return;\n   host.contentEditable="false";
    const node=document.createElement("div");node.className="ai-chat-message "+role;node.textContent=text;
    host.appendChild(node);host.scrollTop=host.scrollHeight;
  }
