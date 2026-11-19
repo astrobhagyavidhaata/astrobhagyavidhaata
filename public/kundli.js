@@ -56,16 +56,21 @@
     const language=selectedChartLanguage();
     return CHART_TRANSLATIONS[language] || CHART_TRANSLATIONS[language.split("-")[0]] || CHART_TRANSLATIONS.en;
   }
-  // Escape translation keys before building dynamic word-boundary regexes.\n  function chartWordPattern(word) {\n    const escaped=String(word).replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\  function localizeChartText(value) {");\n    return new RegExp("\\\\b"+escaped+"\\\\b","gi");\n  }\n  function localizeChartText(value) {
+  // Escape translation keys before building dynamic word-boundary regexes.
+  function chartWordPattern(word) {
+    const escaped=String(word).replace(/[|\\{}()[\]^$+*?.]/g,"\\$&");
+    return new RegExp("\\b"+escaped+"\\b","gi");
+  }
+  function localizeChartText(value) {");\n    return new RegExp("\\\\b"+escaped+"\\\\b","gi");\n  }\n  function localizeChartText(value) {
     const locale=chartLocale();
     const language=selectedChartLanguage().split("-")[0];
     let result=String(value ?? "");
     for(let i=0;i<PLANET_KEYS.length;i++) {
-      result=result.replace(new RegExp("\\b"+PLANET_KEYS[i]+"\\b","gi"),locale.planets[i]);
+      result=result.replace(chartWordPattern(PLANET_KEYS[i]),locale.planets[i]);
       result=result.split(PLANET_HINDI[i]).join(locale.planets[i]);
     }
     for(let i=0;i<SIGN_KEYS.length;i++) {
-      result=result.replace(new RegExp("\\b"+SIGN_KEYS[i]+"\\b","gi"),locale.signs[i]);
+      result=result.replace(chartWordPattern(SIGN_KEYS[i]),locale.signs[i]);
       result=result.split(SIGN_HINDI[i]).join(locale.signs[i]);
     }
     if(language==="en") {
@@ -77,7 +82,7 @@
       result=window.AstroLanguage.translate(result);
     }
     const common={House:locale.labels[2],Planet:locale.labels[3],Sign:locale.labels[4],Nakshatra:locale.labels[5],Pada:locale.labels[6],Ascendant:locale.labels[7]};
-    for(const [word,translation] of Object.entries(common)) result=result.replace(new RegExp("\\b"+word+"\\b","gi"),translation);
+    for(const [word,translation] of Object.entries(common)) result=result.replace(chartWordPattern(word),translation);
     return result;
   }
 
