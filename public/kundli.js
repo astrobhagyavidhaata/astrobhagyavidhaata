@@ -249,26 +249,58 @@
   }
 
   async function findBirthPlace(place) {
-    const url = new URL(GEOCODING_URL);
-
-    url.search = new URLSearchParams({
+    const openMeteoUrl = new URL(GEOCODING_URL);
+    openMeteoUrl.search = new URLSearchParams({
       name: place,
       count: "8",
       language: "en",
       format: "json"
     });
 
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error("Unable to search for the birth place.");
+    let openMeteoError = null;
+    try {
+      const response = await fetch(openMeteoUrl, { headers: { "Accept": "application/json" } });
+      if (!response.ok) throw new Error("Open-Meteo geocoding returned HTTP " + response.status);
+      const data = await response.json();
+      if (Array.isArray(data.results) && data.results.length) return data.results;
+    } catch (error) {
+      openMeteoError = error;
     }
 
-    const data = await response.json();
-
-    return Array.isArray(data.results)
-      ? data.results
-      : [];
+    // Global fallback: OpenStreetMap Nominatim. Convert its response to the
+    // same location shape used by the chart form.
+    try {
+      const osmUrl = new URL("https://nominatim.openstreetmap.org/search");
+      osmUrl.search = new URLSearchParams({
+        q: place,
+        format: "jsonv2",
+        addressdetails: "1",
+        limit: "8"
+      });
+      const response = await fetch(osmUrl, { headers: { "Accept": "application/json", "Accept-Language": "en" } });
+      if (!response.ok) throw new Error("OpenStreetMap geocoding returned HTTP " + response.status);
+      const rows = await response.json();
+      return (Array.isArray(rows) ? rows : []).map(item => {
+        const address = item.address || {};
+        const city = address.city || address.town || address.village ||
+          address.municipality || address.county || item.name || item.display_name;
+        return {
+          name: city,
+          admin1: address.state || address.region || address.state_district || "",
+          country: address.country || "",
+          country_code: String(address.country_code || "").toLowerCase(),
+          latitude: Number(item.lat),
+          longitude: Number(item.lon),
+          elevation: null,
+          label: item.display_name || ""
+        };
+      }).filter(item => Number.isFinite(item.latitude) &&
+        Number.isFinite(item.longitude) &&
+        Math.abs(item.latitude) <= 90 && Math.abs(item.longitude) <= 180);
+    } catch (osmError) {
+      console.error("Global geocoding failed:", openMeteoError?.message, osmError?.message);
+      throw new Error("जन्मस्थान नहीं मिल सका। शहर के साथ राज्य और देश का नाम लिखकर दोबारा प्रयास करें।");
+    }
   }
 
   function showLocationChoices(results, callback) {
