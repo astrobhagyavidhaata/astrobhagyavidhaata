@@ -123,6 +123,15 @@
     .support-topics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
     .support-topics a{display:block;text-align:center;text-decoration:none;padding:11px 8px;border:1px solid #66547f;border-radius:8px;color:#f5d994;font-size:13px}
     @media(max-width:360px){.support-actions,.support-topics{grid-template-columns:1fr}}
+    .ai-astrologer{margin:18px 0;padding:16px;border:1px solid #e6b88e;border-radius:12px;background:#fffaf6;color:#222}
+    .ai-astrologer h2{color:#dc5705}
+    .ai-chat-messages{max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin:12px 0}
+    .ai-chat-message{padding:10px 12px;border-radius:10px;white-space:pre-wrap;line-height:1.55}
+    .ai-chat-message.user{background:#fff0e5;align-self:flex-end;max-width:92%}
+    .ai-chat-message.assistant{background:#f2f2f2;align-self:stretch}
+    #aiAstrologerQuestion{width:100%;box-sizing:border-box;margin:8px 0}
+    #aiAstrologerStatus{min-height:1.3em;font-size:13px;color:#666}
+    #ai-response-box[contenteditable="false"]{user-select:text}
     footer{text-align:center;padding:20px 14px;color:#a99bbd;font-size:12px;line-height:1.7}
     .language-picker{display:flex;align-items:center;gap:8px;margin:8px 0}.language-picker label{color:#f5c66b;font-size:13px}.language-picker select{max-width:190px;padding:8px 10px;border:1px solid #806b9b;border-radius:8px;background:#151020;color:#fff;font-size:14px}
     @media(max-width:420px){header h1{font-size:21px}.panel{padding:15px}#chatMessages{height:300px}}
@@ -203,6 +212,15 @@
       </form>
       <div id="message" role="status" aria-live="polite"></div>
       <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><p class="chat-info">हर वर्ग कुंडली को अलग पेज में देखने के लिए टैब को साइड में स्लाइड करें।</p><div id="vargaCharts"></div></section></div><div id="kTxt" aria-hidden="true"></div></div></div>
+      <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
+        <h2 id="aiAstrologerTitle">✨ ज्योतिषी से अपना सवाल पूछें</h2>
+        <p class="chat-info">अपनी जन्म कुंडली के आधार पर सीधे सवाल पूछें। सवाल पूछने के लिए लॉगिन की आवश्यकता नहीं है।</p>
+        <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
+        <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
+        <textarea id="aiAstrologerQuestion" rows="3" maxlength="4000" placeholder="उदाहरण: मेरी नौकरी और करियर के योग कैसे हैं?"></textarea>
+        <button id="aiAstrologerSend" type="button">सवाल भेजें</button>
+        <p id="aiAstrologerStatus" role="status" aria-live="polite"></p>
+      </section>
     </section>
 
     <section class="panel app-page-panel" data-app-page="saved">
@@ -306,6 +324,6 @@
       activate(0);
     })();
   </script>
-  <script src="kundli.js"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script>
+  <script src="kundli.js"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="ai-chat.js"></script>
 </body>
 </html>
