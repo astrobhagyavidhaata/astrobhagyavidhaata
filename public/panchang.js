@@ -47,7 +47,7 @@
     const p=d.panchang,k=d.kaal;
     const dayChoghadiya=d.choghadiya.day.map(x=>"<tr><td>"+x.number+"</td><td>"+esc(tr(x.name))+"</td><td>"+esc(tr(x.time))+"</td></tr>").join("");
     const nightChoghadiya=d.choghadiya.night.map(x=>"<tr><td>"+x.number+"</td><td>"+esc(x.name)+"</td><td>"+esc(x.time)+"</td></tr>").join("");
-    const bhadra=(k.bhadraIntervals&&k.bhadraIntervals.length)?k.bhadraIntervals.map(esc).join("<br>"):"इस दिन सूर्योदय से अगले सूर्योदय तक भद्रा नहीं।";
+    const bhadra=(k.bhadraIntervals&&k.bhadraIntervals.length)?k.bhadraIntervals.map(v=>esc(tr(v))).join("<br>"):tr("इस दिन सूर्योदय से अगले सूर्योदय तक भद्रा नहीं।");
     const rows=d.hora.map(h=>"<tr><td>"+h.number+"</td><td>"+esc(tr(h.lord))+"</td><td>"+esc(tr(h.time))+"</td></tr>").join("");
     out.innerHTML=[
       "<div class='chat-info'><strong>"+esc(tr(d.weekday))+" · "+esc(d.date)+"</strong> ("+esc(d.timezone)+")</div>",
