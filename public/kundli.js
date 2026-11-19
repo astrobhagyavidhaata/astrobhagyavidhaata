@@ -41,8 +41,7 @@
     let result = String(value ?? "");
     if (!isHindiSelected()) return result;
     for (const [english, hindi] of Object.entries(HINDI_ASTRO_TRANSLATIONS).sort((a,b)=>b[0].length-a[0].length)) {
-      const escaped = english.replace(/[.*+?^${}()|[\]\\]/g, "\\  const $ = (id) => document.getElementById(id);
-");
+      result = result.replace(new RegExp("\\b" + english + "\\b", "gi"), hindi);
       result = result.replace(new RegExp("\\b" + escaped + "\\b", "gi"), hindi);
     }
     return result;
