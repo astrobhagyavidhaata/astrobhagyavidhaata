@@ -6,7 +6,33 @@
   const BENEFICS=new Set(["गुरु","शुक्र"]);
   const MALEFICS=new Set(["सूर्य","मंगल","शनि","राहु","केतु"]);
   const $=id=>document.getElementById(id);
-  const tr=value=>window.AstroLanguage?.translate?window.AstroLanguage.translate(value):String(value??"");
+  const astroHindiMap = {
+    "House":"भाव","Sun":"सूर्य","Moon":"चंद्र","Mars":"मंगल","Mercury":"बुध",
+    "Jupiter":"गुरु","Venus":"शुक्र","Saturn":"शनि","Rahu":"राहु","Ketu":"केतु",
+    "Aries":"मेष","Taurus":"वृषभ","Gemini":"मिथुन","Cancer":"कर्क",
+    "Leo":"सिंह","Virgo":"कन्या","Libra":"तुला","Scorpio":"वृश्चिक",
+    "Sagittarius":"धनु","Capricorn":"मकर","Aquarius":"कुंभ","Pisces":"मीन",
+    "Pada":"चरण","Vishakha":"विशाखा","Purva Bhadrapada":"पूर्वाभाद्रपद","Magha":"मघा",
+    "Ashwini":"अश्विनी","Bharani":"भरणी","Krittika":"कृत्तिका","Rohini":"रोहिणी",
+    "Mrigashira":"मृगशिरा","Ardra":"आर्द्रा","Punarvasu":"पुनर्वसु","Pushya":"पुष्य",
+    "Ashlesha":"आश्लेषा","Purva Phalguni":"पूर्वाफाल्गुनी","Uttara Phalguni":"उत्तराफाल्गुनी",
+    "Hasta":"हस्त","Chitra":"चित्रा","Swati":"स्वाति","Anuradha":"अनुराधा",
+    "Jyeshtha":"ज्येष्ठा","Mula":"मूल","Purva Ashadha":"पूर्वाषाढ़ा","Uttara Ashadha":"उत्तराषाढ़ा",
+    "Shravana":"श्रवण","Dhanishta":"धनिष्ठा","Shatabhisha":"शतभिषा",
+    "Uttara Bhadrapada":"उत्तराभाद्रपद","Revati":"रेवती","Planet":"ग्रह","Sign":"राशि","Nakshatra":"नक्षत्र"
+  };
+  function localizeAstroText(text, lang) {
+    let result=String(text??"");
+    for(const [eng,hin] of Object.entries(astroHindiMap).sort((a,b)=>b[0].length-a[0].length)){
+      const escaped=eng.replace(/[.*+?^${}()|[\]\\]/g,"\\  const $=id=>document.getElementById(id);");
+      result=result.replace(new RegExp("(?<![\\p{L}\\p{N}])"+escaped+"(?![\\p{L}\\p{N}])","giu"),hin);
+    }
+    if(String(lang||"hi").split("-")[0]==="hi")return result;
+    return window.AstroLanguage?.translate?window.AstroLanguage.translate(result):result;
+  }
+  const translateAstroTerm=(text,lang=window.AstroLanguage?.get?.()||document.documentElement.lang||"hi")=>localizeAstroText(text,lang);
+
+  const tr=value=>translateAstroTerm(value);
   let latest=null;
 
   async function getJSON(url,options={}) {
@@ -28,8 +54,9 @@
     host.style.color=isError?"#a12b20":"";
   }
   function statusNature(name) {
-    if(BENEFICS.has(name))return "शुभ";
-    if(MALEFICS.has(name))return "अशुभ";
+    const hindiName=localizeAstroText(name,"hi");
+    if(BENEFICS.has(hindiName))return "शुभ";
+    if(MALEFICS.has(hindiName))return "अशुभ";
     return "मिश्रित";
   }
   function drawChart(host,data,lagnaIndex) {
