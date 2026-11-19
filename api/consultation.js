@@ -5,6 +5,24 @@ const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const {getAuthenticatedUser,activeConsultation,rpc,serviceFetch}=require("../lib/supabase");
 const recentRequests=new Map();
 
+const PRIVATE_FIELD_KEYS = new Set([
+  "name", "fullname", "email", "phone", "mobile", "birthplace", "place",
+  "address", "latitude", "longitude", "lat", "lon", "coordinates",
+  "birthdate", "birthtime", "localdate", "utc", "timezone"
+]);
+
+function stripPersonalFields(value){
+  if(Array.isArray(value))return value.map(stripPersonalFields);
+  if(!value||typeof value!=="object")return value;
+  const clean={};
+  for(const [key,item] of Object.entries(value)){
+    const normalized=key.replace(/[_\\s-]/g,"").toLowerCase();
+    if(PRIVATE_FIELD_KEYS.has(normalized))continue;
+    clean[key]=stripPersonalFields(item);
+  }
+  return clean;
+}
+
 function compactChartContext(source){
   if(!source||typeof source!=="object"||Array.isArray(source))return {};
   const d=source.dasha||{},current=d.current||{};
