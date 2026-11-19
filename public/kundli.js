@@ -433,6 +433,62 @@
       timeline.appendChild(table);dashaFolder.appendChild(timeline);
     } else addNote(dashaFolder,"विंशोत्तरी दशा डेटा उपलब्ध नहीं है।");
 
+    // Keep the combined Mahadasha + Antardasha reading in the first compact slide.
+    // Move the long period schedule into separate touch/swipe slides.
+    if(dashaFolder && dasha){
+      const heading=dashaFolder.querySelector(":scope > h3");
+      const nodes=Array.from(dashaFolder.children).filter(node=>node!==heading);
+      const summaryNodes=nodes.slice(0,3);
+      const activeBox=nodes.find(node=>node.classList.contains("dasha-current-card") && node!==combined);
+      const scheduleTitle=nodes.find(node=>node.tagName==="H4" && /पूरी महादशा/.test(node.textContent));
+      const mahadashaNodes=nodes.filter(node=>node.classList.contains("dasha-period"));
+      const timeline=nodes.find(node=>node.classList.contains("nakshatra-panel") && /विंशोत्तरी महादशा समय-रेखा/.test(node.textContent));
+      const extras=nodes.filter(node=>!summaryNodes.includes(node)&&node!==activeBox&&node!==scheduleTitle&&!mahadashaNodes.includes(node)&&node!==timeline);
+
+      const deckStyle=document.getElementById("dashaSlideStyle")||document.createElement("style");
+      deckStyle.id="dashaSlideStyle";
+      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-slide-card{flex:0 0 100%;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
+      if(!deckStyle.isConnected)document.head.appendChild(deckStyle);
+
+      const summarySlide=document.createElement("section");summarySlide.className="dasha-slide-card";
+      const mahadashaSlide=document.createElement("section");mahadashaSlide.className="dasha-slide-card";
+      const antardashaSlide=document.createElement("section");antardashaSlide.className="dasha-slide-card";
+      const adHeading=document.createElement("h4");adHeading.textContent="महादशा के अनुसार अंतर्दशाएँ";antardashaSlide.appendChild(adHeading);
+      summaryNodes.forEach(node=>summarySlide.appendChild(node));
+      if(extras.length){
+        const detail=document.createElement("details");detail.className="chart-item";
+        const summary=document.createElement("summary");summary.textContent="ग्रह स्थिति और फलादेश का विस्तृत आधार देखने के लिए स्पर्श करें";
+        detail.appendChild(summary);extras.forEach(node=>detail.appendChild(node));summarySlide.appendChild(detail);
+      }
+      if(activeBox)mahadashaSlide.appendChild(activeBox);
+      if(scheduleTitle)mahadashaSlide.appendChild(scheduleTitle);
+      mahadashaNodes.forEach(mdNode=>{
+        const adList=mdNode.querySelector(":scope > .dasha-subperiod-list");
+        if(adList){
+          const group=document.createElement("details");group.className="dasha-period";
+          const groupTitle=document.createElement("summary");
+          groupTitle.textContent=mdNode.querySelector(":scope > summary")?.textContent||"महादशा";
+          group.appendChild(groupTitle);group.appendChild(adList);antardashaSlide.appendChild(group);
+        }
+        mahadashaSlide.appendChild(mdNode);
+      });
+      if(timeline)mahadashaSlide.appendChild(timeline);
+
+      const tabs=document.createElement("div");tabs.className="chart-view-toolbar dasha-slide-tabs";tabs.setAttribute("role","tablist");tabs.setAttribute("aria-label","दशा विवरण चुनें");
+      const viewport=document.createElement("div");viewport.className="dasha-slide-viewport";
+      const slides=[{label:"संयुक्त फलादेश",node:summarySlide},{label:"महादशा",node:mahadashaSlide},{label:"अंतर्दशा",node:antardashaSlide}];
+      slides.forEach((item,index)=>{
+        const button=document.createElement("button");button.type="button";button.className="chart-view-btn"+(index===0?" active":"");button.setAttribute("role","tab");button.setAttribute("aria-selected",String(index===0));button.textContent=item.label;
+        button.addEventListener("click",()=>{viewport.scrollTo({left:viewport.clientWidth*index,behavior:"smooth"});tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});});
+        tabs.appendChild(button);viewport.appendChild(item.node);
+      });
+      let slideFrame=0;
+      viewport.addEventListener("scroll",()=>{if(slideFrame)return;slideFrame=requestAnimationFrame(()=>{slideFrame=0;const index=Math.max(0,Math.min(2,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});});},{passive:true});
+      dashaFolder.replaceChildren();
+      if(heading)dashaFolder.appendChild(heading);
+      dashaFolder.append(tabs,viewport);
+    }
+
     const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
     const av=chart.ashtakavarga;
     if(av?.validation?.passed && av.bhinna && av.sarva){
