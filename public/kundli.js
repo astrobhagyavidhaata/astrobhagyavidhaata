@@ -782,26 +782,69 @@
   const SAVED_KUNDALIS_KEY = "saved_kundalis";
 
   const ASTRO_SAVED_SESSION_KEY = "astro_saved_session";
+  const ASTRO_SESSION_DB_NAME = "astro_bhagya_v1";
+  const ASTRO_SESSION_STORE = "sessions";
+
+  function openAstroSessionDB(){
+    return new Promise((resolve,reject)=>{
+      if(!("indexedDB" in window)){reject(new Error("इस डिवाइस में IndexedDB उपलब्ध नहीं है।"));return;}
+      const request=indexedDB.open(ASTRO_SESSION_DB_NAME,1);
+      request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains(ASTRO_SESSION_STORE))db.createObjectStore(ASTRO_SESSION_STORE);};
+      request.onsuccess=()=>resolve(request.result);
+      request.onerror=()=>reject(request.error||new Error("कुंडली स्टोरेज नहीं खुल सका।"));
+      request.onblocked=()=>reject(new Error("कुंडली स्टोरेज किसी दूसरे टैब में व्यस्त है।"));
+    });
+  }
+  async function writeAstroSessionDB(record){
+    const db=await openAstroSessionDB();
+    try{
+      await new Promise((resolve,reject)=>{
+        const tx=db.transaction(ASTRO_SESSION_STORE,"readwrite");
+        tx.objectStore(ASTRO_SESSION_STORE).put(record,"latest");
+        tx.oncomplete=resolve;
+        tx.onerror=()=>reject(tx.error||new Error("कुंडली सुरक्षित नहीं हो सकी।"));
+        tx.onabort=()=>reject(tx.error||new Error("कुंडली सेविंग रद्द हो गई।"));
+      });
+    }finally{db.close();}
+  }
+  async function readAstroSessionDB(){
+    const db=await openAstroSessionDB();
+    try{
+      return await new Promise((resolve,reject)=>{
+        const tx=db.transaction(ASTRO_SESSION_STORE,"readonly");
+        const request=tx.objectStore(ASTRO_SESSION_STORE).get("latest");
+        request.onsuccess=()=>resolve(request.result||null);
+        request.onerror=()=>reject(request.error||new Error("सेव कुंडली पढ़ी नहीं जा सकी।"));
+      });
+    }finally{db.close();}
+  }
   function readAstroSession(){
     try{return JSON.parse(localStorage.getItem(ASTRO_SAVED_SESSION_KEY)||"null");}catch(_){return null;}
   }
-  function saveAstroSession(details, chart, location){
-    try{
-      const old=readAstroSession();
-      const same=old?.birthDetails&&old.birthDetails.name===details.name&&old.birthDetails.date===details.date&&old.birthDetails.time===details.time&&old.birthDetails.place===details.place;
-      const savedLocation=location?{
-        name:location.name||details.place,admin1:location.admin1||"",country:location.country||"",
-        country_code:location.country_code||"",latitude:location.latitude,longitude:location.longitude,elevation:location.elevation
-      }:(same?old.location:null);
-      const record={
-        version:1,savedAt:new Date().toISOString(),
-        birthDetails:{name:details.name||"",date:details.date||"",time:details.time||"",place:details.place||""},
-        location:savedLocation,
-        chart:chart|| (same?old.chart:null)
-      };
-      localStorage.setItem(ASTRO_SAVED_SESSION_KEY,JSON.stringify(record));
-      return record;
-    }catch(error){console.warn("जन्म विवरण का ऑटो-सेव नहीं हो सका:",error);return null;}
+  async function saveAstroSession(details, chart, location){
+    const old=readAstroSession();
+    const same=old?.birthDetails&&old.birthDetails.name===details.name&&old.birthDetails.date===details.date&&old.birthDetails.time===details.time&&old.birthDetails.place===details.place;
+    const savedLocation=location?{
+      name:location.name||details.place,admin1:location.admin1||"",country:location.country||"",
+      country_code:location.country_code||"",latitude:location.latitude,longitude:location.longitude,elevation:location.elevation
+    }:(same?old.location:null);
+    const record={
+      version:2,savedAt:new Date().toISOString(),
+      birthDetails:{name:details.name||"",date:details.date||"",time:details.time||"",place:details.place||""},
+      location:savedLocation,
+      chart:chart|| (same?old.chart:null)
+    };
+    let localSaved=false;
+    try{localStorage.setItem(ASTRO_SAVED_SESSION_KEY,JSON.stringify(record));localSaved=true;}
+    catch(error){console.warn("स्थानीय कुंडली कॉपी सेव नहीं हो सकी; सुरक्षित स्टोरेज का उपयोग किया जा रहा है:",error);}
+    if(record.chart){
+      try{await writeAstroSessionDB(record);}
+      catch(error){
+        console.error("कुंडली का सुरक्षित IndexedDB बैकअप असफल:",error);
+        if(!localSaved)throw new Error("कुंडली बन गई, लेकिन इस डिवाइस में सुरक्षित नहीं हो सकी। कृपया स्टोरेज की अनुमति जाँचें।");
+      }
+    }
+    return record;
   }
   function saveFormDraft(form){
     const data=new FormData(form);
@@ -810,10 +853,25 @@
       date:String(data.get("dob")||""),
       time:String(data.get("birthTime")||""),
       place:String(data.get("birthPlace")||"").trim()
-    },null,null);
+    },null,null).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
   }
-  function restoreAstroSession(form){
-    const saved=readAstroSession(),details=saved?.birthDetails;
+  async function restoreAstroSession(form){
+    let saved=readAstroSession();
+    if(!saved?.chart){
+      try{
+        const backup=await readAstroSessionDB();
+        if(backup?.chart){
+          const sameDetails=!saved?.birthDetails||(
+            saved.birthDetails.name===backup.birthDetails?.name&&
+            saved.birthDetails.date===backup.birthDetails?.date&&
+            saved.birthDetails.time===backup.birthDetails?.time&&
+            saved.birthDetails.place===backup.birthDetails?.place
+          );
+          if(sameDetails)saved={...(saved||backup),...saved,chart:backup.chart,location:saved?.location||backup.location};
+        }
+      }catch(error){console.warn("IndexedDB से पिछली कुंडली वापस नहीं पढ़ी जा सकी:",error);}
+    }
+    const details=saved?.birthDetails;
     if(!details)return;
     if(form){
       const values={name:details.name,dob:details.date,birthTime:details.time,birthPlace:details.place};
@@ -829,6 +887,7 @@
       renderAstrologyCalculations(saved.chart);
       const panel=$("kBox");if(panel)panel.style.display="block";
       const status=$("message");if(status){status.style.display="block";status.textContent="आपकी पिछली कुंडली और जन्म विवरण इस डिवाइस से वापस लोड किए गए हैं।";}
+      document.dispatchEvent(new CustomEvent("astro:kundli-restored",{detail:saved.chart}));
     }
   }
   async function requestInitialConsultation(chart){
@@ -950,7 +1009,7 @@
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
 
-      saveAstroSession(details,chart,location);
+      await saveAstroSession(details,chart,location);
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
       requestInitialConsultation(chart);
       if (details.saveToAccount) {
@@ -997,7 +1056,7 @@
       const details = validateBirthDetails(
         new FormData(form)
       );
-      saveAstroSession(details,null,null);
+      await saveAstroSession(details,null,null);
 
       if (button) {
         button.disabled = true;
@@ -1083,7 +1142,7 @@
     form.addEventListener("submit", handleSubmit);
     form.addEventListener("input",()=>saveFormDraft(form));
     form.addEventListener("change",()=>saveFormDraft(form));
-    restoreAstroSession(form);
+    restoreAstroSession(form).catch(error=>console.warn("पिछली कुंडली वापस लोड नहीं हुई:",error));
     const languagePicker = $("preferredLanguage");
     if (languagePicker) {
       languagePicker.addEventListener("change", () => {
