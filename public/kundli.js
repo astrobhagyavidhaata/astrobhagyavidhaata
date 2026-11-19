@@ -427,6 +427,45 @@
     note.className="chat-info";
     note.textContent="ध्यान दें: षड्बल में प्रत्येक ग्रह के लिए रूप (Virupa) और आवश्यक न्यूनतम बल की तुलना भी दी जाएगी। भावबल में प्रत्येक भाव का कुल बल और उसके घटक दिखेंगे।";
     strength.appendChild(note);
+
+    // Reorder and split the analysis into six compact, single-visible panels.
+    const dashaPage=$("vimshottariFolder"),taraPage=$("navtaraFolder"),ashtakPage=$("ashtakavargaFolder"),strengthPage=$("shadbalaFolder");
+    const vargaFolder=$("kundliChartsFolder");
+    const splitPages=[
+      ["षड्बल (Shadbala)","shadbala",null],
+      ["भाव बल (Bhava Bala)","bhava",null],
+      ["षोडश वर्ग (D2 से D60)","varga",null]
+    ];
+    const makeTabPage=(label,key)=>{
+      const page=document.createElement("section");page.className="calculation-page";page.dataset.calculationPage=key;
+      const heading=document.createElement("h3");heading.textContent=label;page.appendChild(heading);root.appendChild(page);
+      const button=document.createElement("button");button.type="button";button.textContent=label;button.setAttribute("role","tab");button.setAttribute("aria-selected","false");
+      button.addEventListener("click",()=>{
+        root.querySelectorAll(".calculation-page").forEach(item=>item.classList.toggle("active",item===page));
+        tabs.querySelectorAll('[role="tab"]').forEach(item=>item.setAttribute("aria-selected",String(item===button)));
+        button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+      });
+      tabs.appendChild(button);return page;
+    };
+    const shadbalaPage=makeTabPage(splitPages[0][0],"shadbala");
+    const bhavaPage=makeTabPage(splitPages[1][0],"bhava");
+    const vargaPage=makeTabPage(splitPages[2][0],"varga");
+    const strengthParts=Array.from(strengthPage?.children||[]).filter(node=>node.tagName==="SECTION");
+    if(strengthParts[0])shadbalaPage.appendChild(strengthParts[0]);
+    if(strengthParts[1])bhavaPage.appendChild(strengthParts[1]);
+    Array.from(strengthPage?.children||[]).forEach(node=>{if(node.tagName!=="SECTION")shadbalaPage.appendChild(node);});
+    if(vargaFolder)vargaPage.appendChild(vargaFolder);
+    const orderedPages=[dashaPage,taraPage,shadbalaPage,bhavaPage,ashtakPage,vargaPage].filter(Boolean);
+    orderedPages.forEach((page,index)=>{page.classList.toggle("active",index===0);root.appendChild(page);});
+    const orderedLabels=["महादशा व फलादेश","नवतारा चक्र (तारा बल)","षड्बल (Shadbala)","भाव बल (Bhava Bala)","अष्टकवर्ग (Ashtakvarga)","षोडश वर्ग (D2 से D60)"];
+    const tabButtons=Array.from(tabs.querySelectorAll('[role="tab"]'));
+    const findTab=label=>tabButtons.find(button=>button.textContent.includes(label));
+    const orderedTabs=[findTab("महादशा"),findTab("नवतारा"),findTab("षड्बल"),findTab("भाव बल"),findTab("अष्टकवर्ग"),findTab("षोडश वर्ग")].filter(Boolean);
+    orderedTabs.forEach(button=>tabs.appendChild(button));
+    orderedTabs.forEach((button,index)=>{button.textContent=orderedLabels[index];button.setAttribute("aria-selected",String(index===0));});
+    const left=document.createElement("button");left.type="button";left.className="calculation-tab-arrow";left.textContent="‹";left.setAttribute("aria-label","टैब बाएँ करें");left.addEventListener("click",()=>tabs.scrollBy({left:-180,behavior:"smooth"}));
+    const right=document.createElement("button");right.type="button";right.className="calculation-tab-arrow";right.textContent="›";right.setAttribute("aria-label","टैब दाएँ करें");right.addEventListener("click",()=>tabs.scrollBy({left:180,behavior:"smooth"}));
+    tabs.insertBefore(left,tabs.firstChild);tabs.appendChild(right);
   }
 
   function renderVargaCharts(chart) {
