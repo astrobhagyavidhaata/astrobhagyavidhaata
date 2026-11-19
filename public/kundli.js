@@ -223,6 +223,38 @@
       const dates=document.createElement("p");dates.className="chat-info";
       dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—");
       dashaFolder.appendChild(dates);
+      const combined=document.createElement("section");combined.className="dasha-current-card";
+      const combinedTitle=document.createElement("h4");combinedTitle.textContent="महादशा + अंतर्दशा का संयुक्त फलादेश";combined.appendChild(combinedTitle);
+      const planetPositions=chart.d1?.planets||{};
+      const mdPosition=planetPositions[activeMD],adPosition=planetPositions[activeAD];
+      const positionText=(label,planet,pos)=>{
+        const p=document.createElement("p");p.className="chat-info";
+        p.textContent=label+" "+localizeChartText(planet||"—")+" — राशि: "+(pos?.rashi||"—")+" | भाव: "+(pos?.house?pos.house+"वाँ":"—")+" | नक्षत्र: "+(pos?.nakshatra||"—")+" | चरण: "+(pos?.pada||"—");
+        combined.appendChild(p);
+      };
+      positionText("महादशा स्वामी:",activeMD,mdPosition);
+      positionText("अंतर्दशा स्वामी:",activeAD,adPosition);
+      const relation=document.createElement("p");relation.className="chat-info";
+      if(mdPosition&&adPosition){
+        const links=chart.relationships||{};
+        const conjunction=(links.conjunctions||[]).some(item=>Array.isArray(item.planets)&&item.planets.includes(activeMD)&&item.planets.includes(activeAD));
+        const mdAspect=(links.aspects||[]).some(item=>item.from===activeMD&&item.to===activeAD);
+        const adAspect=(links.aspects||[]).some(item=>item.from===activeAD&&item.to===activeMD);
+        const sameSign=mdPosition.rashiIndex===adPosition.rashiIndex;
+        const sameHouse=mdPosition.house===adPosition.house;
+        const relationParts=[];
+        if(sameSign)relationParts.push("एक ही राशि में स्थित");
+        if(sameHouse)relationParts.push("एक ही भाव में स्थित");
+        if(conjunction)relationParts.push("युति/संयोग");
+        if(mdAspect||adAspect)relationParts.push("परस्पर दृष्टि-संबंध");
+        relation.textContent="दोनों स्वामियों का जन्म-कुंडली संबंध: "+(relationParts.length?relationParts.join("; "):"दिए गए ग्रह-संबंध डेटा में प्रत्यक्ष युति, समान भाव/राशि या परस्पर दृष्टि दर्ज नहीं है।");
+      } else relation.textContent="संयुक्त फलादेश के लिए दोनों दशा स्वामियों की D1 स्थिति उपलब्ध नहीं है।";
+      combined.appendChild(relation);
+      const interpretation=document.createElement("p");interpretation.className="chat-info";
+      interpretation.textContent=mdPosition&&adPosition
+        ?"संयुक्त फलादेश में "+localizeChartText(activeMD)+" महादशा स्वामी की राशि, भाव और नक्षत्र की मुख्य पृष्ठभूमि के साथ "+localizeChartText(activeAD)+" अंतर्दशा स्वामी की स्थिति तथा ऊपर दिया गया ग्रह-संबंध एक साथ पढ़ें। यह गणना-आधारित स्थिति-सार है; निश्चित घटना या गारंटी नहीं।"
+        :"ग्रहों की स्थिति उपलब्ध होने पर संयुक्त फलादेश यहाँ पूरा होगा।";
+      combined.appendChild(interpretation);dashaFolder.appendChild(combined);
       const periodDate=value=>value?new Date(value).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en",{day:"2-digit",month:"short",year:"numeric"}):"—";
       const periodRange=(item)=>periodDate(item.start)+" से "+periodDate(item.end);
       const activeMD=active.mahadasha, activeAD=active.antardasha, activePD=active.pratyantardasha;
