@@ -7,7 +7,7 @@ function createResponse() {
   let payload = null;
   return {
     status(code) { statusCode = code; return this; },
-    setHeader(name, value) { const safeValue = (Array.isArray(value) ? value.join(", ") : String(value)).replace(/[\\u0000-\\u001f\\u007f]/g, ""); headers.set(name, safeValue); },
+    setHeader(name, value) { const safeValue = (Array.isArray(value) ? value.join(", ") : String(value)).replace(/[\x00-\x1F\x7F]/g, ""); headers.set(name, safeValue); },
     json(value) { payload = value; return this; },
     send(value) { payload = value; return this; },
     result() { return Response.json(payload ?? {}, { status: statusCode, headers }); }
