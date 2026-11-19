@@ -12,7 +12,7 @@
     "https://geocoding-api.open-meteo.com/v1/search";
 
   const API_ENDPOINT = "/api/kundli";
-  const signNames = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+  const signNames = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
   const $ = (id) => document.getElementById(id);
   const selectedChartLanguage = () => document.getElementById("preferredLanguage")?.value || "en";
@@ -107,7 +107,7 @@
         const rashiLord=Number.isInteger(rashiIndex)&&rashiIndex>=0&&rashiIndex<12?rashiLords[rashiIndex]:"—";
         const nakshatraIndex=Number(p.nakshatraIndex);
         const nakshatraLord=Number.isInteger(nakshatraIndex)&&nakshatraIndex>=0&&nakshatraIndex<27?nakshatraLords[nakshatraIndex%9]:"—";
-        const planetText=planet+(p.retrograde?" ℞":"");
+        const hindiPlanets={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि",Rahu:"राहु",Ketu:"केतु"};\n        const planetText=(selectedChartLanguage()==="hi"?(hindiPlanets[planet]||planet):planet)+(p.retrograde?" ℞":"");
         const values=[planetText,p.rashi||signs[p.rashiIndex]||"—",rashiLord,houseText,degreeText,p.nakshatra||"—",padaText,nakshatraLord];
         const tr=document.createElement("tr");
         values.forEach(value=>{const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);});
@@ -115,7 +115,7 @@
       }
       table.appendChild(tbody);panel.appendChild(table);
     }
-    triggerChartTranslation();
+
     nav.querySelectorAll("[data-chart-target]").forEach(button=>{
       button.onclick=()=>{
         nav.querySelectorAll("[data-chart-target]").forEach(item=>item.classList.toggle("active",item===button));
@@ -279,6 +279,42 @@
       (av.notes||[]).forEach(note=>addNote(ashtak,note));
     } else addNote(ashtak,"इस जन्म-कुंडली के लिए सत्यापित अष्टकवर्ग डेटा उपलब्ध नहीं है।");
     addNote(strength,"षड्बल और भावबल की शास्त्रीय गणना अभी पूरी तरह लागू नहीं है। सत्यापित गणना जुड़ने के बाद ही ग्रहों और भावों के बल दिखाए जाएँगे।");
+    const toolbar=document.createElement("div");
+    toolbar.className="calculation-tabs calculation-tabs-with-arrows";
+    toolbar.setAttribute("role","tablist");
+    toolbar.setAttribute("aria-label","ज्योतिषीय गणनाएँ");
+    const makeArrow=(label,direction)=>{
+      const button=document.createElement("button");button.type="button";button.className="calculation-tab-arrow";
+      button.textContent=label;button.setAttribute("aria-label",direction<0?"टैब बाएँ करें":"टैब दाएँ करें");
+      button.addEventListener("click",()=>toolbar.scrollBy({left:direction*180,behavior:"smooth"}));return button;
+    };
+    const panelHost=document.createElement("div");panelHost.className="calculation-panels";
+    const specs=[["महादशा व फलादेश","dasha",dashaFolder],["नवतारा चक्र (तारा बल)","tara",tara],["षड्बल (Shadbala)","shadbala",null],["भाव बल (Bhava Bala)","bhava",null],["अष्टकवर्ग (Ashtakvarga)","ashtak",ashtak],["षोडश वर्ग (D2 से D60)","varga",null]];
+    const pages=[];
+    specs.forEach(([label,key,content],index)=>{
+      const page=document.createElement("section");page.className="calculation-page"+(index===0?" active":"");
+      page.dataset.calculationPage=key;page.setAttribute("role","tabpanel");
+      if(content)page.appendChild(content);
+      pages.push(page);panelHost.appendChild(page);
+      const button=document.createElement("button");button.type="button";button.textContent=label;
+      button.setAttribute("role","tab");button.setAttribute("aria-selected",String(index===0));
+      button.addEventListener("click",()=>{
+        pages.forEach((item,i)=>item.classList.toggle("active",i===index));
+        toolbar.querySelectorAll('[role="tab"]').forEach((tab,i)=>tab.setAttribute("aria-selected",String(i===index)));
+        button.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+      });
+      toolbar.appendChild(button);
+    });
+    toolbar.insertBefore(makeArrow("‹",-1),toolbar.firstChild);
+    toolbar.appendChild(makeArrow("›",1));
+    const strengthSections=Array.from(strength.children).filter(node=>node.tagName==="SECTION");
+    if(strengthSections[0])pages[2].appendChild(strengthSections[0]);
+    if(strengthSections[1])pages[3].appendChild(strengthSections[1]);
+    Array.from(strength.children).filter(node=>node.tagName!=="SECTION").forEach(node=>pages[2].appendChild(node));
+    const vargaFolder=$("kundliChartsFolder");
+    if(vargaFolder)pages[5].appendChild(vargaFolder);
+    if(side)pages[0].appendChild(side);
+    root.replaceChildren(toolbar,panelHost);
   }
 
 
