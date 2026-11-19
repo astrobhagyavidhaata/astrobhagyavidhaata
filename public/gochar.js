@@ -172,7 +172,7 @@
     if(!latest||!Array.isArray(latest.planets))return;
     if(!button||!output)return;
     button.disabled=true;button.textContent=tr("AI विश्लेषण तैयार हो रहा है...");
-    output.textContent=tr("Gemini से गोचर फलादेश प्राप्त किया जा रहा है...");
+    output.textContent=tr("Gemini से गोचर विश्लेषण प्राप्त किया जा रहा है...");
     try {
       const chart=window.AstroKundli;
       if(!chart?.d1?.ascendant||!chart?.d1?.planets||!chart?.dasha?.current){
