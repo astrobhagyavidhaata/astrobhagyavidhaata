@@ -39,7 +39,9 @@
     "en-CA":{labels:["Birth ascendant","Moon sign","House","Planet","Sign","Nakshatra","Pada","Ascendant","Nakshatra lord"],planets:["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"],signs:["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]}
   };
   const PLANET_KEYS=["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"];
+  const PLANET_HINDI=["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि","राहु","केतु"];
   const SIGN_KEYS=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  const SIGN_HINDI=["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
   function selectedChartLanguage() {
     return String(window.AstroLanguage?.get?.() || $("preferredLanguage")?.value || document.documentElement.lang || "en");
   }
@@ -50,8 +52,14 @@
   function localizeChartText(value) {
     const locale=chartLocale();
     let result=String(value ?? "");
-    for(let i=0;i<PLANET_KEYS.length;i++) result=result.replace(new RegExp("\\b"+PLANET_KEYS[i]+"\\b","gi"),locale.planets[i]);
-    for(let i=0;i<SIGN_KEYS.length;i++) result=result.replace(new RegExp("\\b"+SIGN_KEYS[i]+"\\b","gi"),locale.signs[i]);
+    for(let i=0;i<PLANET_KEYS.length;i++) {
+      result=result.replace(new RegExp("\\b"+PLANET_KEYS[i]+"\\b","gi"),locale.planets[i]);
+      result=result.split(PLANET_HINDI[i]).join(locale.planets[i]);
+    }
+    for(let i=0;i<SIGN_KEYS.length;i++) {
+      result=result.replace(new RegExp("\\b"+SIGN_KEYS[i]+"\\b","gi"),locale.signs[i]);
+      result=result.split(SIGN_HINDI[i]).join(locale.signs[i]);
+    }
     const common={House:locale.labels[2],Planet:locale.labels[3],Sign:locale.labels[4],Nakshatra:locale.labels[5],Pada:locale.labels[6],Ascendant:locale.labels[7]};
     for(const [word,translation] of Object.entries(common)) result=result.replace(new RegExp("\\b"+word+"\\b","gi"),translation);
     return result;
