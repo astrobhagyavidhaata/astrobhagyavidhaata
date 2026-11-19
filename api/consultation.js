@@ -80,7 +80,7 @@ module.exports = async function(req, res) {
           content: String(item.content || item.text || "").slice(0, 4000)
         })).filter(item => item.content.trim())
       : [];
-    const supported = new Set(["en","hi","mr","pa","ur","fr","de","es","pt","ar","bn","gu","ta","te"]);
+    const supported = new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt-BR","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
     const language = supported.has(body.language) ? body.language : "hi";
     const answer = await askGemini({ question: question.trim(), chartContext, conversationHistory: history, language });
     return res.status(200).json({ success: true, answer });
