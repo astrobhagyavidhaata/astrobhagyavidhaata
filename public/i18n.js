@@ -27,7 +27,7 @@
  const nakshatraNames={
   "अश्विनी":"Ashwini","भरणी":"Bharani","कृत्तिका":"Krittika","रोहिणी":"Rohini","मृगशिरा":"Mrigashira","आर्द्रा":"Ardra","पुनर्वसु":"Punarvasu","पुष्य":"Pushya","आश्लेषा":"Ashlesha","मघा":"Magha","पूर्वाफाल्गुनी":"Purva Phalguni","पूर्वा फाल्गुनी":"Purva Phalguni","उत्तराफाल्गुनी":"Uttara Phalguni","उत्तरा फाल्गुनी":"Uttara Phalguni","हस्त":"Hasta","चित्रा":"Chitra","स्वाति":"Swati","स्वाती":"Swati","विशाखा":"Vishakha","अनुराधा":"Anuradha","ज्येष्ठा":"Jyeshtha","मूल":"Mula","पूर्वाषाढ़ा":"Purva Ashadha","उत्तराषाढ़ा":"Uttara Ashadha","श्रवण":"Shravana","धनिष्ठा":"Dhanishta","शतभिषा":"Shatabhisha","पूर्वाभाद्रपद":"Purva Bhadrapada","उत्तराभाद्रपद":"Uttara Bhadrapada","रेवती":"Revati"
  };
- Object.keys(astroTerms).forEach(locale=>Object.assign(astroTerms[locale],nakshatraNames));
+ Object.keys(astroTerms).forEach(locale=>{if(locale!=="hi")Object.assign(astroTerms[locale],nakshatraNames);});
  const localeTerms={ "en-CA":"en","fr-CA":"fr","pt-BR":"pt","ar-SA":"ar" };
  function translateAstroText(value,locale){
    const base=localeTerms[locale]||String(locale||"en").split("-")[0];
