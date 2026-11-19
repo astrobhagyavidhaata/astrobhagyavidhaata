@@ -98,6 +98,14 @@
     .dasha-date-table th,.dasha-date-table td{padding:8px 5px;border-bottom:1px solid #493568;text-align:left}
     .dasha-date-table th{color:#f5c66b}
     .dasha-active-row{background:#49351d;color:#ffe3a3;font-weight:700}
+    .calculation-slider-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(230px,.85fr);gap:12px;align-items:start}
+    .calculation-main{min-width:0}
+    .calculation-side-slider{position:sticky;top:10px;max-height:75vh;overflow-y:auto;border:1px solid #e5b48e;border-radius:10px;padding:10px;background:#fffaf6}
+    .calculation-side-slider h4{margin:2px 0 10px;color:#dc5705}
+    .dasha-insight-card{padding:10px;margin:8px 0;border:1px solid #f1d2bd;border-radius:8px;background:#fff}
+    .dasha-insight-card strong{color:#b94a05}
+    .dasha-insight-card p{font-size:12px;line-height:1.55;margin:7px 0;color:#333}
+    @media(max-width:700px){.calculation-slider-layout{grid-template-columns:minmax(0,1fr)}.calculation-side-slider{position:relative;top:auto;max-height:300px;display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory}.calculation-side-slider h4{flex:0 0 100%}.dasha-insight-card{flex:0 0 85%;scroll-snap-align:start}}
     .calculation-tabs{position:sticky;top:0;z-index:20}
     #kundliDetailDeck{scroll-margin-top:12px}
     @media(max-width:380px){.dasha-current-grid{grid-template-columns:1fr}.dasha-current-item{display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:left}.dasha-current-item small{grid-column:1/-1}}
