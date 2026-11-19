@@ -15,9 +15,37 @@ app.use((req,res,next)=>{
   next();
 });
 
-// Razorpay signs the exact raw bytes. This route must run before express.json().
-app.post("/api/payments/webhook",express.raw({type:"application/json"}),require("./api/payment-webhook"));
-app.use(express.json({limit:"1mb"}));
+// Read request bodies without body-parser/raw-body. Those packages pull iconv-lite's
+// Node stream shim into the Worker bundle, which fails Cloudflare validation.
+async function readRequestBody(req,res,next){
+  const chunks=[];
+  let size=0;
+  try{
+    for await(const chunk of req){
+      const data=Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk);
+      size+=data.length;
+      if(size>1024*1024)return res.status(413).json({success:false,message:"Request body is too large."});
+      chunks.push(data);
+    }
+    req.body=Buffer.concat(chunks);
+    next();
+  }catch(error){next(error);}
+}
+function jsonBody(req,res,next){
+  const contentType=String(req.headers["content-type"]||"");
+  if(!/^application\/(?:[a-z0-9.+-]*\+)?json(?:\s*;|$)/i.test(contentType))return next();
+  readRequestBody(req,res,error=>{
+    if(error)return next(error);
+    try{
+      req.body=req.body.length?JSON.parse(req.body.toString("utf8")):{};
+      next();
+    }catch(parseError){res.status(400).json({success:false,message:"Invalid JSON body."});}
+  });
+}
+
+// Razorpay signs the exact raw bytes. Keep this route before JSON parsing.
+app.post("/api/payments/webhook",readRequestBody,require("./api/payment-webhook"));
+app.use(jsonBody);
 
 app.get("/healthz",(req,res)=>res.status(200).json({status:"ok"}));
 
