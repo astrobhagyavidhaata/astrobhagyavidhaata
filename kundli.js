@@ -108,7 +108,12 @@
     root.replaceChildren();
     const makeFolder=(title,id)=>{const d=document.createElement("details");d.className="chart-item";const s=document.createElement("summary");s.textContent=title;d.id=id;d.appendChild(s);root.appendChild(d);return d;};
     const addNote=(host,message)=>{const p=document.createElement("p");p.className="chat-info";p.textContent=message;host.appendChild(p);};
-    const tara=makeFolder("1. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");
+    const dashaFolder=makeFolder("1. विंशोत्तरी महादशा, अंतर्दशा और प्रत्यंतर दशा","vimshottariFolder");
+    const vargaFolder=makeFolder("2. षोडश वर्ग कुंडलियाँ (D2 से D60)","shodashvargaFolder");
+    const strength=makeFolder("3. षड्बल और भाव बल (Shadbala & Bhava Bala)","shadbalaFolder");
+    const tara=makeFolder("4. नवतारा चक्र और वर्तमान तारा बल","navtaraFolder");
+    const ashtak=makeFolder("5. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
+    renderVargaCharts(chart,vargaFolder);
     const current=chart.currentTaraBala;
     if(current){
       const p=document.createElement("p");p.className="chat-info";
@@ -135,7 +140,6 @@
       table.appendChild(grid);tara.appendChild(table);
     } else addNote(tara,"नवतारा तालिका की गणना उपलब्ध नहीं है।");
 
-    const dashaFolder=makeFolder("2. महादशा – अंतर्दशा – प्रत्यंतरदशा","vimshottariFolder");
     const dasha=chart.dasha;
     if(dasha){
       const active=dasha.current||{};
@@ -189,7 +193,6 @@
       timeline.appendChild(table);dashaFolder.appendChild(timeline);
     } else addNote(dashaFolder,"विंशोत्तरी दशा डेटा उपलब्ध नहीं है।");
 
-    const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
     const av=chart.ashtakavarga;
     if(av?.validation?.passed && av.bhinna && av.sarva){
       const method=document.createElement("p");method.className="chat-info";
@@ -236,14 +239,11 @@
       ashtak.appendChild(check);
       (av.notes||[]).forEach(note=>addNote(ashtak,note));
     } else addNote(ashtak,"इस जन्म-कुंडली के लिए सत्यापित अष्टकवर्ग डेटा उपलब्ध नहीं है।");
-    const strength=makeFolder("4. षड्बल और भावबल","shadbalaFolder");
     addNote(strength,"षड्बल और भावबल की शास्त्रीय गणना अभी पूरी तरह लागू नहीं है। सत्यापित गणना जुड़ने के बाद ही ग्रहों और भावों के बल दिखाए जाएँगे।");
   }
 
-  function renderVargaCharts(chart) {
-    const root=$("vargaCharts");
+  function renderVargaCharts(chart, root) {
     if(!root)return;
-    root.replaceChildren();
     const heading=document.createElement("h3");
     heading.textContent="षोडश वर्ग कुंडलियाँ — उत्तर भारतीय शैली";
     root.appendChild(heading);
@@ -505,7 +505,6 @@
       const chart = result.chart;
       window.AstroKundli = chart;
       renderMainKundliChart(chart);
-      renderVargaCharts(chart);
       renderAstrologyCalculations(chart);
       const hiddenText = $('kTxt');
       if (hiddenText) hiddenText.textContent = '';
