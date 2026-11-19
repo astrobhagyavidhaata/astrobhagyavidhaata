@@ -458,6 +458,9 @@
     const orderedPages=[dashaPage,taraPage,shadbalaPage,bhavaPage,ashtakPage,vargaPage].filter(Boolean);
     orderedPages.forEach((page,index)=>{page.classList.toggle("active",index===0);root.appendChild(page);});
     const orderedLabels=["महादशा व फलादेश","नवतारा चक्र (तारा बल)","षड्बल (Shadbala)","भाव बल (Bhava Bala)","अष्टकवर्ग (Ashtakvarga)","षोडश वर्ग (D2 से D60)"];
+    const legacyStrengthTab=Array.from(tabs.querySelectorAll('[role="tab"]')).find(button=>/^4\./.test(button.textContent));
+    if(legacyStrengthTab)legacyStrengthTab.remove();
+    if(strengthPage)strengthPage.remove();
     const tabButtons=Array.from(tabs.querySelectorAll('[role="tab"]'));
     const findTab=label=>tabButtons.find(button=>button.textContent.includes(label));
     const orderedTabs=[findTab("महादशा"),findTab("नवतारा"),findTab("षड्बल"),findTab("भाव बल"),findTab("अष्टकवर्ग"),findTab("षोडश वर्ग")].filter(Boolean);
