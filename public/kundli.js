@@ -392,11 +392,16 @@
         return;
       }
 
-      if (!response.ok) {
-        throw new Error("Unable to contact the chart server.");
+      let result;
+      try {
+        result = await response.json();
+      } catch (_) {
+        result = null;
       }
 
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result?.message || ("Chart server returned HTTP " + response.status + "."));
+      }
 
       if (!result || result.success !== true || !result.chart) {
         throw new Error("The server did not return a valid birth chart.");
