@@ -243,13 +243,55 @@
     <section class="panel app-page-panel" data-app-page="kundli">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
-        <label for="dob">जन्म तारीख</label><input id="dob" name="dob" type="date" required>
+        <label>जन्म तारीख</label>
+        <div class="birth-date-selects" style="display:grid;grid-template-columns:1fr 1.35fr 1.2fr;gap:8px">
+          <select id="dobDay" aria-label="जन्म का दिन" required><option value="">दिन</option></select>
+          <select id="dobMonth" aria-label="जन्म का महीना" required><option value="">महीना</option>
+            <option value="1">जनवरी</option><option value="2">फ़रवरी</option><option value="3">मार्च</option><option value="4">अप्रैल</option><option value="5">मई</option><option value="6">जून</option><option value="7">जुलाई</option><option value="8">अगस्त</option><option value="9">सितंबर</option><option value="10">अक्टूबर</option><option value="11">नवंबर</option><option value="12">दिसंबर</option>
+          </select>
+          <select id="dobYear" aria-label="जन्म का साल" required><option value="">साल</option></select>
+        </div>
+        <input id="dob" name="dob" type="hidden">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
-        <label for="birthTime">जन्म समय</label><input id="birthTime" name="birthTime" type="time" required>
+        <label>जन्म समय</label>
+        <div class="birth-time-selects" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <select id="birthHour" aria-label="जन्म का घंटा" required><option value="">घंटा</option></select>
+          <select id="birthMinute" aria-label="जन्म के मिनट" required><option value="">मिनट</option></select>
+          <select id="birthAmPm" aria-label="सुबह या शाम" required><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select>
+        </div>
+        <input id="birthTime" name="birthTime" type="hidden">
         <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
         <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली इस ब्राउज़र में सुरक्षित करें</label>
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
+      <script>
+      (() => {
+        const byId = id => document.getElementById(id);
+        const day = byId("dobDay"), month = byId("dobMonth"), year = byId("dobYear");
+        const hour = byId("birthHour"), minute = byId("birthMinute"), ampm = byId("birthAmPm");
+        if (!day || !month || !year || !hour || !minute || !ampm) return;
+        for (let n = 1; n <= 31; n++) day.add(new Option(String(n), String(n)));
+        for (let n = 1920; n <= 2030; n++) year.add(new Option(String(n), String(n)));
+        for (let n = 1; n <= 12; n++) hour.add(new Option(String(n), String(n)));
+        for (let n = 0; n <= 59; n++) minute.add(new Option(String(n).padStart(2, "0"), String(n).padStart(2, "0")));
+        const updateDate = () => {
+          const d = Number(day.value), m = Number(month.value), y = Number(year.value);
+          const target = byId("dob");
+          if (!d || !m || !y) { target.value = ""; return; }
+          const check = new Date(Date.UTC(y, m - 1, d));
+          target.value = check.getUTCFullYear() === y && check.getUTCMonth() === m - 1 && check.getUTCDate() === d
+            ? y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0") : "";
+        };
+        const updateTime = () => {
+          if (!hour.value || minute.value === "" || !ampm.value) { byId("birthTime").value = ""; return; }
+          let h = Number(hour.value) % 12;
+          if (ampm.value === "PM") h += 12;
+          byId("birthTime").value = String(h).padStart(2, "0") + ":" + minute.value;
+        };
+        [day, month, year].forEach(el => el.addEventListener("change", updateDate));
+        [hour, minute, ampm].forEach(el => el.addEventListener("change", updateTime));
+      })();
+      </script>
       <div id="message" role="status" aria-live="polite"></div>
       <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck"><div id="kundliDetailTabs" class="calculation-tabs" role="tablist" aria-label="ज्योतिषीय विवरण"></div><div id="jyotishCalculations"><p class="chat-info">कुंडली बनने के बाद दशा, नवतारा, अष्टकवर्ग और बल की जानकारी यहाँ दिखेगी।</p></div><section class="app-folder" id="kundliChartsFolder"><h3>षोडश वर्ग कुंडलियाँ — D2 से D60</h3><p class="chat-info">हर वर्ग कुंडली को अलग पेज में देखने के लिए टैब को साइड में स्लाइड करें।</p><div id="vargaCharts"></div></section></div><div id="kTxt" aria-hidden="true"></div></div>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
