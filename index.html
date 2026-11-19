@@ -185,7 +185,7 @@ footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.l
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div>
+      <div id="kBox" style="display:none"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div>
 <div class="astro-slide-shell">
   <nav id="astroSlideTabs" class="astro-slide-tabs" role="tablist" aria-label="ज्योतिषीय गणना स्लाइड">
     <button type="button" data-astro-slide-tab="slide-dasha" aria-selected="true">महादशा व संयुक्त फलादेश</button>
@@ -207,7 +207,7 @@ footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.l
 <div id="kundliDetailTabs" hidden></div>
 <div id="jyotishCalculations" hidden></div>
 <div id="aiInitialSummary" class="chat-info" role="status" aria-live="polite"></div>
-<div id="kTxt" aria-hidden="true"></div></div><button type="button" onclick="openChatBox('एस्ट्रो भाग्य विधाता ऐप AI',5)">AI ज्योतिष सहायक से बात करें</button></div>
+<div id="kTxt" aria-hidden="true"></div></div><button id="aiAstrologerLaunch" type="button" hidden onclick="openChatBox('एस्ट्रो भाग्य विधाता ऐप AI',5)">AI ज्योतिष सहायक से बात करें</button></div>
     </section>
 
     <section class="panel tab-panel" id="savedTabPanel" hidden>
