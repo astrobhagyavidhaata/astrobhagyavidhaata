@@ -21,6 +21,7 @@
     if (!box) return;
 
     box.style.display = "block";
+    box.classList.remove("message-success");
     box.style.color = error ? "#ffb4ab" : "#f5d994";
     box.textContent = message;
   }
@@ -655,6 +656,8 @@
         try {
           saveKundliLocally(chart, details, location);
           showMessage("आपकी कुंडली सफलतापूर्वक 'मेरी कुंडलियाँ' में सुरक्षित कर दी गई है!");
+          const successBox = $("message");
+          if (successBox) successBox.classList.add("message-success");
           if (window.loadKundliHistory) window.loadKundliHistory();
         } catch (saveError) {
           showMessage("कुंडली बन गई, लेकिन इस ब्राउज़र में सेव नहीं हो सकी। डिवाइस की स्टोरेज खाली करके दोबारा प्रयास करें।", true);
