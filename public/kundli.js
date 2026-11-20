@@ -804,37 +804,16 @@
     },null,null,true).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
   }
   async function restoreAstroSession(form){
-    // Restore the last generated chart as well as the birth form after navigation or refresh.
-    let saved=readAstroSession();
-    if(!saved?.chart){
-      try{
-        const databaseRecord=await readAstroSessionDB();
-        if(databaseRecord?.chart)saved=databaseRecord;
-      }catch(error){
-        console.warn("IndexedDB से पिछली कुंडली नहीं पढ़ी जा सकी:",error);
-      }
-    }
-    const details=saved?.birthDetails||{};
+    // A chart is shown only after the user submits fresh birth details.
+    window.AstroKundli=null;
+    selectedBirthPlace=null;
+    const panel=$("kBox");if(panel)panel.style.display="none";
+    const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=true;
+    const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=true;
     if(form){
-      const values={name:details.name||"",dob:details.date||"",birthTime:details.time||"",birthPlace:details.place||""};
-      for(const [id,value] of Object.entries(values)){const field=$(id);if(field&&value)field.value=value;}
-    }
-    if(saved?.location?.latitude!=null&&saved?.location?.longitude!=null){
-      selectedBirthPlace={...saved.location,label:[saved.location.name,saved.location.admin1,saved.location.country].filter(Boolean).join(", ")||details.place||""};
-    }
-    if(saved?.chart){
-      window.AstroKundli=saved.chart;
-      renderMainKundliChart(saved.chart);
-      renderVargaCharts(saved.chart);
-      renderAstrologyCalculations(saved.chart);
-      const panel=$("kBox");if(panel)panel.style.display="block";
-      const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=false;
-      const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=false;
-      document.dispatchEvent(new CustomEvent("astro:kundli-ready",{detail:saved.chart}));
-    }else{
-      const panel=$("kBox");if(panel)panel.style.display="none";
-      const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=true;
-      const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=true;
+      for(const id of ["name","dob","birthTime","birthPlace"]){
+        const field=$(id);if(field)field.value="";
+      }
     }
   }
   async function requestInitialConsultation(chart){
@@ -955,6 +934,8 @@
 
       const panel = $("kBox");
       if (panel) panel.style.display = "block";
+      const aiPanel = $("aiAstrologer");
+      if (aiPanel) aiPanel.hidden = false;
       const aiLaunch = $("aiAstrologerLaunch");
       if (aiLaunch) aiLaunch.hidden = false;
 
