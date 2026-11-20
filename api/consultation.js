@@ -138,9 +138,12 @@ module.exports=async function(req,res,env={}){
     if(/GEMINI_API_KEY/.test(message)){
       return res.status(503).json({success:false,message:"Gemini API key उपलब्ध नहीं है या अमान्य है।"});
     }
-    if(error?.status===429||error?.status===503||/quota|rate.?limit|resource.?exhausted|high demand|overload|temporarily unavailable|HTTP 503|HTTP 429|too many requests/i.test(message)){
+    if(error?.status===429||error?.status===503||/quota|rate.?limit|resource.?exhausted|high demand|overload|temporarily unavailable|HTTP 503|HTTP 429|too many requests|timed?\s*out|timeout|fetch failed|network|socket|ECONN/i.test(message)){
       return res.status(503).json({success:false,retryable:true,retryAfterSeconds:3,message:"AI सेवा पर अभी अधिक भार है। सिस्टम अपने आप दोबारा प्रयास करेगा।"});
     }
-    return res.status(502).json({success:false,retryable:true,retryAfterSeconds:2,message:"अस्थायी नेटवर्क समस्या है। सिस्टम अपने आप दोबारा प्रयास करेगा।"});
+    if(error?.status===400||error?.status===401||error?.status===403||/API_KEY_INVALID|invalid api key|API key not valid|permission denied|billing/i.test(message)){
+      return res.status(502).json({success:false,retryable:false,message:"AI API की सेटिंग या अनुमति में समस्या है। प्रशासक को API key और billing जाँचनी होगी।"});
+    }
+    return res.status(502).json({success:false,retryable:false,message:"AI अनुरोध में स्थायी तकनीकी त्रुटि है।"});
   }
 };
