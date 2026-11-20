@@ -525,8 +525,18 @@
       const buttons=Array.from(slideTabs.querySelectorAll("[data-astro-slide-tab]"));
       const syncAstroTabOnScroll=()=>{const index=Math.max(0,Math.min(buttons.length-1,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));buttons.forEach((button,i)=>button.setAttribute("aria-selected",String(i===index)));buttons[index]?.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});};
       buttons.forEach((button,index)=>{button.onclick=()=>viewport.scrollTo({left:viewport.clientWidth*index,behavior:"smooth"});});
-      viewport.onscroll=()=>{if(viewport._astroSlideFrame)return;viewport._astroSlideFrame=requestAnimationFrame(()=>{viewport._astroSlideFrame=0;syncAstroTabOnScroll();});};
-      viewport.scrollLeft=0;syncAstroTabOnScroll();
+      const syncActiveSlideHeight=()=>{
+        const index=Math.max(0,Math.min(buttons.length-1,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));
+        const active=viewport.children[index];
+        if(active)viewport.style.setProperty("height",Math.ceil(active.getBoundingClientRect().height)+"px","important");
+      };
+      viewport.onscroll=()=>{if(viewport._astroSlideFrame)return;viewport._astroSlideFrame=requestAnimationFrame(()=>{viewport._astroSlideFrame=0;syncAstroTabOnScroll();syncActiveSlideHeight();});};
+      if(typeof ResizeObserver!=="undefined"){
+        viewport._activeSlideResizeObserver=new ResizeObserver(syncActiveSlideHeight);
+        Array.from(viewport.children).forEach(slide=>viewport._activeSlideResizeObserver.observe(slide));
+      }
+      window.addEventListener("resize",syncActiveSlideHeight,{passive:true});
+      viewport.scrollLeft=0;syncAstroTabOnScroll();requestAnimationFrame(syncActiveSlideHeight);
     }
   }
 
