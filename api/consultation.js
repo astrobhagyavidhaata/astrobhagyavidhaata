@@ -109,10 +109,11 @@ module.exports=async function(req,res,env={}){
     const lowerQuestion=question.toLowerCase();
     const hinglishPattern=/\b(main|mai|mujhe|mera|meri|mere|hum|ham|aap|apka|apki|kab|kahan|kaha|kaise|kyu|kyun|kya|hai|hain|tha|thi|hoga|hogi|jaunga|jaungi|jaoge|milega|batao|bataiye|kundli|shaadi|naukri|videsh|paisa|ghar|partner|husband|wife|career|job|marriage|love|relationship)\b/i;
     const hasDevanagari=/[\u0900-\u097F]/.test(question);
-    const language=(hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en";
+    const selectedLanguage=String(body.language||"").toLowerCase().split("-")[0];
+    const language=selectedLanguage==="hi"?"hi":selectedLanguage==="en"?"en":((hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en");
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
     // Use the current low-latency Gemini 3.5 Flash-Lite model.
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.5-flash-lite",signal:req.signal});
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
