@@ -914,7 +914,7 @@
         zodiac: "sidereal",
         ayanamsa: "lahiri",
         houseSystem: "whole_sign",
-        language: "en"
+        language: window.AstroLanguage?.get?.() || $("preferredLanguage")?.value || "hi"
       }
     };
 
