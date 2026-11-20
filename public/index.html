@@ -301,6 +301,35 @@
     #aiAstrologerStatus{margin:3px 0 0!important;min-height:0!important}
     .ai-chat-messages{max-height:220px!important;margin:6px 0!important;padding:0!important}
 
+  
+    /* AI consultation expands over the full viewport only while the user is composing or receiving an answer. */
+    body.ai-chat-expanded{overflow:hidden!important}
+    body.ai-chat-expanded #aiAstrologer{
+      position:fixed!important;inset:0!important;z-index:99999!important;
+      display:flex!important;flex-direction:column!important;
+      width:100vw!important;height:100vh!important;height:100dvh!important;
+      max-height:100vh!important;max-height:100dvh!important;
+      margin:0!important;padding: max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))!important;
+      overflow-y:auto!important;overflow-x:hidden!important;
+      border:0!important;border-radius:0!important;background:#fff!important;
+      box-shadow:none!important;
+    }
+    body.ai-chat-expanded #ai-response-box{
+      display:block!important;flex:1 1 auto!important;
+      width:100%!important;min-height:120px!important;height:auto!important;
+      max-height:none!important;overflow-y:auto!important;
+      margin:10px 0!important;padding:12px!important;
+    }
+    body.ai-chat-expanded #aiAstrologerQuestion{
+      flex:0 0 auto!important;width:100%!important;min-height:110px!important;
+      max-height:30vh!important;resize:vertical!important;
+    }
+    body.ai-chat-expanded #aiAstrologerSend{flex:0 0 auto!important;margin:8px 0!important}
+    body.ai-chat-expanded #aiAstrologerStatus{flex:0 0 auto!important;min-height:22px!important}
+    body.ai-chat-expanded #aiAstrologer h2{flex:0 0 auto!important}
+    body.ai-chat-expanded #aiAstrologer .chat-info{flex:0 0 auto!important}
+    body.ai-chat-expanded #aiAstrologer label{flex:0 0 auto!important}
+
   </style>
 </head>
 <body>
