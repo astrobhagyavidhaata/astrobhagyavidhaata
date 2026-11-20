@@ -260,6 +260,9 @@
   
     #chatMessages:not(:has(.msg-bot,.msg-user)),#ai-response-box:not(:has(.ai-chat-message)){display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
 
+        #kundliMatching{background:#fffaf2!important;color:#242424!important;border:1px solid #ead8c3!important}
+    #kundliMatching>summary{color:#913d0b!important}
+    #kundliMatching>p,#kundliMatching label,#kundliMatching h3{color:#302820!important}
     #kundliMatchResult{background:#fffaf2!important;color:#242424!important;border:1px solid #ead8c3!important;border-radius:12px!important;padding:14px!important;box-shadow:0 2px 8px rgba(55,35,15,.08)!important}
     #kundliMatchResult *{color:#242424!important}
     #kundliMatchResult h3,#kundliMatchResult h4{color:#9a3e08!important}
@@ -412,7 +415,7 @@
         <div id="kundliMatchResult" aria-live="polite"></div>
       </details>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
-        <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
+        <h2 id="aiAstrologerTitle">✨ कृत्रिम बुद्धिमत्ता ज्योतिषी से अपना सवाल पूछें</h2>
         <p class="chat-info">अपनी जन्म कुंडली के आधार पर कृत्रिम बुद्धिमत्ता ज्योतिषी से सीधे सवाल पूछें।</p>
         <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
         <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
