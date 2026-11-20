@@ -424,8 +424,9 @@
       const syncViewportHeight=()=>{
         const activeSlide=slides[activeIndex()]?.node;
         if(!activeSlide || !activeSlide.getClientRects().length)return;
-        const contentHeight=Math.ceil(activeSlide.scrollHeight);
-        if(contentHeight>0)viewport.style.height=(contentHeight+12)+"px";
+        const hasContent=activeSlide.textContent.trim().length>0;
+        const contentHeight=hasContent?Math.ceil(activeSlide.getBoundingClientRect().height):0;
+        viewport.style.height=(contentHeight>0?contentHeight+12:0)+"px";
       };
       const scheduleViewportMeasure=()=>requestAnimationFrame(()=>requestAnimationFrame(syncViewportHeight));
       let slideFrame=0;
