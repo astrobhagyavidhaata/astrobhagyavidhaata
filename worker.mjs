@@ -1,5 +1,7 @@
 import consultationHandler from "./api/consultation.js";
 import kundliHandler from "./api/kundli.js";
+import gocharHandler from "./api/gochar.js";
+import panchangHandler from "./api/panchang.js";
 
 function createResponse() {
   let statusCode = 200;
@@ -45,6 +47,31 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
   }
 }
 
+async function runGetApi(handler, request, env = {}) {
+  if (request.method !== "GET") {
+    return Response.json({ success: false, message: "Only GET requests are accepted." }, {
+      status: 405, headers: { Allow: "GET", "Content-Type": "application/json" }
+    });
+  }
+  const url = new URL(request.url);
+  const headers = Object.fromEntries(request.headers.entries());
+  const req = {
+    method: "GET",
+    headers,
+    query: Object.fromEntries(url.searchParams.entries()),
+    secure: url.protocol === "https:",
+    socket: { remoteAddress: headers["cf-connecting-ip"] || "anonymous" }
+  };
+  const res = createResponse();
+  try {
+    await handler(req, res, env || {});
+    return res.result();
+  } catch (error) {
+    console.error("Worker GET API error:", error?.message || error);
+    return Response.json({ success: false, message: "The API request could not be completed." }, { status: 500 });
+  }
+}
+
 export default {
   async fetch(request, env = {}, ctx) {
     try {
@@ -75,6 +102,13 @@ export default {
       // Kundli calculation API
       if (url.pathname === "/api/chart" || url.pathname === "/api/kundli") {
         return await runApi(kundliHandler, request, bindings);
+      }
+
+      if (url.pathname === "/api/gochar") {
+        return await runGetApi(gocharHandler, request, bindings);
+      }
+      if (url.pathname === "/api/panchang") {
+        return await runGetApi(panchangHandler, request, bindings);
       }
 
       if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
