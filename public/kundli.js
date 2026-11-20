@@ -15,6 +15,7 @@
   const signNames = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
 
   const $ = (id) => document.getElementById(id);
+  let cleanupAstrologyCalculationRender = null;
 
   const CHART_TRANSLATIONS = {
     en:{labels:["Birth ascendant","Moon sign","House","Planet","Sign","Nakshatra","Pada","Ascendant","Nakshatra lord"],planets:["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"],signs:["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]},
@@ -182,6 +183,16 @@
   }
 
   function renderAstrologyCalculations(chart) {
+    if (cleanupAstrologyCalculationRender) cleanupAstrologyCalculationRender();
+    const renderCleanupTasks = [];
+    cleanupAstrologyCalculationRender = () => {
+      for (const cleanup of renderCleanupTasks.splice(0)) { try { cleanup(); } catch (_) {} }
+    };
+    const trackObserver = observer => { renderCleanupTasks.push(() => observer.disconnect()); return observer; };
+    const trackResizeHandler = handler => {
+      window.addEventListener("resize", handler, { passive: true });
+      renderCleanupTasks.push(() => window.removeEventListener("resize", handler));
+    };
     let activeMD = null;
     let activeAD = null;
     let activePD = null;
@@ -448,15 +459,15 @@
       if(heading)dashaFolder.appendChild(heading);
       dashaFolder.append(tabs,viewport);
       if(typeof ResizeObserver!=="undefined"){
-        const slideResizeObserver=new ResizeObserver(scheduleViewportMeasure);
+        const slideResizeObserver=trackObserver(new ResizeObserver(scheduleViewportMeasure));
         slides.forEach(item=>slideResizeObserver.observe(item.node));
       }
       const kundliBox=document.getElementById("kBox");
       if(kundliBox && typeof MutationObserver!=="undefined"){
-        const visibilityObserver=new MutationObserver(scheduleViewportMeasure);
+        const visibilityObserver=trackObserver(new MutationObserver(scheduleViewportMeasure));
         visibilityObserver.observe(kundliBox,{attributes:true,attributeFilter:["style","class","hidden"]});
       }
-      window.addEventListener("resize",scheduleViewportMeasure,{passive:true});
+      trackResizeHandler(scheduleViewportMeasure);
       scheduleViewportMeasure();
     }
 
@@ -568,7 +579,7 @@
       viewport.onscroll=()=>{if(viewport._astroSlideFrame)return;viewport._astroSlideFrame=requestAnimationFrame(()=>{viewport._astroSlideFrame=0;syncAstroTabOnScroll();syncActiveSlideHeight();});};
       const scheduleActiveSlideHeight=()=>requestAnimationFrame(()=>requestAnimationFrame(syncActiveSlideHeight));
       if(typeof ResizeObserver!=="undefined"){
-        viewport._activeSlideResizeObserver=new ResizeObserver(scheduleActiveSlideHeight);
+        viewport._activeSlideResizeObserver=trackObserver(new ResizeObserver(scheduleActiveSlideHeight));
         Array.from(viewport.children).forEach(slide=>viewport._activeSlideResizeObserver.observe(slide));
       }
       if(typeof MutationObserver!=="undefined"){
@@ -576,15 +587,15 @@
           if(viewport._activeSlideResizeObserver)Array.from(viewport.children).forEach(slide=>viewport._activeSlideResizeObserver.observe(slide));
           scheduleActiveSlideHeight();
         };
-        viewport._activeSlideMutationObserver=new MutationObserver(observeAddedSlides);
+        viewport._activeSlideMutationObserver=trackObserver(new MutationObserver(observeAddedSlides));
         viewport._activeSlideMutationObserver.observe(viewport,{childList:true,subtree:true});
       }
       const chartPanel=document.getElementById("kBox");
       if(chartPanel&&typeof MutationObserver!=="undefined"){
-        viewport._activeSlideVisibilityObserver=new MutationObserver(scheduleActiveSlideHeight);
+        viewport._activeSlideVisibilityObserver=trackObserver(new MutationObserver(scheduleActiveSlideHeight));
         viewport._activeSlideVisibilityObserver.observe(chartPanel,{attributes:true,attributeFilter:["style","class","hidden"]});
       }
-      window.addEventListener("resize",scheduleActiveSlideHeight,{passive:true});
+      trackResizeHandler(scheduleActiveSlideHeight);
       viewport.scrollLeft=0;syncAstroTabOnScroll();scheduleActiveSlideHeight();
     }
   }
