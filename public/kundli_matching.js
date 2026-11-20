@@ -2,7 +2,7 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const NAK = ["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वाभाद्रपद","उत्तराभाद्रपद","रेवती"];
-  const SIGNS = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+  const SIGNS = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];\n  const EN_SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];\n  const english = () => (window.AstroLanguage?.get?.() || $("preferredLanguage")?.value) === "en";\n  const t = (hi,en) => english() ? en : hi;\n  const signName = index => (english() ? EN_SIGNS : SIGNS)[Number(index)] || "—";\n  const nakName = name => english() ? (window.AstroLanguage?.translate?.(name) || name) : name;\n  const planetName = name => english() ? (window.AstroLanguage?.translate?.(name) || name) : name;
   const SIGN_LORDS = ["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
   const GANA = [0,1,2,1,0,2,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
   const YONI = [0,1,2,3,3,4,5,2,5,6,6,7,8,9,8,9,10,10,4,11,12,11,13,0,13,7,1];
@@ -85,9 +85,9 @@
   function renderD1Panel(person,title){
     const chart=person.chart.d1,asc=Number(chart?.ascendant?.rashiIndex);
     const wrap=document.createElement("section");wrap.className="match-d1-panel";
-    const heading=document.createElement("h4");heading.textContent=title+" की जन्म कुंडली";wrap.appendChild(heading);
+    const heading=document.createElement("h4");heading.textContent=english() ? title+" Birth Chart" : title+" की जन्म कुंडली";wrap.appendChild(heading);
     const meta=document.createElement("p");meta.className="match-d1-meta";
-    meta.textContent="जन्म स्थान: "+person.place+" · लग्न: "+(SIGNS[asc]||"—");wrap.appendChild(meta);
+    meta.textContent=t("जन्म स्थान: ","Birth place: ")+person.place+" · "+t("लग्न: ","Ascendant: ")+signName(asc);wrap.appendChild(meta);
     const grid=document.createElement("div");grid.className="match-d1-grid";
     const positions=[[0,0],[0,1],[0,2],[0,3],[1,3],[2,3],[3,3],[3,2],[3,1],[3,0],[2,0],[1,0]];
     const cells=new Map();
@@ -97,9 +97,9 @@
       const house=cells.get(i);
       if(house){
         const sign=(asc+house-1)%12;
-        const h=document.createElement("strong");h.textContent="भाव "+house;cell.appendChild(h);
-        const signLabel=document.createElement("span");signLabel.textContent=SIGNS[sign];cell.appendChild(signLabel);
-        const occupants=Object.entries(chart.planets||{}).filter(([,p])=>Number(p.house)===house).map(([name])=>name);
+        const h=document.createElement("strong");h.textContent=t("भाव ","House ")+house;cell.appendChild(h);
+        const signLabel=document.createElement("span");signLabel.textContent=signName(sign);cell.appendChild(signLabel);
+        const occupants=Object.entries(chart.planets||{}).filter(([,p])=>Number(p.house)===house).map(([name])=>planetName(name));
         const planets=document.createElement("small");planets.textContent=occupants.join(" · ")||"—";cell.appendChild(planets);
       }
       grid.appendChild(cell);
@@ -123,17 +123,17 @@
     ];
     const total=items.reduce((sum,x)=>sum+x[1],0);
     const root=$("kundliMatchResult");root.replaceChildren();
-    const title=document.createElement("h3");title.textContent="मिलान का परिणाम";root.appendChild(title);
-    const summary=document.createElement("p");summary.textContent="वर: "+SIGNS[gm.rashiIndex]+" राशि, "+g.name+" नक्षत्र (चरण "+g.pada+") · वधू: "+SIGNS[bm.rashiIndex]+" राशि, "+b.name+" नक्षत्र (चरण "+b.pada+")";root.appendChild(summary);
-    const score=document.createElement("p");score.className="match-score";score.textContent=total.toFixed(1)+" / 36 गुण";root.appendChild(score);
+    const title=document.createElement("h3");title.textContent=t("मिलान का परिणाम","Matching Result");root.appendChild(title);
+    const summary=document.createElement("p");summary.textContent=t("वर: ","Groom: ")+signName(gm.rashiIndex)+t(" राशि, "," sign, ")+nakName(g.name)+t(" नक्षत्र (चरण "," Nakshatra (Pada ")+g.pada+") · "+t("वधू: ","Bride: ")+signName(bm.rashiIndex)+t(" राशि, "," sign, ")+nakName(b.name)+t(" नक्षत्र (चरण "," Nakshatra (Pada ")+b.pada+")";root.appendChild(summary);
+    const score=document.createElement("p");score.className="match-score";score.textContent=total.toFixed(1)+" / 36 "+t("गुण","Points");root.appendChild(score);
     const table=document.createElement("table");table.className="match-table";
-    const head=document.createElement("tr");["अष्टकूट","प्राप्त गुण","अधिकतम"].forEach(t=>{const th=document.createElement("th");th.textContent=t;head.appendChild(th);});table.appendChild(head);
+    const head=document.createElement("tr");[t("अष्टकूट","Koota"),t("प्राप्त गुण","Scored"),t("अधिकतम","Maximum")].forEach(t=>{const th=document.createElement("th");th.textContent=t;head.appendChild(th);});table.appendChild(head);
     items.forEach(([name,value,max])=>{const row=document.createElement("tr");[name,value.toFixed(1),String(max)].forEach(t=>{const td=document.createElement("td");td.textContent=t;row.appendChild(td);});table.appendChild(row);});root.appendChild(table);
-    const assessment=document.createElement("p");assessment.textContent=total>=18?"परंपरागत मानक के अनुसार 18 या अधिक गुण का मिलान स्वीकार्य माना जाता है।": "परंपरागत 18 गुण के मानक से यह मिलान कम है; विवाह निर्णय से पहले विस्तृत व्यक्तिगत कुंडली परीक्षण करें।";root.appendChild(assessment);
-    const mtitle=document.createElement("h3");mtitle.textContent="मंगल दोष";root.appendChild(mtitle);
-    const mtext=document.createElement("p");mtext.textContent="वर: "+(marsG?.dosha?"मंगल दोष के संकेत हैं":"मंगल दोष नहीं")+". लग्न से भाव "+marsG?.fromAsc+", चंद्र से भाव "+marsG?.fromMoon+"। वधू: "+(marsB?.dosha?"मंगल दोष के संकेत हैं":"मंगल दोष नहीं")+". लग्न से भाव "+marsB?.fromAsc+", चंद्र से भाव "+marsB?.fromMoon+"।";root.appendChild(mtext);
-    const note=document.createElement("p");note.className="match-note";note.textContent="यह परिणाम वर्तमान खगोलीय गणना और मुहूर्त चिंतामणि की पारंपरिक अष्टकूट तालिका पर आधारित है। अयनांश में रैखिक सन्निकटन है; पूर्ण विवाह निर्णय से पहले दोनों की संपूर्ण कुंडली भी देखें।";root.appendChild(note);
-    root.appendChild(renderD1Panel(groom,"वर"));root.appendChild(renderD1Panel(bride,"वधू"));
+    const assessment=document.createElement("p");assessment.textContent=total>=18?t("परंपरागत मानक के अनुसार 18 या अधिक गुण का मिलान स्वीकार्य माना जाता है।","Under the traditional benchmark, a score of 18 or more is considered acceptable."):t("परंपरागत 18 गुण के मानक से यह मिलान कम है; विवाह निर्णय से पहले विस्तृत व्यक्तिगत कुंडली परीक्षण करें।","This is below the traditional 18-point benchmark; review both full charts before making a marriage decision.");root.appendChild(assessment);
+    const mtitle=document.createElement("h3");mtitle.textContent=t("मंगल दोष","Manglik Dosha");root.appendChild(mtitle);
+    const mtext=document.createElement("p");mtext.textContent=t("वर: ","Groom: ")+(marsG?.dosha?t("मंगल दोष के संकेत हैं","Manglik indications present"):t("मंगल दोष नहीं","No Manglik Dosha"))+". "+t("लग्न से भाव ","House from Ascendant ")+marsG?.fromAsc+", "+t("चंद्र से भाव ","from Moon ")+marsG?.fromMoon+"। "+t("वधू: ","Bride: ")+(marsB?.dosha?t("मंगल दोष के संकेत हैं","Manglik indications present"):t("मंगल दोष नहीं","No Manglik Dosha"))+". "+t("लग्न से भाव ","House from Ascendant ")+marsB?.fromAsc+", "+t("चंद्र से भाव ","from Moon ")+marsB?.fromMoon+"।";root.appendChild(mtext);
+    const note=document.createElement("p");note.className="match-note";note.textContent=t("यह परिणाम वर्तमान खगोलीय गणना और मुहूर्त चिंतामणि की पारंपरिक अष्टकूट तालिका पर आधारित है। अयनांश में रैखिक सन्निकटन है; पूर्ण विवाह निर्णय से पहले दोनों की संपूर्ण कुंडली भी देखें।","This result uses the traditional Ashtakoota table attributed to Muhurta Chintamani. A linear ayanamsa approximation is used; review both complete charts before making a final marriage decision.");root.appendChild(note);
+    root.appendChild(renderD1Panel(groom,t("वर","Groom")));root.appendChild(renderD1Panel(bride,t("वधू","Bride")));
   }
   document.addEventListener("DOMContentLoaded",()=>{
     const form=$("kundliMatchForm");if(!form)return;
@@ -141,9 +141,9 @@
       event.preventDefault();
       const button=$("runKundliMatch"),status=$("kundliMatchStatus"),result=$("kundliMatchResult");
       if(!form.reportValidity())return;
-      button.disabled=true;status.textContent="दोनों जन्म कुंडलियों की गणना की जा रही है...";result.replaceChildren();
-      try{const [g,b]=await Promise.all([buildChart("matchGroom"),buildChart("matchBride")]);renderResult(g,b);status.textContent="गुण मिलान पूरा हुआ।"}
-      catch(error){status.textContent=error.message||"गणना पूरी नहीं हो सकी।"}
+      button.disabled=true;status.textContent=t("दोनों जन्म कुंडलियों की गणना की जा रही है...","Calculating both birth charts...");result.replaceChildren();
+      try{const [g,b]=await Promise.all([buildChart("matchGroom"),buildChart("matchBride")]);renderResult(g,b);status.textContent=t("गुण मिलान पूरा हुआ।","Kundli matching complete.")}
+      catch(error){status.textContent=error.message||(english()?"Calculation could not be completed.":"गणना पूरी नहीं हो सकी।")}
       finally{button.disabled=false;}
     });
   });
