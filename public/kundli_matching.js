@@ -38,7 +38,7 @@
 
   function scoreVarna(g,b){return VARNA[g] <= VARNA[b] ? 1 : 0;}
   function scoreVashya(g,b){return VASHYA_SCORE[VASHYA[b]][VASHYA[g]];}
-  function taraOne(from,to){const n=((to-from+27)%27)+1;return [2,4,6,8,0].includes(n%9)?1.5:0;}
+  function taraOne(from,to){const n=((to-from+27)%27)+1;return [3,5,7].includes(n%9)?0:1.5;}
   function scoreTara(g,b){return taraOne(g,b)+taraOne(b,g);}
   function scoreYoni(g,b){return YONI_SCORE[YONI[b]][YONI[g]];}
   function scoreGrahaMaitri(g,b){
