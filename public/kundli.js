@@ -426,7 +426,19 @@
         if(!activeSlide || !activeSlide.getClientRects().length)return;
         const hasContent=activeSlide.textContent.trim().length>0;
         const contentHeight=hasContent?Math.ceil(activeSlide.getBoundingClientRect().height):0;
-        viewport.style.height=(contentHeight>0?contentHeight+12:0)+"px";
+        if(contentHeight>0){
+          viewport.style.height=(contentHeight+12)+"px";
+          viewport.style.minHeight="";
+          viewport.style.padding="";
+          viewport.style.margin="";
+          viewport.style.border="";
+        }else{
+          viewport.style.height="0px";
+          viewport.style.minHeight="0";
+          viewport.style.padding="0";
+          viewport.style.margin="0";
+          viewport.style.border="0";
+        }
       };
       const scheduleViewportMeasure=()=>requestAnimationFrame(()=>requestAnimationFrame(syncViewportHeight));
       let slideFrame=0;
