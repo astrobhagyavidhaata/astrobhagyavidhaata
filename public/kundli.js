@@ -245,7 +245,7 @@
       activeAD=active.antardasha||null;
       activePD=active.pratyantardasha||null;
       const p=document.createElement("p");p.className="chat-info";
-      p.textContent="वर्तमान दशा: "+(active.mahadasha||"—")+" महादशा / "+(active.antardasha||"—")+" अंतर्दशा / "+(active.pratyantardasha||"—")+" प्रत्यंतरदशा";
+      p.textContent="वर्तमान दशा: "+(active.mahadasha||"—")+" महादशा में "+(active.antardasha||"—")+" अंतर्दशा";
       dashaFolder.appendChild(p);
       const dates=document.createElement("p");dates.className="chat-info";
       dates.textContent="महादशा: "+(active.mahadashaStart?new Date(active.mahadashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.mahadashaEnd?new Date(active.mahadashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" | अंतर्दशा: "+(active.antardashaStart?new Date(active.antardashaStart).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—")+" से "+(active.antardashaEnd?new Date(active.antardashaEnd).toLocaleDateString(window.AstroLanguage?.get?.() || document.documentElement.lang || "en"):"—");
@@ -256,7 +256,7 @@
       activeBox.innerHTML="";
       const activeTitle=document.createElement("h4");activeTitle.textContent="अभी चल रही विंशोत्तरी दशा";activeBox.appendChild(activeTitle);
       const activeGrid=document.createElement("div");activeGrid.className="dasha-current-grid";
-      [[ "महादशा",activeMD,active.mahadashaStart,active.mahadashaEnd ],["अंतरदशा",activeAD,active.antardashaStart,active.antardashaEnd],["प्रत्यंतरदशा",activePD,active.pratyantardashaStart,active.pratyantardashaEnd]].forEach(([label,planet,start,end])=>{
+      [[ "महादशा",activeMD,active.mahadashaStart,active.mahadashaEnd ],["अंतरदशा",activeAD,active.antardashaStart,active.antardashaEnd]].forEach(([label,planet,start,end])=>{
         const item=document.createElement("div");item.className="dasha-current-item";
         const name=document.createElement("strong");name.textContent=label;const value=document.createElement("span");value.textContent=localizeChartText(planet||"—");
         const range=document.createElement("small");range.textContent=periodDate(start)+" – "+periodDate(end);
