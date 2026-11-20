@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://astrobhagyavidhaata.in/sitemap.xml
+Sitemap: https://astrobhagyavidhaata.info/sitemap.xml
