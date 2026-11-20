@@ -289,7 +289,19 @@
     .match-d1-cell small{font-size:10px;line-height:1.35;overflow-wrap:anywhere;color:#28231f!important}
     @media(max-width:360px){.match-d1-cell{padding:1px}.match-d1-cell strong,.match-d1-cell small{font-size:8px}.match-d1-cell span{font-size:9px}}
 
-</style>
+
+    /* Keep the AI astrologer directly below birth details; remove the oversized blank gap. */
+    #aiAstrologer{display:block!important;margin:8px 0 12px!important;padding:12px!important;scroll-margin-top:8px}
+    #aiAstrologer h2{margin:0 0 6px!important;font-size:19px!important}
+    #aiAstrologer .chat-info{margin:4px 0 8px!important;line-height:1.4!important}
+    #ai-response-box:empty{display:none!important}
+    #aiAstrologer label{margin:8px 0 5px!important}
+    #aiAstrologerQuestion{margin:4px 0 6px!important;min-height:76px!important}
+    #aiAstrologerSend{margin:6px 0!important;padding:12px!important}
+    #aiAstrologerStatus{margin:3px 0 0!important;min-height:0!important}
+    .ai-chat-messages{max-height:220px!important;margin:6px 0!important;padding:0!important}
+
+  </style>
 </head>
 <body>
   <header class="app-header"><div class="header-title"><h1>🔱 एस्ट्रो भाग्य विधाता</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत जन्म कुंडली</p></div><div class="language-picker notranslate"><label for="preferredLanguage">भाषा</label><select id="preferredLanguage" onchange="changeAppLanguage(this.value)" aria-label="भाषा चुनें / Choose language"><option value="hi">हिन्दी</option><option value="en">English</option></select></div><div class="header-actions"><button type="button" id="shareAppButton" class="secondary">↗ शेयर</button><button type="button" id="installAppButton">⬇ ऐप इंस्टॉल</button></div></header>
@@ -358,6 +370,16 @@
       })();
       </script>
       <div id="message" role="status" aria-live="polite"></div>
+      <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
+        <h2 id="aiAstrologerTitle">✨ कृत्रिम बुद्धिमत्ता ज्योतिषी से अपना सवाल पूछें</h2>
+        <p class="chat-info">अपनी जन्म कुंडली के आधार पर कृत्रिम बुद्धिमत्ता ज्योतिषी से सीधे सवाल पूछें।</p>
+        <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
+        <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
+        <textarea id="aiAstrologerQuestion" rows="3" maxlength="4000" placeholder="उदाहरण: मेरी नौकरी और करियर के योग कैसे हैं?"></textarea>
+        <button id="aiAstrologerSend" type="button">सवाल भेजें</button>
+        <p id="aiAstrologerStatus" role="status" aria-live="polite"></p>
+      </section>
+
       <div id="kBox" style="display:none"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div>
       
       <div id="kundliDetailDeck" class="kundli-detail-deck">
@@ -427,15 +449,7 @@
         </form>
         <div id="kundliMatchResult" aria-live="polite"></div>
       </details>
-      <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
-        <h2 id="aiAstrologerTitle">✨ कृत्रिम बुद्धिमत्ता ज्योतिषी से अपना सवाल पूछें</h2>
-        <p class="chat-info">अपनी जन्म कुंडली के आधार पर कृत्रिम बुद्धिमत्ता ज्योतिषी से सीधे सवाल पूछें।</p>
-        <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
-        <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
-        <textarea id="aiAstrologerQuestion" rows="3" maxlength="4000" placeholder="उदाहरण: मेरी नौकरी और करियर के योग कैसे हैं?"></textarea>
-        <button id="aiAstrologerSend" type="button">सवाल भेजें</button>
-        <p id="aiAstrologerStatus" role="status" aria-live="polite"></p>
-      </section>
+
 </div>
 
     </section>
