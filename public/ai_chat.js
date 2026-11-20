@@ -149,7 +149,7 @@
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
       let response;
       try {
         response = await fetch(CHAT_API, {
@@ -191,7 +191,7 @@
       chatHistory = chatHistory.slice(-12);
 
     } catch (error) {
-      loading.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "AI उत्तर में 45 सेकंड से अधिक समय लगा। कृपया फिर प्रयास करें।" : error.message);
+      loading.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "AI उत्तर में 30 सेकंड से अधिक समय लगा। कृपया फिर प्रयास करें।" : error.message);
 
     } finally {
       chatBusy = false;
