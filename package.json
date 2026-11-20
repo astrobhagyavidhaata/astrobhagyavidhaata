@@ -15,6 +15,7 @@
   "dependencies": {
     "astronomy-engine": "^2.1.19",
     "luxon": "^3.7.2",
-    "tz-lookup": "^6.1.25"
+    "tz-lookup": "^6.1.25",
+    "express": "^4.21.2"
   }
 }
