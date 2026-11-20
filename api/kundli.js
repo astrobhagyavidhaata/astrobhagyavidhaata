@@ -73,6 +73,7 @@ module.exports = async function handler(req, res) {
     );
     const result = {
       name: String(body.name || "").trim().slice(0,100),
+      gender: ["male","female"].includes(String(body.gender||"").toLowerCase()) ? String(body.gender).toLowerCase() : null,
       birth: {
         localDate: body.birthDate, localTime: body.birthTime,
         timezone: timezone.zone.name || timezone.zone,
