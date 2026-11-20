@@ -418,11 +418,23 @@
         button.addEventListener("click",()=>{viewport.scrollTo({left:viewport.clientWidth*index,behavior:"smooth"});tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});});
         tabs.appendChild(button);viewport.appendChild(item.node);
       });
+      // Match the viewport height to the visible slide, not the tallest hidden slide.
+      const syncViewportHeight=()=>{
+        const index=Math.max(0,Math.min(2,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));
+        const activeSlide=slides[index]?.node;
+        if(activeSlide)viewport.style.height=Math.ceil(activeSlide.getBoundingClientRect().height)+"px";
+      };
       let slideFrame=0;
-      viewport.addEventListener("scroll",()=>{if(slideFrame)return;slideFrame=requestAnimationFrame(()=>{slideFrame=0;const index=Math.max(0,Math.min(2,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});});},{passive:true});
+      viewport.addEventListener("scroll",()=>{if(slideFrame)return;slideFrame=requestAnimationFrame(()=>{slideFrame=0;const index=Math.max(0,Math.min(2,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});syncViewportHeight();});},{passive:true});
       dashaFolder.replaceChildren();
       if(heading)dashaFolder.appendChild(heading);
       dashaFolder.append(tabs,viewport);
+      if(typeof ResizeObserver!=="undefined"){
+        const slideResizeObserver=new ResizeObserver(syncViewportHeight);
+        slides.forEach(item=>slideResizeObserver.observe(item.node));
+      }
+      window.addEventListener("resize",syncViewportHeight,{passive:true});
+      requestAnimationFrame(syncViewportHeight);
     }
 
     const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
