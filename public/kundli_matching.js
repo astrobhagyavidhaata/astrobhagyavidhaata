@@ -73,7 +73,7 @@
     return {fromAsc,fromMoon,ascDosha:bad.includes(fromAsc),moonDosha:bad.includes(fromMoon),dosha:bad.includes(fromAsc)||bad.includes(fromMoon)};
   }
   async function locate(place){
-    const url="https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(place)+"&count=5&language=hi&format=json";
+    const url="https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(place)+"&count=5&language="+(english()?"en":"hi")+"&format=json";
     const response=await fetch(url,{headers:{Accept:"application/json"}});
     if(!response.ok)throw new Error("जन्म स्थान खोजा नहीं जा सका: "+place);
     const data=await response.json();const list=data.results||[];
@@ -118,14 +118,14 @@
     if(!gm||!bm||!Number.isFinite(Number(gm.longitude))||!Number.isFinite(Number(bm.longitude)))throw new Error("चंद्रमा की गणना उपलब्ध नहीं है; दोनों जन्म समय और स्थान जाँचें।");
     const g=nakInfo(gm.longitude),b=nakInfo(bm.longitude);
     const items=[
-      ["वर्ण",scoreVarna(gm.rashiIndex,bm.rashiIndex),1],
-      ["वश्य",scoreVashya(gm.rashiIndex,bm.rashiIndex),2],
-      ["तारा",scoreTara(g.index,b.index),3],
-      ["योनि",scoreYoni(g.index,b.index),4],
-      ["ग्रह मैत्री",scoreGrahaMaitri(gm.rashiIndex,bm.rashiIndex),5],
-      ["गण",scoreGana(g.index,b.index),6],
-      ["भकूट",scoreBhakoot(gm.rashiIndex,bm.rashiIndex),7],
-      ["नाड़ी",scoreNadi(g.index,b.index),8]
+      [t("वर्ण","Varna"),scoreVarna(gm.rashiIndex,bm.rashiIndex),1],
+      [t("वश्य","Vashya"),scoreVashya(gm.rashiIndex,bm.rashiIndex),2],
+      [t("तारा","Tara"),scoreTara(g.index,b.index),3],
+      [t("योनि","Yoni"),scoreYoni(g.index,b.index),4],
+      [t("ग्रह मैत्री","Graha Maitri"),scoreGrahaMaitri(gm.rashiIndex,bm.rashiIndex),5],
+      [t("गण","Gana"),scoreGana(g.index,b.index),6],
+      [t("भकूट","Bhakoot"),scoreBhakoot(gm.rashiIndex,bm.rashiIndex),7],
+      [t("नाड़ी","Nadi"),scoreNadi(g.index,b.index),8]
     ];
     const total=items.reduce((sum,x)=>sum+x[1],0);
     const root=$("kundliMatchResult");root.replaceChildren();
