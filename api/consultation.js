@@ -79,7 +79,7 @@ function compactChartContext(source){
       asOf:transit.asOf,natalMoonRashi:transit.natalMoonRashi,natalAscendantRashi:transit.natalAscendantRashi,
       planets:(transit.planets||[]).map(p=>({
         name:p.name,rashi:p.rashi,degreeInRashi:p.degreeInRashi,nakshatra:p.nakshatra,
-        pada:p.pada,houseFromMoon:p.houseFromMoon,houseFromAscendant:p.houseFromAscendant,retrograde:p.retrograde
+        pada:p.pada,navamsa:p.navamsa,houseFromMoon:p.houseFromMoon,houseFromAscendant:p.houseFromAscendant,retrograde:p.retrograde
       }))
     }:null
   });
