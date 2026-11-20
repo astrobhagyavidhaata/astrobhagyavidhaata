@@ -148,7 +148,12 @@
     $("chatMessages")?.appendChild(loading);
 
     try {
-      const response = await fetch(CHAT_API, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      let response;
+      try {
+        response = await fetch(CHAT_API, {
+        signal: controller.signal,
         method: "POST",
         credentials: "same-origin",
         headers: {
@@ -161,7 +166,10 @@
           conversationHistory: chatHistory.slice(-12),
           language: document.getElementById("preferredLanguage")?.value || "en"
         })
-      });
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       const data = await response.json();
 
@@ -183,7 +191,7 @@
       chatHistory = chatHistory.slice(-12);
 
     } catch (error) {
-      loading.textContent = "उत्तर प्राप्त नहीं हुआ: " + error.message;
+      loading.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "AI उत्तर में 45 सेकंड से अधिक समय लगा। कृपया फिर प्रयास करें।" : error.message);
 
     } finally {
       chatBusy = false;
