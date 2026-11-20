@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "Astro Bhagya Vidhata",
+  "short_name": "Astro Vidhata",
+  "description": "वैदिक ज्योतिष, जन्म कुंडली और AI ज्योतिषीय मार्गदर्शन",
+  "lang": "hi",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#17112b",
+  "categories": [
+    "lifestyle",
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
