@@ -42,6 +42,7 @@ async function runConsultation(request, env) {
     method: request.method,
     headers,
     body,
+    signal: request.signal,
     secure: new URL(request.url).protocol === "https:",
     socket: { remoteAddress: headers["cf-connecting-ip"] || "anonymous" }
   };
