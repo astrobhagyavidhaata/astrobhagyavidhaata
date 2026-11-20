@@ -4,11 +4,26 @@
   const NAK = ["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वाभाद्रपद","उत्तराभाद्रपद","रेवती"];
   const SIGNS = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
   const SIGN_LORDS = ["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
-  const GANA = [0,2,2,1,0,2,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
-  const YONI = [0,1,2,3,3,4,5,2,5,6,6,7,8,9,8,9,10,10,4,11,13,11,12,0,12,7,1];
+  const GANA = [0,1,2,1,0,2,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
+  const YONI = [0,1,2,3,3,4,5,2,5,6,6,7,8,9,8,9,10,10,4,11,12,11,13,0,13,7,1];
   const VARNA = [1,2,3,0,1,2,3,0,1,2,3,0]; // Brahmin 0, Kshatriya 1, Vaishya 2, Shudra 3
-  const NADI = NAK.map((_,i)=>i%3);
-  const ANIMAL_ENEMIES = new Set(["0-8","1-12","2-11","3-13","4-10","5-6","7-9"]);
+  const NADI = [0,2,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2];
+  const YONI_SCORE = [
+    [4,2,3,2,2,3,3,3,0,1,3,2,2,1],
+    [2,4,3,2,2,3,3,3,3,2,2,2,2,0],
+    [3,3,4,3,2,3,1,3,3,1,3,0,3,1],
+    [2,2,3,4,2,2,1,1,2,2,2,2,0,2],
+    [2,2,2,2,4,1,1,2,2,1,0,2,2,1],
+    [2,2,3,2,1,4,0,2,2,1,2,2,2,2],
+    [2,2,2,1,1,0,4,2,2,2,2,2,2,1],
+    [3,2,3,1,2,2,2,4,3,0,3,2,3,1],
+    [0,3,3,2,2,2,2,3,4,1,2,2,2,3],
+    [1,2,1,2,1,1,2,0,1,4,2,1,2,2],
+    [3,2,3,2,0,2,2,3,2,1,4,2,2,2],
+    [2,3,0,2,2,2,2,2,2,1,2,4,2,3],
+    [2,2,3,0,2,2,2,3,2,2,2,2,4,2],
+    [1,0,1,2,1,2,1,1,3,2,2,2,2,4]
+  ];
   const FRIENDS = {
     सूर्य:["चंद्र","मंगल","गुरु"],चंद्र:["सूर्य","बुध"],मंगल:["सूर्य","चंद्र","गुरु"],
     बुध:["सूर्य","शुक्र"],गुरु:["सूर्य","चंद्र","मंगल"],शुक्र:["बुध","शनि"],शनि:["बुध","शुक्र"]
@@ -17,23 +32,30 @@
     सूर्य:["शुक्र","शनि"],चंद्र:[],मंगल:["बुध"],बुध:["चंद्र"],गुरु:["बुध","शुक्र"],
     शुक्र:["सूर्य","चंद्र"],शनि:["सूर्य","चंद्र","मंगल"]
   };
-  const VASHYA = [0,0,1,2,3,1,1,4,1,0,1,2]; // quadruped, human, aquatic, wild, insect
-  const VASHYA_SCORE = [[2,1,1,1,0],[1,2,1,1,1],[1,1,2,0,1],[1,1,0,2,0],[0,1,1,0,2]];
-  const GANA_SCORE = [[6,5,1],[5,6,0],[1,0,6]];
+  const VASHYA = [1,1,0,2,1,0,0,2,3,2,2,2]; // Chatushpada, Dvipada, Jalachara, Keeta
+  const VASHYA_SCORE = [[2,0.5,0.5,1],[0.5,2,2,2],[0.5,2,2,2],[1,2,2,2]];
+  const GANA_SCORE = [[6,5,1],[6,6,0],[0,0,6]];
 
   function scoreVarna(g,b){return VARNA[g] <= VARNA[b] ? 1 : 0;}
-  function scoreVashya(g,b){return VASHYA_SCORE[VASHYA[g]][VASHYA[b]];}
+  function scoreVashya(g,b){return VASHYA_SCORE[VASHYA[b]][VASHYA[g]];}
   function taraOne(from,to){const n=((to-from+27)%27)+1;return [2,4,6,8,0].includes(n%9)?1.5:0;}
   function scoreTara(g,b){return taraOne(g,b)+taraOne(b,g);}
-  function scoreYoni(g,b){const a=YONI[g],c=YONI[b];if(a===c)return 4;const key=[Math.min(a,c),Math.max(a,c)].join("-");if(ANIMAL_ENEMIES.has(key))return 0;return 2;}
+  function scoreYoni(g,b){return YONI_SCORE[YONI[b]][YONI[g]];}
   function scoreGrahaMaitri(g,b){
-    const a=SIGN_LORDS[g],c=SIGN_LORDS[b];
-    if(a===c)return 5;
-    const ab=(FRIENDS[a]||[]).includes(c),ba=(FRIENDS[c]||[]).includes(a);
-    const ae=(ENEMIES[a]||[]).includes(c),be=(ENEMIES[c]||[]).includes(a);
-    if(ab&&ba)return 5;if((ab&&!be)||(ba&&!ae))return 4;if(ae&&be)return 0;if(ae||be)return 1;return 3;
+    const order=["सूर्य","चंद्र","मंगल","बुध","गुरु","शुक्र","शनि"];
+    const table=[
+      [5,5,5,4,5,0,0],
+      [5,5,4,1,4,0.5,0.5],
+      [5,4,5,0.5,5,3,0.5],
+      [4,1,0.5,5,0.5,5,4],
+      [5,4,5,0.5,5,0.5,3],
+      [0,0.5,3,5,0.5,5,5],
+      [0,0.5,0.5,4,3,5,5]
+    ];
+    const brideLord=order.indexOf(SIGN_LORDS[b]),groomLord=order.indexOf(SIGN_LORDS[g]);
+    return table[brideLord][groomLord];
   }
-  function scoreGana(g,b){return GANA_SCORE[GANA[g]][GANA[b]];}
+  function scoreGana(g,b){return GANA_SCORE[GANA[b]][GANA[g]];}
   function scoreBhakoot(g,b){const d=(b-g+12)%12+1;return [2,5,6,8,9,12].includes(d)?0:7;}
   function scoreNadi(g,b){return NADI[g]===NADI[b]?0:8;}
   function nakInfo(longitude){const n=((Number(longitude)%360)+360)%360;const i=Math.floor(n/(360/27));return {index:i,name:NAK[i],pada:Math.floor((n%(360/27))/(360/108))+1};}
@@ -59,6 +81,30 @@
     const data=await response.json().catch(()=>({}));
     if(!response.ok||!data.success||!data.chart)throw new Error(data.message||"जन्म कुंडली की गणना पूरी नहीं हुई।");
     return {chart:data.chart,place:[location.name,location.region,location.country].filter(Boolean).join(", ")};
+  }
+  function renderD1Panel(person,title){
+    const chart=person.chart.d1,asc=Number(chart?.ascendant?.rashiIndex);
+    const wrap=document.createElement("section");wrap.className="match-d1-panel";
+    const heading=document.createElement("h4");heading.textContent=title+" की जन्म कुंडली";wrap.appendChild(heading);
+    const meta=document.createElement("p");meta.className="match-d1-meta";
+    meta.textContent="जन्म स्थान: "+person.place+" · लग्न: "+(SIGNS[asc]||"—");wrap.appendChild(meta);
+    const grid=document.createElement("div");grid.className="match-d1-grid";
+    const positions=[[0,0],[0,1],[0,2],[0,3],[1,3],[2,3],[3,3],[3,2],[3,1],[3,0],[2,0],[1,0]];
+    const cells=new Map();
+    positions.forEach(([r,c],house)=>cells.set((r*4+c),house+1));
+    for(let i=0;i<16;i++){
+      const cell=document.createElement("div");cell.className="match-d1-cell";
+      const house=cells.get(i);
+      if(house){
+        const sign=(asc+house-1)%12;
+        const h=document.createElement("strong");h.textContent="भाव "+house;cell.appendChild(h);
+        const signLabel=document.createElement("span");signLabel.textContent=SIGNS[sign];cell.appendChild(signLabel);
+        const occupants=Object.entries(chart.planets||{}).filter(([,p])=>Number(p.house)===house).map(([name])=>name);
+        const planets=document.createElement("small");planets.textContent=occupants.join(" · ")||"—";cell.appendChild(planets);
+      }
+      grid.appendChild(cell);
+    }
+    wrap.appendChild(grid);return wrap;
   }
   function renderResult(groom,bride){
     const gm=groom.chart.d1.planets?.चंद्र,bm=bride.chart.d1.planets?.चंद्र;
@@ -86,7 +132,7 @@
     const assessment=document.createElement("p");assessment.textContent=total>=18?"परंपरागत मानक के अनुसार 18 या अधिक गुण का मिलान स्वीकार्य माना जाता है।": "परंपरागत 18 गुण के मानक से यह मिलान कम है; विवाह निर्णय से पहले विस्तृत व्यक्तिगत कुंडली परीक्षण करें।";root.appendChild(assessment);
     const mtitle=document.createElement("h3");mtitle.textContent="मंगल दोष";root.appendChild(mtitle);
     const mtext=document.createElement("p");mtext.textContent="वर: "+(marsG?.dosha?"मंगल दोष के संकेत हैं":"मंगल दोष नहीं")+". लग्न से भाव "+marsG?.fromAsc+", चंद्र से भाव "+marsG?.fromMoon+"। वधू: "+(marsB?.dosha?"मंगल दोष के संकेत हैं":"मंगल दोष नहीं")+". लग्न से भाव "+marsB?.fromAsc+", चंद्र से भाव "+marsB?.fromMoon+"।";root.appendChild(mtext);
-    const note=document.createElement("p");note.className="chat-info";note.textContent="गणना में वर्तमान ऐप का खगोलीय इंजन, लाहिड़ी अयनांश का रैखिक सन्निकटन और पारंपरिक अष्टकूट तालिकाएँ उपयोग हुई हैं। विभिन्न ज्योतिषीय परंपराओं में कुछ गुणों तथा मंगल दोष के नियमों में अंतर हो सकता है; इसे अकेले विवाह निर्णय का आधार न बनाएं।";root.appendChild(note);
+    const note=document.createElement("p");note.className="match-note";note.textContent="यह परिणाम वर्तमान खगोलीय गणना और मुहूर्त चिंतामणि की पारंपरिक अष्टकूट तालिका पर आधारित है। अयनांश में रैखिक सन्निकटन है; पूर्ण विवाह निर्णय से पहले दोनों की संपूर्ण कुंडली भी देखें।";root.appendChild(note);\n    root.appendChild(renderD1Panel(groom,"वर"));root.appendChild(renderD1Panel(bride,"वधू"));
   }
   document.addEventListener("DOMContentLoaded",()=>{
     const form=$("kundliMatchForm");if(!form)return;
