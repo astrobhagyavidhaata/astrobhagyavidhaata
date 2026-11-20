@@ -2,7 +2,6 @@
 
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
-const recentRequests=new Map();
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
 const PRIVATE_FIELD_KEYS = new Set([
@@ -112,12 +111,6 @@ module.exports=async function(req,res,env={}){
     const question=body.question||body.content;
     if(typeof question!=="string"||!question.trim())return res.status(400).json({success:false,message:"कृपया अपना प्रश्न लिखें।"});
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
-    const forwarded=req.headers?.["x-forwarded-for"]||req.headers?.["x-real-ip"]||req.socket?.remoteAddress||"anonymous";
-    const clientKey=String(forwarded).split(",")[0].trim().slice(0,100)||"anonymous";
-    const now=Date.now(),last=recentRequests.get(clientKey)||0;
-    if(now-last<3000)return res.status(429).json({success:false,message:"अगला प्रश्न भेजने से पहले कुछ सेकंड रुकें।"});
-    recentRequests.set(clientKey,now);
-    if(recentRequests.size>5000){for(const [key,time] of recentRequests){if(now-time>60000)recentRequests.delete(key);}}
     const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
     const chartContext=compactChartContext(liveChartContext);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
@@ -146,8 +139,8 @@ module.exports=async function(req,res,env={}){
       return res.status(503).json({success:false,message:"Gemini API key उपलब्ध नहीं है या अमान्य है।"});
     }
     if(error?.status===429||error?.status===503||/quota|rate.?limit|resource.?exhausted|high demand|overload|temporarily unavailable|HTTP 503|HTTP 429|too many requests/i.test(message)){
-      return res.status(429).json({success:false,message:"AI सेवा पर अभी अधिक भार है। कृपया कुछ क्षण बाद पुनः प्रयास करें।"});
+      return res.status(503).json({success:false,retryable:true,retryAfterSeconds:3,message:"AI सेवा पर अभी अधिक भार है। सिस्टम अपने आप दोबारा प्रयास करेगा।"});
     }
-    return res.status(502).json({success:false,message});
+    return res.status(502).json({success:false,retryable:true,retryAfterSeconds:2,message:"अस्थायी नेटवर्क समस्या है। सिस्टम अपने आप दोबारा प्रयास करेगा।"});
   }
 };
