@@ -14,7 +14,7 @@ function createResponse() {
   };
 }
 
-async function runApi(handler, request, env = {}) {
+async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
   if (request.method !== "POST") {
     return Response.json({ success: false, message: "Only POST requests are accepted." }, {
       status: 405, headers: { Allow: "POST", "Content-Type": "application/json" }
@@ -23,11 +23,14 @@ async function runApi(handler, request, env = {}) {
   let body;
   try { body = await request.json(); }
   catch { return Response.json({ success: false, message: "Invalid JSON body." }, { status: 400 }); }
+  const safeBody = Array.isArray(allowedBodyKeys)
+    ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(body, key)).map(key => [key, body[key]]))
+    : body;
   const headers = Object.fromEntries(request.headers.entries());
   const req = {
     method: request.method,
     headers,
-    body,
+    body: safeBody,
     signal: request.signal,
     secure: new URL(request.url).protocol === "https:",
     socket: { remoteAddress: headers["cf-connecting-ip"] || "anonymous" }
@@ -60,7 +63,7 @@ export default {
       // Route AI consultation through the shared Gemini handler so chart context,
       // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        return await runApi(consultationHandler, request, bindings);
+        return await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language"]);
       }
 
       // Kundli calculation API
