@@ -565,12 +565,26 @@
         if(active)viewport.style.setProperty("height",Math.ceil(active.getBoundingClientRect().height)+"px","important");
       };
       viewport.onscroll=()=>{if(viewport._astroSlideFrame)return;viewport._astroSlideFrame=requestAnimationFrame(()=>{viewport._astroSlideFrame=0;syncAstroTabOnScroll();syncActiveSlideHeight();});};
+      const scheduleActiveSlideHeight=()=>requestAnimationFrame(()=>requestAnimationFrame(syncActiveSlideHeight));
       if(typeof ResizeObserver!=="undefined"){
-        viewport._activeSlideResizeObserver=new ResizeObserver(syncActiveSlideHeight);
+        viewport._activeSlideResizeObserver=new ResizeObserver(scheduleActiveSlideHeight);
         Array.from(viewport.children).forEach(slide=>viewport._activeSlideResizeObserver.observe(slide));
       }
-      window.addEventListener("resize",syncActiveSlideHeight,{passive:true});
-      viewport.scrollLeft=0;syncAstroTabOnScroll();requestAnimationFrame(syncActiveSlideHeight);
+      if(typeof MutationObserver!=="undefined"){
+        const observeAddedSlides=()=>{
+          if(viewport._activeSlideResizeObserver)Array.from(viewport.children).forEach(slide=>viewport._activeSlideResizeObserver.observe(slide));
+          scheduleActiveSlideHeight();
+        };
+        viewport._activeSlideMutationObserver=new MutationObserver(observeAddedSlides);
+        viewport._activeSlideMutationObserver.observe(viewport,{childList:true,subtree:true});
+      }
+      const chartPanel=document.getElementById("kBox");
+      if(chartPanel&&typeof MutationObserver!=="undefined"){
+        viewport._activeSlideVisibilityObserver=new MutationObserver(scheduleActiveSlideHeight);
+        viewport._activeSlideVisibilityObserver.observe(chartPanel,{attributes:true,attributeFilter:["style","class","hidden"]});
+      }
+      window.addEventListener("resize",scheduleActiveSlideHeight,{passive:true});
+      viewport.scrollLeft=0;syncAstroTabOnScroll();scheduleActiveSlideHeight();
     }
   }
 
