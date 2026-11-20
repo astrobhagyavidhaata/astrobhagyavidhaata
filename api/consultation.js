@@ -101,7 +101,7 @@ module.exports=async function(req,res,env={}){
     const language=supportedLanguages.has(body.language)?body.language:"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
     // gemini.js tries gemini-2.5-flash-lite, then gemini-2.0-flash, then discovers supported Flash models.
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash-lite"});
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash-lite",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
