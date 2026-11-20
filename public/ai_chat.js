@@ -89,6 +89,9 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    if (byId("ai-response-box")?.children.length === 0) {
+      addMessage("नमस्कार! मैं पंडित Astro Vidhata AI हूँ। आपकी उपलब्ध जन्म कुंडली, नवांश, दशा और गोचर के आधार पर आपके प्रश्नों का ज्योतिषीय विश्लेषण करूँगा।", "assistant");
+    }
     const button = byId("aiAstrologerSend");
     const input = byId("aiAstrologerQuestion");
     button?.addEventListener("click", sendQuestion);
