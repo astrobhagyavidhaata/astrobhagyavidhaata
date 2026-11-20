@@ -118,7 +118,8 @@
         activeController = null;
         busy = false;
         if (button) button.disabled = false;
-        // Keep the consultation panel expanded after the answer.
+        // Re-assert fullscreen after the mobile keyboard closes and the request finishes.
+        expandChat();
       }
     }
   }
