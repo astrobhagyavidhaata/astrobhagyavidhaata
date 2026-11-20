@@ -45,7 +45,7 @@
  const picker=document.getElementById("preferredLanguage");
  if(!picker)return;
  const original=new WeakMap();
- const supported=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt-BR","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
+ const supported=new Set(["en","hi"]);
  const attrNames=["placeholder","title","aria-label","alt"];
  function translateTextNode(node,lang){
    const raw=node.nodeValue;
@@ -89,7 +89,7 @@
    document.body.childNodes.forEach(node=>translateElement(node,base));
    const notice=document.getElementById("languageNotice");
    if(notice){
-     const labels={"en":"Language: English","en-CA":"Language: English (Canada)","hi":"भाषा: हिन्दी","mr":"भाषा: मराठी","pa":"ਐਪ ਦੀ ਭਾਸ਼ਾ: ਪੰਜਾਬੀ","ur":"زبان: اردو","fr":"Langue : Français","fr-CA":"Langue : Français (Canada)","de":"Sprache: Deutsch","es":"Idioma: Español","pt-BR":"Idioma: Português (Brasil)","ar-SA":"اللغة: العربية (السعودية)","bn":"ভাষা: বাংলা","gu":"ભાષા: ગુજરાતી","ta":"மொழி: தமிழ்","te":"భాష: తెలుగు","kn":"ಭಾಷೆ: ಕನ್ನಡ","ml":"ഭാഷ: മലയാളം","or":"ଭାଷା: ଓଡ଼ିଆ","as":"ভাষা: অসমীয়া"};
+     const labels={"en":"Language: English","hi":"भाषा: हिन्दी"};
      notice.textContent=hasPack?(labels[active]||"Language selected"):(labels[active]+" — some detailed descriptions are still being translated.");
    }
    try{localStorage.setItem("astro_language",active)}catch(_){}
@@ -130,7 +130,7 @@
    }
  }
  window.googleTranslateElementInit=window.googleTranslateElementInit||function(){
-   if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"hi",includedLanguages:"en,hi,mr,pa,ur,fr,de,es,pt,ar,bn,gu,ta,te,kn,ml,or,as",autoDisplay:false},"google_translate_element");}
+   if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"hi",includedLanguages:"en,hi",autoDisplay:false},"google_translate_element");}
  };
 // Keep document direction aligned with the selected language without fighting Google Translate.
  const directionGuard=new MutationObserver(()=>{
