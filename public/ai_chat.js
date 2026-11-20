@@ -4,6 +4,8 @@
   const endpoint = "/api/consultation";
   const byId = id => document.getElementById(id);
   let busy = false;
+  let activeController = null;
+  let requestSequence = 0;
   const history = [];
 
   function addMessage(text, role) {
@@ -17,6 +19,10 @@
   }
 
   window.resetAstroChat = function resetAstroChat() {
+    requestSequence++;
+    if (activeController) activeController.abort();
+    activeController = null;
+    busy = false;
     history.length = 0;
     const box = byId("ai-response-box");
     if (box) box.replaceChildren();
@@ -24,13 +30,13 @@
     if (input) input.value = "";
     const status = byId("aiAstrologerStatus");
     if (status) status.textContent = "";
+    const button = byId("aiAstrologerSend");
+    if (button) button.disabled = false;
   };
 
   function chartContext() {
     const chart = window.AstroKundli;
-    if (chart && typeof chart === "object") return chart;
-    const node = byId("kTxt");
-    return node && node.textContent.trim() ? node.textContent.trim() : null;
+    return chart && typeof chart === "object" ? chart : null;
   }
 
   async function sendQuestion() {
@@ -42,16 +48,15 @@
     if (!question) { if (status) status.textContent = "कृपया अपना सवाल लिखें।"; return; }
     if (question.length > 4000) { if (status) status.textContent = "प्रश्न 4000 अक्षरों से छोटा रखें।"; return; }
     busy = true;
+    const requestId = ++requestSequence;
+    const controller = new AbortController();
+    activeController = controller;
     if (button) button.disabled = true;
-    if (status) status.textContent = "ज्योतिषाचार्य उत्तर तैयार कर रहे हैं...";
+    if (status) status.textContent = "उत्तर तैयार किया जा रहा है...";
     addMessage(question, "user");
     input.value = "";
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 18000);
-      let response;
-      try {
-        response = await fetch(endpoint, {
+      const response = await fetch(endpoint, {
         signal: controller.signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,21 +66,23 @@
           language: byId("preferredLanguage")?.value || "hi",
           conversationHistory: history.slice(-10)
         })
-        });
-      } finally {
-        clearTimeout(timeoutId);
-      }
+      });
       const data = await response.json().catch(() => ({}));
+      if (requestId !== requestSequence) return;
       if (!response.ok) throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
       if (typeof data.answer !== "string" || !data.answer.trim()) throw new Error("AI से उत्तर प्राप्त नहीं हुआ।");
-      addMessage(data.answer.startsWith("मैं Astro vidhata AI हूँ") ? data.answer : "मैं Astro vidhata AI हूँ\n" + data.answer, "assistant");
+      addMessage(data.answer, "assistant");
       history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
       if (status) status.textContent = "";
     } catch (error) {
-      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "AI उत्तर में 18 सेकंड से अधिक समय लगा। कृपया फिर प्रयास करें।" : error.message);
+      if (requestId !== requestSequence) return;
+      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "अनुरोध रद्द हुआ या समय-सीमा पूरी हुई। दोबारा प्रयास करें।" : error.message);
     } finally {
-      busy = false;
-      if (button) button.disabled = false;
+      if (requestId === requestSequence) {
+        activeController = null;
+        busy = false;
+        if (button) button.disabled = false;
+      }
     }
   }
 
