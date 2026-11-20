@@ -38,7 +38,13 @@ function redactQuestion(question, rawChart){
   const values=[...new Set(collectPrivateValues(rawChart))].sort((a,b)=>b.length-a.length);
   for(const value of values)clean=clean.split(value).join("[निजी जानकारी हटाई गई]");
   clean=clean.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,"[ईमेल हटाया गया]");
-  clean=clean.replace(/(?:\+?\d[\d\s().-]{7,}\d)/g,"[फोन नंबर हटाया गया]");
+  // Redact only genuine phone-like sequences; preserve dates and dasha periods.
+  clean=clean.replace(/\+?\d[\d\s().-]{7,}\d/g,match=>{
+    const digits=match.replace(/\D/g,"");
+    if(digits.length<10||digits.length>15)return match;
+    if(/^\s*\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}\s*$/.test(match))return match;
+    return "[निजी नंबर हटाया गया]";
+  });
   return clean;
 }
 
