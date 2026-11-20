@@ -126,7 +126,21 @@ module.exports=async function(req,res,env={}){
     const hasDevanagari=/[\u0900-\u097F]/.test(question);
     const selectedLanguage=String(body.language||"").toLowerCase().split("-")[0];
     const language=selectedLanguage==="hi"?"hi":selectedLanguage==="en"?"en":((hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en");
-    const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
+    // Owner-only prediction override: authenticate with a Worker secret, never a client-side password.
+    const ownerSecret=String(env?.ASTRO_OWNER_PASSWORD||"");
+    const suppliedQuestion=question.trim();
+    let ownerAuthorized=false;
+    let ownerInstruction="";
+    let safeOriginalQuestion=suppliedQuestion;
+    if(ownerSecret && suppliedQuestion.includes(ownerSecret)){
+      ownerAuthorized=true;
+      safeOriginalQuestion=suppliedQuestion.split(ownerSecret).join(" ").replace(/(?:मालिक|owner|पासवर्ड|password|निर्देश|instruction)\s*[:：-]?/gi," ").replace(/\s+/g," ").trim();
+      ownerInstruction=safeOriginalQuestion;
+    }
+    const privateSafeQuestion=redactQuestion(safeOriginalQuestion,body.chartContext);
+    if(ownerAuthorized && !privateSafeQuestion){
+      return res.status(200).json({success:true,answer:"Owner Mode प्रमाणित है। अब अपना निर्देश और जिस प्रश्न की भविष्यवाणी बदलनी है, उसे लिखें।",identity:"Astro vidhata AI",ownerAuthorized:true,sanitizedQuestion:""});
+    }
     const conversationHistory=Array.isArray(body.conversationHistory)
       ? body.conversationHistory.slice(-12).map(item=>({
           role:item?.role==="assistant"||item?.role==="model"?"assistant":"user",
@@ -134,8 +148,8 @@ module.exports=async function(req,res,env={}){
         })).filter(item=>item.content.trim())
       : [];
     // Use Gemini 3.8 Flash for chart-based reasoning; keep a bounded recent dialogue for follow-ups.
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
-    return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
+    const answer=await askGemini({question:privateSafeQuestion,ownerInstruction:ownerAuthorized?ownerInstruction:"",chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
+    return res.status(200).json({success:true,answer,identity:"Astro vidhata AI",ownerAuthorized,sanitizedQuestion:privateSafeQuestion});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
     console.error("Consultation API error:",message);
