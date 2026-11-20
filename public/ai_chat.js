@@ -118,7 +118,7 @@
         activeController = null;
         busy = false;
         if (button) button.disabled = false;
-        collapseChat();
+        // Keep the consultation panel expanded after the answer.
       }
     }
   }
