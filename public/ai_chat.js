@@ -5,15 +5,28 @@
   const byId = id => document.getElementById(id);
   let busy = false;
 
+  // Give the fullscreen chat its own browser-history entry so Android Back
+  // closes the chat first instead of navigating away from the whole app.
+  let chatBackEntry = false;
+
   // Keep the chat in its original DOM position. Reparenting a focused textarea
   // to document.body causes mobile browsers to blur it and immediately collapse.
   function expandChat() {
     if (!byId("aiAstrologer")) return;
-    document.body.classList.add("ai-chat-expanded");
+    if (!document.body.classList.contains("ai-chat-expanded")) {
+      window.history.pushState({ astroChatExpanded: true }, "", window.location.href);
+      chatBackEntry = true;
+      document.body.classList.add("ai-chat-expanded");
+    }
   }
 
-  function collapseChat() {
+  function collapseChat(restoreHistory = true) {
+    const wasExpanded = document.body.classList.contains("ai-chat-expanded");
     document.body.classList.remove("ai-chat-expanded");
+    if (wasExpanded && chatBackEntry && restoreHistory) {
+      chatBackEntry = false;
+      window.history.back();
+    }
   }
 
   let activeController = null;
@@ -118,8 +131,7 @@
         activeController = null;
         busy = false;
         if (button) button.disabled = false;
-        // Re-assert fullscreen after the mobile keyboard closes and the request finishes.
-        expandChat();
+        // The expanded class remains active until the user presses Back.
       }
     }
   }
@@ -137,6 +149,15 @@
       document.documentElement.style.setProperty("--ai-visual-top", Math.max(0, viewport.offsetTop) + "px");
     };
     syncVisualViewport();
+
+    // Android system Back / browser Back closes the expanded chat first.
+    window.addEventListener("popstate", () => {
+      if (document.body.classList.contains("ai-chat-expanded")) {
+        chatBackEntry = false;
+        collapseChat(false);
+      }
+    });
+
     window.visualViewport?.addEventListener("resize", syncVisualViewport);
     window.visualViewport?.addEventListener("scroll", syncVisualViewport);
     window.addEventListener("resize", syncVisualViewport, { passive: true });
