@@ -38,12 +38,13 @@ function redactQuestion(question, rawChart){
   const values=[...new Set(collectPrivateValues(rawChart))].sort((a,b)=>b.length-a.length);
   for(const value of values)clean=clean.split(value).join("[निजी जानकारी हटाई गई]");
   clean=clean.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,"[ईमेल हटाया गया]");
-  // Redact only genuine phone-like sequences; preserve dates and dasha periods.
-  clean=clean.replace(/\+?\d[\d\s().-]{7,}\d/g,match=>{
-    const digits=match.replace(/\D/g,"");
-    if(digits.length<10||digits.length>15)return match;
-    if(/^\s*\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}\s*$/.test(match))return match;
-    return "[निजी नंबर हटाया गया]";
+  // Only redact common phone formats; do not mistake dates or date/time strings for numbers.
+  clean=clean.replace(/\\+?\\d[\\d\\s().-]{7,}\\d/g,match=>{
+    const compact=match.replace(/[\\s().-]/g,"");
+    const indianMobile=/^(?:\\+?91)?[6-9]\\d{9}$/.test(compact);
+    const groupedMobile=/^(?:\\+?91)?[6-9]\\d{4}[\\s-]?[6-9]\\d{4}$/.test(match.trim());
+    const internationalMobile=/^\\+\\d{10,14}$/.test(compact);
+    return indianMobile||groupedMobile||internationalMobile ? "[निजी नंबर हटाया गया]" : match;
   });
   return clean;
 }
