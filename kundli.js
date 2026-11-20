@@ -594,10 +594,10 @@
       const pos=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
       for(let house=1;house<=12;house++){
         const [x,y]=pos[house-1],sign=(Number(varga.ascendant.rashiIndex)+house-1)%12,group=document.createElementNS(ns,"g");
-        const signText=document.createElementNS(ns,"text");signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");signText.textContent=localizeChartText(signNames[sign]);
-        const planetText=document.createElementNS(ns,"text");planetText.setAttribute("x",x);planetText.setAttribute("y",y+9);planetText.setAttribute("text-anchor","middle");planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
+        const signText=document.createElementNS(ns,"text");signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");signText.setAttribute("font-size","16");signText.setAttribute("font-weight","800");signText.setAttribute("fill","#4b2d16");signText.setAttribute("data-rashi-number",String(sign+1));signText.textContent=String(sign+1);
+        const planetText=document.createElementNS(ns,"text");planetText.setAttribute("x",x);planetText.setAttribute("y",y+14);planetText.setAttribute("text-anchor","middle");planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
         const names=occupants[house]||[];for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=localizeChartText(names.slice(i,i+2).join(" "));planetText.appendChild(span);}
-        group.append(signText,planetText);svg.appendChild(group);
+        const signTitle=document.createElementNS(ns,"title");signTitle.textContent="राशि "+(sign+1)+" — "+localizeChartText(signNames[sign]);group.append(signTitle,signText,planetText);svg.appendChild(group);
       }
       card.appendChild(svg);
       const caption=document.createElement("p");caption.className="chart-asc";caption.textContent="लग्न: "+localizeChartText(signNames[Number(varga.ascendant.rashiIndex)]);card.appendChild(caption);
