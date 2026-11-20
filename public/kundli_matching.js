@@ -40,7 +40,7 @@
   };
   const VASHYA = [1,1,0,2,1,0,0,2,3,2,2,2]; // Chatushpada, Dvipada, Jalachara, Keeta
   const VASHYA_SCORE = [[2,0.5,0.5,1],[0.5,2,2,2],[0.5,2,2,2],[1,2,2,2]];
-  const GANA_SCORE = [[6,5,1],[6,6,0],[0,0,6]];
+  const GANA_SCORE = [[6,5,0],[6,6,0],[0,0,6]];
 
   function scoreVarna(g,b){return VARNA[g] <= VARNA[b] ? 1 : 0;}
   function scoreVashya(g,b){return VASHYA_SCORE[VASHYA[b]][VASHYA[g]];}
@@ -91,26 +91,24 @@
   function renderD1Panel(person,title){
     const chart=person.chart.d1,asc=Number(chart?.ascendant?.rashiIndex);
     const wrap=document.createElement("section");wrap.className="match-d1-panel";
-    const heading=document.createElement("h4");heading.textContent=english() ? title+" Birth Chart" : title+" की जन्म कुंडली";wrap.appendChild(heading);
-    const meta=document.createElement("p");meta.className="match-d1-meta";
-    meta.textContent=t("जन्म स्थान: ","Birth place: ")+person.place+" · "+t("लग्न: ","Ascendant: ")+signName(asc);wrap.appendChild(meta);
-    const grid=document.createElement("div");grid.className="match-d1-grid";
-    const positions=[[0,0],[0,1],[0,2],[0,3],[1,3],[2,3],[3,3],[3,2],[3,1],[3,0],[2,0],[1,0]];
-    const cells=new Map();
-    positions.forEach(([r,c],house)=>cells.set((r*4+c),house+1));
-    for(let i=0;i<16;i++){
-      const cell=document.createElement("div");cell.className="match-d1-cell";
-      const house=cells.get(i);
-      if(house){
-        const sign=(asc+house-1)%12;
-        const h=document.createElement("strong");h.textContent=t("भाव ","House ")+house;cell.appendChild(h);
-        const signLabel=document.createElement("span");signLabel.textContent=signName(sign);cell.appendChild(signLabel);
-        const occupants=Object.entries(chart.planets||{}).filter(([,p])=>Number(p.house)===house).map(([name])=>planetName(name));
-        const planets=document.createElement("small");planets.textContent=occupants.join(" · ")||"—";cell.appendChild(planets);
-      }
-      grid.appendChild(cell);
+    const heading=document.createElement("h4");heading.textContent=english()?title+" Birth Chart":title+" की जन्म कुंडली";wrap.appendChild(heading);
+    const meta=document.createElement("p");meta.className="match-d1-meta";meta.textContent=t("जन्म स्थान: ","Birth place: ")+person.place+" · "+t("लग्न: ","Ascendant: ")+signName(asc);wrap.appendChild(meta);
+    if(!Number.isInteger(asc)||asc<0||asc>11){const warning=document.createElement("p");warning.textContent=t("लग्न की जानकारी उपलब्ध नहीं है।","Ascendant data is unavailable.");wrap.appendChild(warning);return wrap;}
+    const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");svg.setAttribute("viewBox","0 0 400 400");svg.setAttribute("role","img");svg.setAttribute("aria-label",t("उत्तर भारतीय शैली की जन्म कुंडली","North Indian diamond birth chart"));
+    svg.style.cssText="display:block;width:100%;max-width:400px;height:auto;margin:10px auto;background:#fffaf0;border-radius:8px";
+    const line=(x1,y1,x2,y2)=>{const el=document.createElementNS(ns,"line");for(const [k,v] of Object.entries({x1,y1,x2,y2}))el.setAttribute(k,v);el.setAttribute("stroke","#875b2b");el.setAttribute("stroke-width","2");svg.appendChild(el);};
+    const border=document.createElementNS(ns,"rect");for(const [k,v] of Object.entries({x:2,y:2,width:396,height:396,fill:"none",stroke:"#875b2b","stroke-width":3}))border.setAttribute(k,v);svg.appendChild(border);
+    line(2,2,398,398);line(398,2,2,398);line(200,2,398,200);line(398,200,200,398);line(200,398,2,200);line(2,200,200,2);
+    const positions=[[200,100],[100,34],[34,100],[100,200],[34,300],[100,366],[200,300],[300,366],[366,300],[300,200],[366,100],[300,34]];
+    for(let house=1;house<=12;house++){
+      const [x,y]=positions[house-1],sign=(asc+house-1)%12;
+      const signText=document.createElementNS(ns,"text");signText.setAttribute("x",x);signText.setAttribute("y",y-9);signText.setAttribute("text-anchor","middle");signText.setAttribute("font-size","12");signText.setAttribute("font-weight","bold");signText.setAttribute("fill","#4b2d16");signText.textContent=signName(sign)+" "+(sign+1);
+      const planetText=document.createElementNS(ns,"text");planetText.setAttribute("x",x);planetText.setAttribute("y",y+9);planetText.setAttribute("text-anchor","middle");planetText.setAttribute("font-size","10");planetText.setAttribute("font-weight","600");planetText.setAttribute("fill","#9a421d");
+      const names=Object.entries(chart.planets||{}).filter(([,p])=>Number(p.house)===house).map(([name])=>planetName(name));
+      for(let i=0;i<names.length;i+=2){const span=document.createElementNS(ns,"tspan");span.setAttribute("x",x);span.setAttribute("dy",i===0?"0":"11");span.textContent=names.slice(i,i+2).join(" ");planetText.appendChild(span);}
+      svg.append(signText,planetText);
     }
-    wrap.appendChild(grid);return wrap;
+    wrap.appendChild(svg);return wrap;
   }
   function renderResult(groom,bride){
     const gm=groom.chart.d1.planets?.चंद्र,bm=bride.chart.d1.planets?.चंद्र;

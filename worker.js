@@ -72,6 +72,12 @@ export default {
   async fetch(request, env = {}, ctx) {
     try {
       const url = new URL(request.url);
+      const isConsultation = url.pathname === "/api/consultation";
+      const origin = request.headers.get("Origin") || "";
+      const allowedOrigins = new Set(["https://astrobhagyavidhaata.in","https://www.astrobhagyavidhaata.in","https://astrobhagyavidhaata.info","https://www.astrobhagyavidhaata.info"]);
+      const corsHeaders = new Headers({ "Vary":"Origin", "Access-Control-Allow-Methods":"POST, OPTIONS", "Access-Control-Allow-Headers":"Content-Type, Authorization", "Access-Control-Max-Age":"86400" });
+      if (allowedOrigins.has(origin)) corsHeaders.set("Access-Control-Allow-Origin", origin);
+      if (isConsultation && request.method === "OPTIONS") return new Response(null,{status:204,headers:corsHeaders});
       const bindings = env || {};
 
       // Non-secret readiness check for the AI consultation binding.
@@ -79,14 +85,17 @@ export default {
         return Response.json({
           success: true,
           configured: Boolean(bindings.GEMINI_API_KEY),
-          model: "gemini-3.5-flash-lite"
+          model: "gemini-3.8-flash"
         }, { headers: { "Cache-Control": "no-store" } });
       }
 
       // Route AI consultation through the shared Gemini handler so chart context,
       // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        return await runApi(consultationHandler, request, bindings);
+        const response = await runApi(consultationHandler, request, bindings);
+        const headers = new Headers(response.headers);
+        corsHeaders.forEach((value,key)=>headers.set(key,value));
+        return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
       }
 
       // Kundli calculation API

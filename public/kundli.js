@@ -729,7 +729,7 @@
     url.search = new URLSearchParams({
       name: place,
       count: "8",
-      language: (window.AstroLanguage?.get?.() || document.documentElement.lang || "en").split("-")[0],
+      language: (/[\u0900-\u097F]/.test(place) ? "hi" : /[A-Za-z]/.test(place) ? "en" : (window.AstroLanguage?.get?.() || document.documentElement.lang || "en").split("-")[0]),
       format: "json"
     });
 
