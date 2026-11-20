@@ -15,6 +15,7 @@
     item.className = "ai-chat-message " + role;
     item.textContent = text;
     box.appendChild(item);
+    while (box.children.length > 40) box.firstElementChild?.remove();
     box.scrollTop = box.scrollHeight;
   }
 
@@ -73,6 +74,7 @@
       if (typeof data.answer !== "string" || !data.answer.trim()) throw new Error("AI से उत्तर प्राप्त नहीं हुआ।");
       addMessage(data.answer, "assistant");
       history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
+      if (history.length > 20) history.splice(0, history.length - 20);
       if (status) status.textContent = "";
     } catch (error) {
       if (requestId !== requestSequence) return;
