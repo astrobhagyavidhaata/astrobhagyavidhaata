@@ -259,10 +259,30 @@
     .calculation-page.active{display:block}
   
     #chatMessages:not(:has(.msg-bot,.msg-user)),#ai-response-box:not(:has(.ai-chat-message)){display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+
+    #kundliMatchResult{background:#fffaf2!important;color:#242424!important;border:1px solid #ead8c3!important;border-radius:12px!important;padding:14px!important;box-shadow:0 2px 8px rgba(55,35,15,.08)!important}
+    #kundliMatchResult *{color:#242424!important}
+    #kundliMatchResult h3,#kundliMatchResult h4{color:#9a3e08!important}
+    #kundliMatchResult .match-score{color:#a94308!important;font-weight:800}
+    #kundliMatchResult .match-table{background:#fff!important;border-collapse:collapse!important}
+    #kundliMatchResult .match-table th{background:#f7e8d8!important;color:#74300b!important}
+    #kundliMatchResult .match-table td{background:#fff!important;color:#222!important}
+    #kundliMatchResult .match-table th,#kundliMatchResult .match-table td{border:1px solid #e2cdb8!important;padding:9px 7px!important}
+    #kundliMatchResult .match-note{background:#fff2e5!important;color:#53331f!important;border-left:3px solid #dc5705!important;padding:10px!important;border-radius:7px!important}
+    .match-d1-panel{margin:16px 0;padding:12px;background:#fff!important;color:#222!important;border:1px solid #e5d4c3;border-radius:10px}
+    .match-d1-panel h4{margin:0 0 6px;text-align:center;color:#943e0a!important}
+    .match-d1-meta{font-size:12px;text-align:center;color:#555!important}
+    .match-d1-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;background:#9a795b;border:2px solid #9a795b;max-width:440px;margin:10px auto;aspect-ratio:1}
+    .match-d1-cell{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:0;overflow:hidden;padding:3px;background:#fffaf2;text-align:center}
+    .match-d1-cell strong{font-size:10px;color:#8a3b10!important}
+    .match-d1-cell span{font-size:11px;font-weight:700;color:#29231e!important}
+    .match-d1-cell small{font-size:10px;line-height:1.35;overflow-wrap:anywhere;color:#28231f!important}
+    @media(max-width:360px){.match-d1-cell{padding:1px}.match-d1-cell strong,.match-d1-cell small{font-size:8px}.match-d1-cell span{font-size:9px}}
+
 </style>
 </head>
 <body>
-  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>Vedic Astrology &amp; Personal Birth Chart</p></div><div class="language-picker notranslate"><label for="preferredLanguage">Language</label><select id="preferredLanguage" onchange="changeAppLanguage(this.value)" aria-label="Choose prediction language"><option value="en">English</option><option value="en-CA">English (Canada)</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="fr">Français</option><option value="fr-CA">Français (Canada)</option><option value="de">Deutsch</option><option value="es">Español</option><option value="pt-BR">Português (Brasil)</option><option value="ar-SA">العربية (السعودية)</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option></select></div></header>
+  <header class="app-header"><div class="header-title"><h1>🔱 Astro Bhagya Vidhata</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत जन्म कुंडली</p></div><div class="language-picker notranslate"><label for="preferredLanguage">भाषा / Language</label><select id="preferredLanguage" onchange="changeAppLanguage(this.value)" aria-label="भाषा चुनें / Choose language"><option value="hi">हिन्दी</option><option value="en">English</option></select></div></header>
   
   <main>
     <nav id="appPageTabs" class="app-page-tabs" aria-label="ऐप के पेज">
