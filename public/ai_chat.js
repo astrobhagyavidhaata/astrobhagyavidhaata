@@ -79,13 +79,13 @@
           if (requestId !== requestSequence) return;
           if (response.ok && typeof data.answer === "string" && data.answer.trim()) break;
           const retryable = data.retryable === true || [408, 425, 429, 500, 502, 503, 504].includes(response.status);
-          if (!retryable) throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
+          if (!retryable) { const permanentError = new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।"); permanentError.permanent = true; throw permanentError; }
           attempt++;
           const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
           if (status) status.textContent = "अभी सर्वर पर अधिक प्रश्न हैं। आपका सवाल सुरक्षित है—उत्तर के लिए अपने आप दोबारा प्रयास हो रहा है...";
           await wait(delay);
         } catch (error) {
-          if (error.name === "AbortError" || requestId !== requestSequence) throw error;
+          if (error.name === "AbortError" || error.permanent === true || requestId !== requestSequence) throw error;
           // Network disconnects are transient; keep retrying with a capped delay.
           attempt++;
           const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
