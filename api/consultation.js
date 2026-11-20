@@ -7,7 +7,7 @@ const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" 
 
 const PRIVATE_FIELD_KEYS = new Set([
   "name", "fullname", "email", "phone", "mobile", "birthplace", "place",
-  "address", "latitude", "longitude", "lat", "lon", "coordinates",
+  "address", "latitude", "lat", "lon", "coordinates",
   "birthdate", "birthtime", "localdate", "utc", "timezone"
 ]);
 
@@ -48,6 +48,7 @@ function compactChartContext(source){
   const d=source.dasha||{},current=d.current||{};
   const md=(d.mahadashas||[]).find(x=>x.planet===current.mahadasha);
   const ad=(md?.antardashas||[]).find(x=>x.planet===current.antardasha);
+  const pd=(ad?.pratyantardashas||[]).find(x=>x.planet===current.pratyantardasha);
   const pickPlanet=(planet)=>({
     rashi:planet?.rashi,rashiIndex:planet?.rashiIndex,longitude:planet?.longitude,
     degreeInRashi:planet?.degreeInRashi,nakshatra:planet?.nakshatra,pada:planet?.pada,
@@ -67,23 +68,37 @@ function compactChartContext(source){
   const transit=source.gochar||source.transits||null;
   return stripPersonalFields({
     gender: source.gender || null,
+    calculation: source.calculation || null,
     d1:pickChart(source.d1),
     d9:pickChart(source.d9),
+    natalPlanetaryPositions: Object.fromEntries(Object.entries(source.d1?.planets||{}).map(([name,planet])=>[name,pickPlanet(planet)])),
+    birthNakshatra: d.birthMoon || null,
+    taraChart: source.taraChart || null,
     taraBala:source.currentTaraBala||null,
     mahadasha:md?{planet:md.planet,start:numericDate(md.start),end:numericDate(md.end)}:{planet:current.mahadasha||null,start:numericDate(current.mahadashaStart),end:numericDate(current.mahadashaEnd)},
     antardasha:ad?{planet:ad.planet,start:numericDate(ad.start),end:numericDate(ad.end)}:{planet:current.antardasha||null,start:numericDate(current.antardashaStart),end:numericDate(current.antardashaEnd)},
+    pratyantardasha:pd?{planet:pd.planet,start:numericDate(pd.start),end:numericDate(pd.end)}:{planet:current.pratyantardasha||null,start:numericDate(current.pratyantardashaStart),end:numericDate(current.pratyantardashaEnd)},
+    vimshottariCurrent:{
+      mahadasha:current.mahadasha||null,antardasha:current.antardasha||null,pratyantardasha:current.pratyantardasha||null,
+      mahadashaStart:numericDate(current.mahadashaStart),mahadashaEnd:numericDate(current.mahadashaEnd),
+      antardashaStart:numericDate(current.antardashaStart),antardashaEnd:numericDate(current.antardashaEnd),
+      pratyantardashaStart:numericDate(current.pratyantardashaStart),pratyantardashaEnd:numericDate(current.pratyantardashaEnd)
+    },
     currentTaraBalaByPlanet:source.currentTaraBalaByPlanet||null,
     dashaDates:{
       mahadashaStart:numericDate(md?.start||current.mahadashaStart),
       mahadashaEnd:numericDate(md?.end||current.mahadashaEnd),
       antardashaStart:numericDate(ad?.start||current.antardashaStart),
-      antardashaEnd:numericDate(ad?.end||current.antardashaEnd)
+      antardashaEnd:numericDate(ad?.end||current.antardashaEnd),
+      pratyantardashaStart:numericDate(pd?.start||current.pratyantardashaStart),
+      pratyantardashaEnd:numericDate(pd?.end||current.pratyantardashaEnd)
     },
     gochar:transit?{
-      asOf:transit.asOf,natalMoonRashi:transit.natalMoonRashi,natalAscendantRashi:transit.natalAscendantRashi,
+      asOf:transit.asOf,ayanamsa:transit.ayanamsa,houseSystem:transit.houseSystem,
+      accuracyNote:transit.accuracyNote,natalMoonRashi:transit.natalMoonRashi,natalAscendantRashi:transit.natalAscendantRashi,
       planets:(transit.planets||[]).map(p=>({
-        name:p.name,rashi:p.rashi,degreeInRashi:p.degreeInRashi,nakshatra:p.nakshatra,
-        pada:p.pada,navamsa:p.navamsa,houseFromMoon:p.houseFromMoon,houseFromAscendant:p.houseFromAscendant,retrograde:p.retrograde,taraBala:p.taraBala
+        name:p.name,longitude:p.longitude,rashi:p.rashi,rashiIndex:p.rashiIndex,degreeInRashi:p.degreeInRashi,
+        nakshatra:p.nakshatra,pada:p.pada,navamsa:p.navamsa,houseFromMoon:p.houseFromMoon,houseFromAscendant:p.houseFromAscendant,retrograde:p.retrograde,taraBala:p.taraBala
       }))
     }:null
   });
@@ -112,8 +127,8 @@ module.exports=async function(req,res,env={}){
     const selectedLanguage=String(body.language||"").toLowerCase().split("-")[0];
     const language=selectedLanguage==="hi"?"hi":selectedLanguage==="en"?"en":((hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en");
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
-    // Use the current low-latency Gemini 3.5 Flash-Lite model.
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.5-flash-lite",signal:req.signal});
+    // Use Gemini 3.8 Flash as the primary reasoning model; Flash-Lite remains the fallback.
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
