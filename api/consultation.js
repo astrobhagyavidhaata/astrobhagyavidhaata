@@ -107,8 +107,8 @@ module.exports=async function(req,res,env={}){
     const hasDevanagari=/[\u0900-\u097F]/.test(question);
     const language=(hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
-    // gemini.js tries gemini-2.5-flash-lite, then gemini-2.0-flash, then discovers supported Flash models.
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash-lite",signal:req.signal});
+    // Use the current low-latency Gemini 3.5 Flash-Lite model.
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.5-flash-lite",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
