@@ -149,6 +149,11 @@ footer{color:#76685c!important}.language-picker label{color:#9a4300!important}.l
     #slide-dasha{background:transparent!important;border-color:transparent!important;padding:4px 0!important}
   
     #chatMessages:not(:has(.msg-bot,.msg-user)),#ai-response-box:not(:has(.ai-chat-message)){display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+
+    /* Keep the current-dasha slide compact; collapsed details must not stretch its dark panel. */
+    #slide-dasha,.astro-slide-card,.dasha-slide-viewport,.dasha-slide-card{height:auto!important;min-height:0!important;align-self:flex-start!important;}
+    .dasha-slide-viewport{align-items:flex-start!important;}
+    .dasha-slide-card{max-height:none!important;}
 </style>
 </head>
 <body>
