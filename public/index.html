@@ -258,7 +258,7 @@
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
       <div id="message" role="status" aria-live="polite"></div>
-      <div id="kBox"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck">
+      <div id="kBox" style="display:none"><h2>🪷 आपकी जन्म कुंडली</h2><div id="mainChartSlot"><div class="chart-view-toolbar" role="group" aria-label="कुंडली चुनें"><button type="button" class="chart-view-btn active" data-chart-target="chartD1">D1</button><button type="button" class="chart-view-btn" data-chart-target="chartD9">D9</button><button type="button" class="chart-view-btn" data-chart-target="chartMoon">चंद्र कुंडली</button><button type="button" class="chart-view-btn" data-chart-target="planetNakshatra">ग्रह-नक्षत्र</button></div><div id="chartCards" class="chart-cards"></div><div id="planetNakshatra" class="nakshatra-panel"></div><div id="kundliDetailDeck" class="kundli-detail-deck">
         <div id="kundliDetailTabs" hidden></div><div id="jyotishCalculations" hidden></div>
         <div class="astro-slide-wrapper" id="astroAnalysisDeck">
           <div class="astro-slide-nav" id="astroSlideNav">
@@ -287,6 +287,10 @@
         .astro-tab-btn.active{background:linear-gradient(135deg,#e86f0c,#c85200)!important;color:#fff!important;border-color:#c85200!important}
         .astro-slide-viewport{display:flex;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;scroll-behavior:smooth;width:100%;border-radius:12px;background:#fff;border:1px solid #f0d9c2;margin-top:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
         .astro-slide-card{flex:0 0 100%;width:100%;min-width:100%;scroll-snap-align:start;padding:14px;box-sizing:border-box;height:auto;overflow:visible}
+        #astroSlideViewport{height:auto!important;min-height:0!important;}
+        #astroSlideViewport>.astro-slide-card:empty{display:none!important;}
+        #astroSlideViewport>#slide-shodashvarga:has(#vargaCharts:empty){display:none!important;}
+        .astro-slide-card{min-height:0!important;height:auto!important;}
         .astro-slide-card .calculation-page{display:block!important;margin:0;border:0;padding:0;background:transparent}
         .astro-slide-card .calculation-page h3{margin:0 0 12px}
         .astro-slide-card #kundliChartsFolder{margin:0;border:0;padding:0;background:transparent}
@@ -296,7 +300,9 @@
         function goAstroSlide(idx){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||idx<0||idx>=btns.length)return;vp.scrollTo({left:vp.clientWidth*idx,behavior:"smooth"});btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
         function syncAstroTabOnScroll(){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||!vp.clientWidth)return;const idx=Math.max(0,Math.min(btns.length-1,Math.round(vp.scrollLeft/vp.clientWidth)));btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
       </script><div id="kTxt" aria-hidden="true"></div></div>
-      <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
+      
+</div>
+      <section id="aiAstrologer" hidden class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
         <p class="chat-info">अपनी जन्म कुंडली के आधार पर AI ज्योतिषी से सीधे सवाल पूछें। सवाल पूछने के लिए लॉगिन या सक्रिय सत्र की आवश्यकता नहीं है।</p>
         <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
@@ -305,7 +311,6 @@
         <button id="aiAstrologerSend" type="button">सवाल भेजें</button>
         <p id="aiAstrologerStatus" role="status" aria-live="polite"></p>
       </section>
-</div>
     </section>
 
     <section class="panel app-page-panel" data-app-page="saved">
