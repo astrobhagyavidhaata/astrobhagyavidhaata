@@ -48,35 +48,34 @@ function compactChartContext(source){
   const d=source.dasha||{},current=d.current||{};
   const md=(d.mahadashas||[]).find(x=>x.planet===current.mahadasha);
   const ad=(md?.antardashas||[]).find(x=>x.planet===current.antardasha);
-  const pd=(ad?.pratyantardashas||[]).find(x=>x.planet===current.pratyantardasha);
+  const pickPlanet=(planet)=>({
+    rashi:planet?.rashi,rashiIndex:planet?.rashiIndex,longitude:planet?.longitude,
+    degreeInRashi:planet?.degreeInRashi,nakshatra:planet?.nakshatra,pada:planet?.pada,
+    house:planet?.house,retrograde:planet?.retrograde
+  });
+  const pickChart=(chart)=>({
+    ascendant:chart?.ascendant?{
+      rashi:chart.ascendant.rashi,rashiIndex:chart.ascendant.rashiIndex,
+      degreeInRashi:chart.ascendant.degreeInRashi,nakshatra:chart.ascendant.nakshatra,
+      pada:chart.ascendant.pada,house:chart.ascendant.house
+    }:null,
+    houses:chart?.houses||undefined,
+    planets:Object.fromEntries(Object.entries(chart?.planets||{}).map(([name,planet])=>[name,pickPlanet(planet)]))
+  });
+  const transit=source.gochar||source.transits||null;
   return stripPersonalFields({
-    // Only calculated astrology data is sent to the answer engine.
-    d1:source.d1||null,
-    d9:source.d9||null,
-    planets:source.planets||source.d1?.planets||{},
-    shadbala:source.shadbala||null,
-    shadbalaMethod:source.shadbalaMethod||null,
-    ashtakavarga:source.ashtakavarga||null,
-    vargas:source.vargas||{},
-    relationships:source.relationships||{},
-    specialLagnas:source.specialLagnas||{},
-    kharaPoints:source.kharaPoints||{},
-    argala:source.argala||null,
-    drishti:source.drishti||null,
-    gochar:source.gochar||source.transits||null,
-    dasha:{
-      birthMoon:d.birthMoon||{},
-      startingMahadasha:d.startingMahadasha||null,
-      balanceAtBirthYears:d.balanceAtBirthYears||null,
-      current,
-      currentMahadasha:md?{planet:md.planet,start:md.start,end:md.end}:null,
-      currentAntardasha:ad?{planet:ad.planet,start:ad.start,end:ad.end}:null,
-      currentPratyantardasha:pd?{planet:pd.planet,start:pd.start,end:pd.end}:null,
-      currentMahadashaAntardashas:(md?.antardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end})),
-      currentAntardashaPratyantardashas:(ad?.pratyantardashas||[]).map(x=>({planet:x.planet,start:x.start,end:x.end}))
-    },
-    taraChart:source.taraChart||[],
-    currentTaraBala:source.currentTaraBala||null
+    d1:pickChart(source.d1),
+    d9:pickChart(source.d9),
+    taraBala:source.currentTaraBala||null,
+    mahadasha:md?{planet:md.planet,start:md.start,end:md.end}:current.mahadasha||null,
+    antardasha:ad?{planet:ad.planet,start:ad.start,end:ad.end}:current.antardasha||null,
+    gochar:transit?{
+      asOf:transit.asOf,natalMoonRashi:transit.natalMoonRashi,natalAscendantRashi:transit.natalAscendantRashi,
+      planets:(transit.planets||[]).map(p=>({
+        name:p.name,rashi:p.rashi,degreeInRashi:p.degreeInRashi,nakshatra:p.nakshatra,
+        pada:p.pada,houseFromMoon:p.houseFromMoon,houseFromAscendant:p.houseFromAscendant,retrograde:p.retrograde
+      }))
+    }:null
   });
 }
 
