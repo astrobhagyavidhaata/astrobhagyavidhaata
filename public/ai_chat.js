@@ -40,6 +40,8 @@
     return chart && typeof chart === "object" ? chart : null;
   }
 
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
   async function sendQuestion() {
     if (busy) return;
     const input = byId("aiAstrologerQuestion");
@@ -57,28 +59,47 @@
     addMessage(question, "user");
     input.value = "";
     try {
-      const response = await fetch(endpoint, {
-        signal: controller.signal,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question,
-          chartContext: chartContext(),
-          language: byId("preferredLanguage")?.value || "hi",
-          conversationHistory: history.slice(-10)
-        })
+      const payload = JSON.stringify({
+        question,
+        chartContext: chartContext(),
+        language: byId("preferredLanguage")?.value || "hi",
+        conversationHistory: history.slice(-10)
       });
-      const data = await response.json().catch(() => ({}));
-      if (requestId !== requestSequence) return;
-      if (!response.ok) throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
-      if (typeof data.answer !== "string" || !data.answer.trim()) throw new Error("AI से उत्तर प्राप्त नहीं हुआ।");
+      let data = null;
+      let attempt = 0;
+      while (true) {
+        try {
+          const response = await fetch(endpoint, {
+            signal: controller.signal,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: payload
+          });
+          data = await response.json().catch(() => ({}));
+          if (requestId !== requestSequence) return;
+          if (response.ok && typeof data.answer === "string" && data.answer.trim()) break;
+          const retryable = data.retryable === true || [408, 425, 429, 500, 502, 503, 504].includes(response.status);
+          if (!retryable) throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
+          attempt++;
+          const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
+          if (status) status.textContent = "अभी सर्वर पर अधिक प्रश्न हैं। आपका सवाल सुरक्षित है—उत्तर के लिए अपने आप दोबारा प्रयास हो रहा है...";
+          await wait(delay);
+        } catch (error) {
+          if (error.name === "AbortError" || requestId !== requestSequence) throw error;
+          // Network disconnects are transient; keep retrying with a capped delay.
+          attempt++;
+          const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
+          if (status) status.textContent = "कनेक्शन में अस्थायी रुकावट है। आपका सवाल सुरक्षित है—फिर से प्रयास हो रहा है...";
+          await wait(delay);
+        }
+      }
       addMessage(data.answer, "assistant");
       history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
       if (history.length > 20) history.splice(0, history.length - 20);
       if (status) status.textContent = "";
     } catch (error) {
       if (requestId !== requestSequence) return;
-      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "अनुरोध रद्द हुआ या समय-सीमा पूरी हुई। दोबारा प्रयास करें।" : error.message);
+      if (status) status.textContent = error.name === "AbortError" ? "अनुरोध रद्द किया गया।" : "उत्तर प्राप्त नहीं हुआ: " + error.message;
     } finally {
       if (requestId === requestSequence) {
         activeController = null;
