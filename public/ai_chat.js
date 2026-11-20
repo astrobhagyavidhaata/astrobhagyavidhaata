@@ -37,7 +37,12 @@
     addMessage(question, "user");
     input.value = "";
     try {
-      const response = await fetch(endpoint, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      let response;
+      try {
+        response = await fetch(endpoint, {
+        signal: controller.signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,7 +51,10 @@
           language: byId("preferredLanguage")?.value || "hi",
           conversationHistory: history.slice(-10)
         })
-      });
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।");
       if (typeof data.answer !== "string" || !data.answer.trim()) throw new Error("AI से उत्तर प्राप्त नहीं हुआ।");
@@ -54,7 +62,7 @@
       history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
       if (status) status.textContent = "";
     } catch (error) {
-      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + error.message;
+      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "AI उत्तर में 45 सेकंड से अधिक समय लगा। कृपया फिर प्रयास करें।" : error.message);
     } finally {
       busy = false;
       if (button) button.disabled = false;
