@@ -554,9 +554,9 @@
     if(!taraPage)heading(slide("slide-navtara"),"नवतारा चक्र (तारा बल)");
     if(!ashtakPage)heading(slide("slide-ashtakvarga"),"अष्टकवर्ग");
     if(!vargaFolder)heading(slide("slide-shodashvarga"),"षोडश वर्ग कुंडलियाँ (D2–D60)");
-    const viewport=$("astroSlideViewport"),slideTabs=$("astroSlideTabs");
+    const viewport=$("astroSlideViewport"),slideTabs=$("astroSlideNav");
     if(viewport&&slideTabs){
-      const buttons=Array.from(slideTabs.querySelectorAll("[data-astro-slide-tab]"));
+      const buttons=Array.from(slideTabs.querySelectorAll("button"));
       const syncAstroTabOnScroll=()=>{const index=Math.max(0,Math.min(buttons.length-1,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));buttons.forEach((button,i)=>button.setAttribute("aria-selected",String(i===index)));buttons[index]?.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});};
       buttons.forEach((button,index)=>{button.onclick=()=>viewport.scrollTo({left:viewport.clientWidth*index,behavior:"smooth"});});
       const syncActiveSlideHeight=()=>{
