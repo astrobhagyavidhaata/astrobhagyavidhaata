@@ -119,8 +119,13 @@
           await wait(delay);
         }
       }
+      // Replace the visible and stored user turn with the server-redacted text so owner credentials never persist in chat history.
+      const safeQuestion=typeof data.sanitizedQuestion==="string"?data.sanitizedQuestion:question;
+      const responseBox=byId("ai-response-box");
+      const lastUserMessage=responseBox?.querySelector(".ai-chat-message.user:last-of-type");
+      if(lastUserMessage && safeQuestion!==question) lastUserMessage.textContent=safeQuestion||"Owner authentication";
       addMessage(data.answer, "assistant");
-      history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
+      history.push({ role: "user", content: safeQuestion }, { role: "assistant", content: data.answer });
       if (history.length > 20) history.splice(0, history.length - 20);
       if (status) status.textContent = "";
     } catch (error) {
