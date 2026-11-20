@@ -14,6 +14,12 @@
   <meta name="twitter:title" content="Astro Bhagya Vidhata | वैदिक ज्योतिष">
   <meta name="twitter:description" content="जन्म कुंडली, दशा, गोचर और AI वैदिक ज्योतिषीय मार्गदर्शन।">
   <meta name="theme-color" content="#17112b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/app-icon.svg">
   <title>Astro Bhagya Vidhata | वैदिक ज्योतिष</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -286,7 +292,7 @@
 </style>
 </head>
 <body>
-  <header class="app-header"><div class="header-title"><h1>🔱 एस्ट्रो भाग्य विधाता</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत जन्म कुंडली</p></div><div class="language-picker notranslate"><label for="preferredLanguage">भाषा</label><select id="preferredLanguage" onchange="changeAppLanguage(this.value)" aria-label="भाषा चुनें / Choose language"><option value="hi">हिन्दी</option><option value="en">English</option></select></div></header>
+  <header class="app-header"><div class="header-title"><h1>🔱 एस्ट्रो भाग्य विधाता</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत जन्म कुंडली</p></div><div class="language-picker notranslate"><label for="preferredLanguage">भाषा</label><select id="preferredLanguage" onchange="changeAppLanguage(this.value)" aria-label="भाषा चुनें / Choose language"><option value="hi">हिन्दी</option><option value="en">English</option></select></div><div class="header-actions"><button type="button" id="shareAppButton" class="secondary">↗ शेयर</button><button type="button" id="installAppButton">⬇ ऐप इंस्टॉल</button></div></header>
   
   <main>
     <nav id="appPageTabs" class="app-page-tabs" aria-label="ऐप के पेज">
@@ -395,7 +401,11 @@
         .astro-slide-card .calculation-page h3{margin:0 0 12px}
         .astro-slide-card #kundliChartsFolder{margin:0;border:0;padding:0;background:transparent}
         @media(max-width:600px){.astro-slide-card{padding:12px}}
-      </style>
+        .header-actions{position:absolute;right:12px;top:12px;display:flex;gap:6px;z-index:2}
+    .header-actions button{width:auto;margin:0;padding:8px 10px;font-size:12px;white-space:nowrap}
+    .app-header .language-picker{position:absolute;left:12px;top:12px;margin:0}
+    @media(max-width:520px){.app-header{min-height:112px;padding:42px 8px 12px}.app-header .header-title h1{font-size:20px}.app-header .header-title p{font-size:12px;margin-top:4px}.header-actions{right:8px;top:8px}.header-actions button{padding:7px 8px;font-size:11px}.app-header .language-picker{left:8px;top:8px}.app-header .language-picker label{display:none}.app-header .language-picker select{min-width:78px;width:78px;padding:5px;font-size:12px}}
+  </style>
       <script>
         function goAstroSlide(idx){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||idx<0||idx>=btns.length)return;vp.scrollTo({left:vp.clientWidth*idx,behavior:"smooth"});btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
         function syncAstroTabOnScroll(){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||!vp.clientWidth)return;const idx=Math.max(0,Math.min(btns.length-1,Math.round(vp.scrollLeft/vp.clientWidth)));btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
@@ -531,6 +541,7 @@
       activate(0);
     })();
   </script>
+  <script src="/app.js"></script>
   <script src="kundli.js"></script><script src="kundli_matching.js"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script>
 </body>
 </html>
