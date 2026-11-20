@@ -85,7 +85,7 @@
    document.documentElement.lang=active;
    document.documentElement.dir=(base==="ur"||base==="ar")?"rtl":"ltr";
    if(document.body)document.body.dir=(base==="ur"||base==="ar")?"rtl":"ltr";
-   document.title=base==="fr"?"Astro Bhagya Vidhata | Astrologie védique":base==="pa"?"Astro Bhagya Vidhata | ਵੈਦਿਕ ਜੋਤਿਸ਼":"Astro Bhagya Vidhata | Vedic Astrology";
+   document.title=active==="hi"?"एस्ट्रो भाग्य विधाता | वैदिक ज्योतिष":"Astro Bhagya Vidhata | Vedic Astrology";
    document.body.childNodes.forEach(node=>translateElement(node,base));
    const notice=document.getElementById("languageNotice");
    if(notice){
@@ -106,44 +106,7 @@
  });
  function setLanguage(lang){current=supported.has(lang)?lang:"en";apply(current)}
  
- function applyGoogleTranslation(lang){
-   const base=String(lang||"en").split("-")[0];
-   // Hindi is the source language of the app's original interface.
-   const target=base==="ar"?"ar":base;
-   const cookieValue="/hi/"+target;
-   document.cookie="googtrans="+cookieValue+"; path=/; SameSite=Lax";
-   try{localStorage.setItem("googtrans",cookieValue)}catch(_){}
-   const rtl=target==="ur"||target==="ar";
-   document.documentElement.dir=rtl?"rtl":"ltr";
-   if(document.body)document.body.dir=rtl?"rtl":"ltr";
-   const trigger=()=>{
-     const combo=document.querySelector(".goog-te-combo");
-     if(combo){combo.value=target;combo.dispatchEvent(new Event("change",{bubbles:true}));return true;}
-     return false;
-   };
-   if(!trigger()){
-     const waitForWidget=new MutationObserver(()=>{
-       if(trigger())waitForWidget.disconnect();
-     });
-     waitForWidget.observe(document.body,{childList:true,subtree:true});
-     window.setTimeout(()=>waitForWidget.disconnect(),12000);
-   }
- }
- window.googleTranslateElementInit=window.googleTranslateElementInit||function(){
-   if(window.google&&google.translate){new google.translate.TranslateElement({pageLanguage:"hi",includedLanguages:"en,hi",autoDisplay:false},"google_translate_element");}
- };
-// Keep document direction aligned with the selected language without fighting Google Translate.
- const directionGuard=new MutationObserver(()=>{
-   const rtl=current==="ur"||current==="ar-SA"||current==="ar";
-   const wanted=rtl?"rtl":"ltr";
-   if(document.documentElement.dir!==wanted)document.documentElement.dir=wanted;
-   if(document.body&&document.body.dir!==wanted)document.body.dir=wanted;
- });
- directionGuard.observe(document.documentElement,{attributes:true,attributeFilter:["dir"]});
- if(document.body)directionGuard.observe(document.body,{attributes:true,attributeFilter:["dir"]});
- document.documentElement.dir="ltr";
- if(document.body)document.body.dir="ltr";
- picker.addEventListener("change",()=>{setLanguage(picker.value);applyGoogleTranslation(picker.value);});
+
  // Preserve the language selected by the user; apply it before rendering the chart.
  const initialLanguage=supported.has(picker.value)?picker.value:"en";
  picker.value=initialLanguage;
