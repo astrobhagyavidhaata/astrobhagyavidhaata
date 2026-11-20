@@ -37,11 +37,15 @@ async function runConsultation(request, env) {
   } catch {
     return Response.json({ success: false, message: "Invalid JSON body." }, { status: 400 });
   }
+  const allowedBodyKeys = ["question", "content", "chartContext", "language"];
+  const safeBody = Object.fromEntries(
+    allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(body || {}, key)).map(key => [key, body[key]])
+  );
   const headers = Object.fromEntries(request.headers.entries());
   const req = {
     method: request.method,
     headers,
-    body,
+    body: safeBody,
     signal: request.signal,
     secure: new URL(request.url).protocol === "https:",
     socket: { remoteAddress: headers["cf-connecting-ip"] || "anonymous" }
