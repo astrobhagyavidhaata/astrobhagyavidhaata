@@ -383,7 +383,7 @@
 
       const deckStyle=document.getElementById("dashaSlideStyle")||document.createElement("style");
       deckStyle.id="dashaSlideStyle";
-      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;align-items:flex-start;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-slide-card{flex:0 0 100%;align-self:flex-start;height:max-content;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
+      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;align-items:flex-start;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-slide-card{flex:0 0 100%;align-self:flex-start;height:max-content;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}.dasha-schedule-scroll{max-height:140px;min-height:0;height:auto;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}.dasha-current-card{height:auto;min-height:0}";
       if(!deckStyle.isConnected)document.head.appendChild(deckStyle);
 
       const summarySlide=document.createElement("section");summarySlide.className="dasha-slide-card";
@@ -398,6 +398,7 @@
       }
       if(activeBox)mahadashaSlide.appendChild(activeBox);
       if(scheduleTitle)mahadashaSlide.appendChild(scheduleTitle);
+      const scheduleScroll=document.createElement("div");scheduleScroll.className="dasha-schedule-scroll";mahadashaSlide.appendChild(scheduleScroll);
       mahadashaNodes.forEach(mdNode=>{
         const adList=mdNode.querySelector(":scope > .dasha-subperiod-list");
         if(adList){
@@ -406,9 +407,9 @@
           groupTitle.textContent=mdNode.querySelector(":scope > summary")?.textContent||"महादशा";
           group.appendChild(groupTitle);group.appendChild(adList);antardashaSlide.appendChild(group);
         }
-        mahadashaSlide.appendChild(mdNode);
+        scheduleScroll.appendChild(mdNode);
       });
-      if(timeline)mahadashaSlide.appendChild(timeline);
+      if(timeline)scheduleScroll.appendChild(timeline);
 
       const tabs=document.createElement("div");tabs.className="chart-view-toolbar dasha-slide-tabs";tabs.setAttribute("role","tablist");tabs.setAttribute("aria-label","दशा विवरण चुनें");
       const viewport=document.createElement("div");viewport.className="dasha-slide-viewport";
@@ -677,6 +678,7 @@
   function validateBirthDetails(data) {
     const details = {
       name: String(data.get("name") || "").trim(),
+      gender: String(data.get("gender") || "").trim(),
       date: String(data.get("dob") || ""),
       time: String(data.get("birthTime") || ""),
       place: String(data.get("birthPlace") || "").trim(),
@@ -685,6 +687,7 @@
 
     if (
       !details.name ||
+      !["male","female"].includes(details.gender) ||
       !details.date ||
       !details.time ||
       !details.place
@@ -824,7 +827,7 @@
     }:(same?old.location:null);
     const record={
       version:2,savedAt:new Date().toISOString(),
-      birthDetails:{name:details.name||"",date:details.date||"",time:details.time||"",place:details.place||""},
+      birthDetails:{name:details.name||"",gender:details.gender||"",date:details.date||"",time:details.time||"",place:details.place||""},
       location:savedLocation,
       chart:chart|| ((same||preserveExistingChart)?old.chart:null)
     };
@@ -844,6 +847,7 @@
     const data=new FormData(form);
     saveAstroSession({
       name:String(data.get("name")||"").trim(),
+      gender:String(data.get("gender")||""),
       date:String(data.get("dob")||""),
       time:String(data.get("birthTime")||""),
       place:String(data.get("birthPlace")||"").trim()
@@ -857,7 +861,7 @@
     const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=true;
     const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=true;
     if(form){
-      for(const id of ["name","dob","birthTime","birthPlace"]){
+      for(const id of ["name","dob","birthGender","birthTime","birthPlace"]){
         const field=$(id);if(field)field.value="";
       }
     }
@@ -874,7 +878,7 @@
       title: (details.name || "जन्म कुंडली") + " — " + details.date,
       createdAt: new Date().toISOString(),
       birthDetails: {
-        name: details.name, localDate: details.date, localTime: details.time,
+        name: details.name, gender: details.gender, localDate: details.date, localTime: details.time,
         place: [location.name, location.admin1, location.country].filter(Boolean).join(", "),
         latitude: location.latitude, longitude: location.longitude
       },
@@ -889,6 +893,7 @@
   async function generateKundli(details, location) {
     const payload = {
       name: details.name,
+      gender: details.gender,
 
       birthDate: details.date,
 
