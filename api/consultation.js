@@ -120,6 +120,8 @@ module.exports=async function(req,res,env={}){
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
     const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
     const chartContext=compactChartContext(liveChartContext);
+    // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
+    const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
     const lowerQuestion=question.toLowerCase();
     const hinglishPattern=/\b(main|mai|mujhe|mera|meri|mere|hum|ham|aap|apka|apki|kab|kahan|kaha|kaise|kyu|kyun|kya|hai|hain|tha|thi|hoga|hogi|jaunga|jaungi|jaoge|milega|batao|bataiye|kundli|shaadi|naukri|videsh|paisa|ghar|)\b/i;
@@ -146,7 +148,7 @@ module.exports=async function(req,res,env={}){
         })).filter(item=>item.content.trim())
       : [];
     // Use Gemini 3.8 Flash for chart-based reasoning; keep a bounded recent dialogue for follow-ups.
-    const answer=await askGemini({question:privateSafeQuestion,ownerInstruction:ownerAuthorized?ownerInstruction:"",chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
+    const answer=await askGemini({question:privateSafeQuestion,personName,ownerInstruction:ownerAuthorized?ownerInstruction:"",chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI",ownerAuthorized,sanitizedQuestion:privateSafeQuestion});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
