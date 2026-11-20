@@ -302,15 +302,15 @@
     .ai-chat-messages{max-height:220px!important;margin:6px 0!important;padding:0!important}
 
   
-    /* AI consultation expands over the full viewport only while the user is composing or receiving an answer. */
-    body.ai-chat-expanded{overflow:hidden!important}
+    /* Keep the consultation fullscreen after sending and while the answer is displayed. */
+    body.ai-chat-expanded{overflow:hidden!important;height:100%!important}
     body.ai-chat-expanded #aiAstrologer{
-      position:fixed!important;top:var(--ai-visual-top,0px)!important;left:0!important;right:0!important;bottom:auto!important;z-index:99999!important;
+      position:fixed!important;inset:0!important;z-index:99999!important;
       display:flex!important;flex-direction:column!important;
-      width:100vw!important;height:var(--ai-visual-height,100dvh)!important;
-      max-height:var(--ai-visual-height,100dvh)!important;
-      margin:0!important;padding: max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))!important;
-      overflow-y:auto!important;overflow-x:hidden!important;
+      box-sizing:border-box!important;width:100vw!important;height:100dvh!important;
+      min-height:100dvh!important;max-height:100dvh!important;
+      margin:0!important;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))!important;
+      overflow-y:hidden!important;overflow-x:hidden!important;
       border:0!important;border-radius:0!important;background:#fff!important;
       box-shadow:none!important;
     }
