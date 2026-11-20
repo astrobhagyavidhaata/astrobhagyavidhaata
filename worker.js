@@ -43,6 +43,37 @@ async function runApi(handler, request, env = {}) {
   }
 }
 
+async function serveGithubStatic(request, env, ctx) {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const url = new URL(request.url);
+  let assetPath = url.pathname === "/" ? "/index.html" : url.pathname;
+  if (!assetPath.startsWith("/") || assetPath.includes("..") || assetPath.includes("\\\\") || assetPath.startsWith("/api/")) return null;
+  const originUrl = "https://raw.githubusercontent.com/astrobhagyavidhaata/astrobhagyavidhaata/main/public" + assetPath;
+  const cacheKey = new Request("https://astrobhagyavidhaata.in/__github_static_cache" + assetPath + url.search, { method: "GET" });
+  const cache = caches.default;
+  if (request.method === "GET") {
+    const cached = await cache.match(cacheKey);
+    if (cached) return new Response(cached.body, { status: cached.status, headers: cached.headers });
+  }
+  const upstream = await fetch(originUrl, { headers: { "Accept": "*/*" } });
+  if (!upstream.ok) return null;
+  const headers = new Headers(upstream.headers);
+  headers.set("Cache-Control", "public, max-age=60, s-maxage=300");
+  headers.set("X-Astro-Static-Source", "github-main");
+  let response;
+  if ((headers.get("content-type") || "").includes("text/html")) {
+    let html = await upstream.text();
+    const hideIncomplete = "<style id=\\"hide-incomplete-bala-tabs\\">#astroSlideNav>.astro-tab-btn:nth-of-type(3),#astroSlideNav>.astro-tab-btn:nth-of-type(4),#astroSlideViewport>#slide-shadbala,#astroSlideViewport>#slide-bhavabala{display:none!important}</style>";
+    html = html.includes("</head>") ? html.replace("</head>", hideIncomplete + "</head>") : hideIncomplete + html;
+    headers.set("Content-Type", "text/html; charset=utf-8");
+    response = new Response(html, { status: upstream.status, headers });
+  } else {
+    response = new Response(request.method === "HEAD" ? null : upstream.body, { status: upstream.status, headers });
+  }
+  if (request.method === "GET" && response.ok) ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}
+
 async function runGetApi(handler, request, env = {}) {
   if (request.method !== "GET") {
     return Response.json({ success: false, message: "Only GET requests are accepted." }, {
@@ -114,11 +145,11 @@ export default {
         return Response.json({ success: false, message: "API endpoint not found." }, { status: 404 });
       }
 
-      // Static assets binding may be absent in preview or misconfigured deployments.
+      // Serve current public/ files from GitHub main at the edge; retain ASSETS as fallback.
+      const githubStatic = await serveGithubStatic(request, bindings, ctx);
+      if (githubStatic) return githubStatic;
       const assets = bindings && bindings.ASSETS;
-      if (assets && typeof assets.fetch === "function") {
-        return await assets.fetch(request);
-      }
+      if (assets && typeof assets.fetch === "function") return await assets.fetch(request);
 
       return new Response("Astro Bhagya Vidhata Server Active", {
         status: 200,
