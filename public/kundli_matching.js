@@ -2,7 +2,13 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const NAK = ["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्वा फाल्गुनी","उत्तरा फाल्गुनी","हस्त","चित्रा","स्वाती","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढ़ा","उत्तराषाढ़ा","श्रवण","धनिष्ठा","शतभिषा","पूर्वाभाद्रपद","उत्तराभाद्रपद","रेवती"];
-  const SIGNS = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];\n  const EN_SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];\n  const english = () => (window.AstroLanguage?.get?.() || $("preferredLanguage")?.value) === "en";\n  const t = (hi,en) => english() ? en : hi;\n  const signName = index => (english() ? EN_SIGNS : SIGNS)[Number(index)] || "—";\n  const nakName = name => english() ? (window.AstroLanguage?.translate?.(name) || name) : name;\n  const planetName = name => english() ? (window.AstroLanguage?.translate?.(name) || name) : name;
+  const SIGNS = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
+  const EN_SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  const english = () => (window.AstroLanguage?.get?.() || $("preferredLanguage")?.value) === "en";
+  const t = (hi,en) => english() ? en : hi;
+  const signName = index => (english() ? EN_SIGNS : SIGNS)[Number(index)] || "—";
+  const nakName = name => english() ? (window.AstroLanguage?.translate?.(name) || name) : name;
+  const planetName = name => english() ? (window.AstroLanguage?.translate?.(name) || name) : name;
   const SIGN_LORDS = ["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
   const GANA = [0,1,2,1,0,2,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
   const YONI = [0,1,2,3,3,4,5,2,5,6,6,7,8,9,8,9,10,10,4,11,12,11,13,0,13,7,1];
