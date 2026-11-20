@@ -67,8 +67,14 @@ function compactChartContext(source){
     d1:pickChart(source.d1),
     d9:pickChart(source.d9),
     taraBala:source.currentTaraBala||null,
-    mahadasha:md?{planet:md.planet,start:md.start,end:md.end}:current.mahadasha||null,
-    antardasha:ad?{planet:ad.planet,start:ad.start,end:ad.end}:current.antardasha||null,
+    mahadasha:md?{planet:md.planet,start:md.start,end:md.end}:{planet:current.mahadasha||null,start:current.mahadashaStart||null,end:current.mahadashaEnd||null},
+    antardasha:ad?{planet:ad.planet,start:ad.start,end:ad.end}:{planet:current.antardasha||null,start:current.antardashaStart||null,end:current.antardashaEnd||null},
+    dashaDates:{
+      mahadashaStart:md?.start||current.mahadashaStart||null,
+      mahadashaEnd:md?.end||current.mahadashaEnd||null,
+      antardashaStart:ad?.start||current.antardashaStart||null,
+      antardashaEnd:ad?.end||current.antardashaEnd||null
+    },
     gochar:transit?{
       asOf:transit.asOf,natalMoonRashi:transit.natalMoonRashi,natalAscendantRashi:transit.natalAscendantRashi,
       planets:(transit.planets||[]).map(p=>({
@@ -95,8 +101,11 @@ module.exports=async function(req,res,env={}){
     if(recentRequests.size>5000){for(const [key,time] of recentRequests){if(now-time>60000)recentRequests.delete(key);}}
     const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
     const chartContext=compactChartContext(liveChartContext);
-    const supportedLanguages=new Set(["en","en-CA","hi","mr","pa","ur","fr","fr-CA","de","es","pt","pt-BR","ar","ar-SA","bn","gu","ta","te","kn","ml","or","as"]);
-    const language=supportedLanguages.has(body.language)?body.language:"en";
+    // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
+    const lowerQuestion=question.toLowerCase();
+    const hinglishPattern=/\\b(main|mai|mujhe|mera|meri|mere|hum|ham|aap|apka|apki|kab|kahan|kaha|kaise|kyu|kyun|kya|hai|hain|tha|thi|hoga|hogi|jaunga|jaungi|jaoge|milega|milega|batao|bataiye|kundli|shaadi|naukri|videsh|paisa|ghar|career|mera)\\b/i;
+    const hasDevanagari=/[\\u0900-\\u097F]/.test(question);
+    const language=(hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
     // gemini.js tries gemini-2.5-flash-lite, then gemini-2.0-flash, then discovers supported Flash models.
     const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-2.5-flash-lite",signal:req.signal});
