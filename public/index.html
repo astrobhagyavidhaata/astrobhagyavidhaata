@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Astro Bhagya Vidhata — वैदिक ज्योतिष, जन्म कुंडली, दशा, गोचर और AI ज्योतिषीय मार्गदर्शन।">
+  <link rel="canonical" href="https://astrobhagyavidhaata.in/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Astro Bhagya Vidhata | वैदिक ज्योतिष">
+  <meta property="og:description" content="जन्म कुंडली, दशा, गोचर और AI वैदिक ज्योतिषीय मार्गदर्शन।">
+  <meta property="og:url" content="https://astrobhagyavidhaata.in/">
+  <meta property="og:site_name" content="Astro Bhagya Vidhata">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Astro Bhagya Vidhata | वैदिक ज्योतिष">
+  <meta name="twitter:description" content="जन्म कुंडली, दशा, गोचर और AI वैदिक ज्योतिषीय मार्गदर्शन।">
   <meta name="theme-color" content="#17112b">
   <title>Astro Bhagya Vidhata | वैदिक ज्योतिष</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +56,7 @@
     button:disabled{opacity:.6;cursor:not-allowed}
     .secondary{background:#493568;color:white}
     #message,#walletMessage,#panchangMessage{display:none;padding:12px;margin-top:14px;border-radius:8px;background:#151020;color:#f5d994;line-height:1.6;overflow-wrap:anywhere}
-    #kBox{display:none;margin-top:18px}
+    #kBox{display:none!important;margin-top:18px}\n    #aiAstrologer{margin:8px 0 12px!important}
     #kTxt{display:none!important}
     .app-folder{display:block;margin:14px 0;border:1px solid #70558e;border-radius:12px;background:#181326;padding:12px}
     .app-folder>summary{cursor:pointer;color:#f5d994;font-weight:bold;font-size:16px;padding:5px;list-style-position:inside}
@@ -357,7 +367,7 @@
         function syncAstroTabOnScroll(){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||!vp.clientWidth)return;const idx=Math.max(0,Math.min(btns.length-1,Math.round(vp.scrollLeft/vp.clientWidth)));btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
       </script><div id="kTxt" aria-hidden="true"></div></div>
 </div>
-      <section id="aiAstrologer" hidden class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
+      <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
         <p class="chat-info">अपनी जन्म कुंडली के आधार पर AI ज्योतिषी से सीधे सवाल पूछें। सवाल पूछने के लिए लॉगिन या सक्रिय सत्र की आवश्यकता नहीं है।</p>
         <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
