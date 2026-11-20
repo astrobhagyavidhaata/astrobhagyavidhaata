@@ -359,6 +359,8 @@
         #astroSlideViewport{min-height:0!important;align-items:flex-start;}
         #astroSlideViewport>.astro-slide-card:empty{display:none!important;}
         #astroSlideViewport>#slide-shodashvarga:has(#vargaCharts:empty){display:none!important;}
+        #astroSlideViewport:not(:has(>.astro-slide-card:not(:empty):not(:has(#vargaCharts:empty)))){display:none!important;}
+        #slide-shodashvarga:has(#vargaCharts:empty){display:none!important;}
         .astro-slide-card{min-height:0!important;height:auto!important;}
         .astro-slide-card .calculation-page{display:block!important;margin:0;border:0;padding:0;background:transparent}
         .astro-slide-card .calculation-page h3{margin:0 0 12px}
