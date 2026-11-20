@@ -103,8 +103,8 @@ module.exports=async function(req,res,env={}){
     const chartContext=compactChartContext(liveChartContext);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
     const lowerQuestion=question.toLowerCase();
-    const hinglishPattern=/\\b(main|mai|mujhe|mera|meri|mere|hum|ham|aap|apka|apki|kab|kahan|kaha|kaise|kyu|kyun|kya|hai|hain|tha|thi|hoga|hogi|jaunga|jaungi|jaoge|milega|milega|batao|bataiye|kundli|shaadi|naukri|videsh|paisa|ghar|career|mera)\\b/i;
-    const hasDevanagari=/[\\u0900-\\u097F]/.test(question);
+    const hinglishPattern=/\b(main|mai|mujhe|mera|meri|mere|hum|ham|aap|apka|apki|kab|kahan|kaha|kaise|kyu|kyun|kya|hai|hain|tha|thi|hoga|hogi|jaunga|jaungi|jaoge|milega|milega|batao|bataiye|kundli|shaadi|naukri|videsh|paisa|ghar|career|mera)\b/i;
+    const hasDevanagari=/[\u0900-\u097F]/.test(question);
     const language=(hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
     // gemini.js tries gemini-2.5-flash-lite, then gemini-2.0-flash, then discovers supported Flash models.
