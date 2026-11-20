@@ -16,6 +16,16 @@
     box.scrollTop = box.scrollHeight;
   }
 
+  window.resetAstroChat = function resetAstroChat() {
+    history.length = 0;
+    const box = byId("ai-response-box");
+    if (box) box.replaceChildren();
+    const input = byId("aiAstrologerQuestion");
+    if (input) input.value = "";
+    const status = byId("aiAstrologerStatus");
+    if (status) status.textContent = "";
+  };
+
   function chartContext() {
     const chart = window.AstroKundli;
     if (chart && typeof chart === "object") return chart;
