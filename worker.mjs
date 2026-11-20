@@ -76,11 +76,7 @@ export default {
   async fetch(request, env = {}, ctx) {
     try {
       const url = new URL(request.url);
-      // Keep the .in domain canonical; permanently redirect the bonus .info hostname.
-      if (url.hostname === "astrobhagyavidhaata.info" || url.hostname === "www.astrobhagyavidhaata.info") {
-        url.hostname = url.hostname.startsWith("www.") ? "www.astrobhagyavidhaata.in" : "astrobhagyavidhaata.in";
-        return Response.redirect(url.toString(), 301);
-      }
+      // Keep .info live until the .in nameserver delegation is active.
 
       const bindings = env || {};
 
