@@ -127,8 +127,14 @@ module.exports=async function(req,res,env={}){
     const selectedLanguage=String(body.language||"").toLowerCase().split("-")[0];
     const language=selectedLanguage==="hi"?"hi":selectedLanguage==="en"?"en":((hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en");
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
-    // Use Gemini 3.8 Flash as the primary reasoning model; Flash-Lite remains the fallback.
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
+    const conversationHistory=Array.isArray(body.conversationHistory)
+      ? body.conversationHistory.slice(-12).map(item=>({
+          role:item?.role==="assistant"||item?.role==="model"?"assistant":"user",
+          content:redactQuestion(String(item?.content||"").slice(0,2500),body.chartContext)
+        })).filter(item=>item.content.trim())
+      : [];
+    // Use Gemini 3.8 Flash for chart-based reasoning; keep a bounded recent dialogue for follow-ups.
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
