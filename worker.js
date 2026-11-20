@@ -63,7 +63,7 @@ async function serveGithubStatic(request, env, ctx) {
   let response;
   if ((headers.get("content-type") || "").includes("text/html")) {
     let html = await upstream.text();
-    const hideIncomplete = "<style id=\\"hide-incomplete-bala-tabs\\">#astroSlideNav>.astro-tab-btn:nth-of-type(3),#astroSlideNav>.astro-tab-btn:nth-of-type(4),#astroSlideViewport>#slide-shadbala,#astroSlideViewport>#slide-bhavabala{display:none!important}</style>";
+    const hideIncomplete = '<style id="hide-incomplete-bala-tabs">#astroSlideNav>.astro-tab-btn:nth-of-type(3),#astroSlideNav>.astro-tab-btn:nth-of-type(4),#astroSlideViewport>#slide-shadbala,#astroSlideViewport>#slide-bhavabala{display:none!important}</style>';
     html = html.includes("</head>") ? html.replace("</head>", hideIncomplete + "</head>") : hideIncomplete + html;
     headers.set("Content-Type", "text/html; charset=utf-8");
     response = new Response(html, { status: upstream.status, headers });
