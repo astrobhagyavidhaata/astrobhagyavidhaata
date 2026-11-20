@@ -5,10 +5,10 @@
   const SIGNS = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुंभ","मीन"];
   const SIGN_LORDS = ["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
   const GANA = [0,2,2,1,0,2,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
-  const YONI = [0,1,2,3,4,5,6,7,5,8,9,9,10,11,10,11,12,13,4,12,13,6,14,14,14,8,1];
-  const VARNA = [2,3,1,0,2,1,3,2,2,1,3,0]; // Brahmin 0, Kshatriya 1, Vaishya 2, Shudra 3
+  const YONI = [0,1,2,3,3,4,5,2,5,6,6,7,8,9,8,9,10,10,4,11,13,11,12,0,12,7,1];
+  const VARNA = [1,2,3,0,1,2,3,0,1,2,3,0]; // Brahmin 0, Kshatriya 1, Vaishya 2, Shudra 3
   const NADI = NAK.map((_,i)=>i%3);
-  const ANIMAL_ENEMIES = new Set(["0-8","1-7","2-10","3-12","4-13","5-11","6-9","7-14"]);
+  const ANIMAL_ENEMIES = new Set(["0-8","1-12","2-11","3-13","4-10","5-6","7-9"]);
   const FRIENDS = {
     सूर्य:["चंद्र","मंगल","गुरु"],चंद्र:["सूर्य","बुध"],मंगल:["सूर्य","चंद्र","गुरु"],
     बुध:["सूर्य","शुक्र"],गुरु:["सूर्य","चंद्र","मंगल"],शुक्र:["बुध","शनि"],शनि:["बुध","शुक्र"]
@@ -25,7 +25,7 @@
   function scoreVashya(g,b){return VASHYA_SCORE[VASHYA[g]][VASHYA[b]];}
   function taraOne(from,to){const n=((to-from+27)%27)+1;return [2,4,6,8,0].includes(n%9)?1.5:0;}
   function scoreTara(g,b){return taraOne(g,b)+taraOne(b,g);}
-  function scoreYoni(g,b){const a=YONI[g],c=YONI[b];if(a===c)return 4;const key=[Math.min(a,c),Math.max(a,c)].join("-");if(ANIMAL_ENEMIES.has(key))return 0;return 3;}
+  function scoreYoni(g,b){const a=YONI[g],c=YONI[b];if(a===c)return 4;const key=[Math.min(a,c),Math.max(a,c)].join("-");if(ANIMAL_ENEMIES.has(key))return 0;return 2;}
   function scoreGrahaMaitri(g,b){
     const a=SIGN_LORDS[g],c=SIGN_LORDS[b];
     if(a===c)return 5;
