@@ -124,8 +124,8 @@ module.exports=async function(req,res,env={}){
     if(/GEMINI_API_KEY/.test(message)){
       return res.status(503).json({success:false,message:"Gemini API key उपलब्ध नहीं है या अमान्य है।"});
     }
-    if(/quota|rate.?limit|resource.?exhausted/i.test(message)){
-      return res.status(429).json({success:false,message:"AI सेवा की अनुरोध सीमा पूरी हुई है। थोड़ी देर बाद पुनः प्रयास करें।"});
+    if(/quota|rate.?limit|resource.?exhausted|high demand|overload|temporarily unavailable|HTTP 503/i.test(message)){
+      return res.status(429).json({success:false,message:"AI सेवा पर अभी अधिक भार है। कृपया कुछ क्षण बाद पुनः प्रयास करें।"});
     }
     return res.status(502).json({success:false,message});
   }
