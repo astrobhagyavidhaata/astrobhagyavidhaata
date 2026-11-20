@@ -383,11 +383,13 @@
         .astro-tab-btn.active{background:linear-gradient(135deg,#e86f0c,#c85200)!important;color:#fff!important;border-color:#c85200!important}
         .astro-slide-viewport{display:flex;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;scroll-behavior:smooth;width:100%;border-radius:12px;background:#fff;border:1px solid #f0d9c2;margin-top:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
         .astro-slide-card{flex:0 0 100%;width:100%;min-width:100%;scroll-snap-align:start;padding:14px;box-sizing:border-box;height:auto;overflow:visible}
-        #astroSlideViewport{min-height:0!important;align-items:flex-start;}
+        /* Hide the complete empty chart strip, not just its empty slides. */
+        #astroSlideViewport{display:none!important;min-height:0!important;align-items:flex-start;margin-top:0!important;border:0!important;background:transparent!important;}
+        #astroSlideViewport:has(>#slide-dasha>*,>#slide-navtara>*,>#slide-shadbala>*,>#slide-bhavabala>*,>#slide-ashtakvarga>*,>#slide-shodashvarga #vargaCharts>*){display:flex!important;}
         #astroSlideViewport>.astro-slide-card:empty{display:none!important;}
         #astroSlideViewport>#slide-shodashvarga:has(#vargaCharts:empty){display:none!important;}
-        #astroSlideViewport:not(:has(>.astro-slide-card:not(:empty):not(:has(#vargaCharts:empty)))){display:none!important;}
         #slide-shodashvarga:has(#vargaCharts:empty){display:none!important;}
+        .astro-slide-wrapper:has(#astroSlideViewport:not(:has(>#slide-dasha>*,>#slide-navtara>*,>#slide-shadbala>*,>#slide-bhavabala>*,>#slide-ashtakvarga>*,>#slide-shodashvarga #vargaCharts>*)) .astro-slide-nav{display:none!important;}
         .astro-slide-card{min-height:0!important;height:auto!important;}
         .astro-slide-card .calculation-page{display:block!important;margin:0;border:0;padding:0;background:transparent}
         .astro-slide-card .calculation-page h3{margin:0 0 12px}
