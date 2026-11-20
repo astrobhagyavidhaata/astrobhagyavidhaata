@@ -61,7 +61,7 @@ async function serveGithubStatic(request, env, ctx) {
   headers.set("Cache-Control", "public, max-age=60, s-maxage=300");
   headers.set("X-Astro-Static-Source", "github-main");
   let response;
-  if ((headers.get("content-type") || "").includes("text/html")) {
+  if (assetPath.endsWith(".html") || (headers.get("content-type") || "").includes("text/html")) {
     let html = await upstream.text();
     const hideIncomplete = '<style id="hide-incomplete-bala-tabs">#astroSlideNav>.astro-tab-btn:nth-of-type(3),#astroSlideNav>.astro-tab-btn:nth-of-type(4),#astroSlideViewport>#slide-shadbala,#astroSlideViewport>#slide-bhavabala{display:none!important}</style>';
     html = html.includes("</head>") ? html.replace("</head>", hideIncomplete + "</head>") : hideIncomplete + html;
