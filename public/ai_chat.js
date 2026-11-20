@@ -62,7 +62,7 @@
       history.push({ role: "user", content: question }, { role: "assistant", content: data.answer });
       if (status) status.textContent = "";
     } catch (error) {
-      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "AI उत्तर में 30 सेकंड से अधिक समय लगा। कृपया फिर प्रयास करें।" : error.message);
+      if (status) status.textContent = "उत्तर प्राप्त नहीं हुआ: " + (error.name === "AbortError" ? "AI उत्तर में 10 सेकंड से अधिक समय लगा। कृपया फिर प्रयास करें।" : error.message);
     } finally {
       busy = false;
       if (button) button.disabled = false;
