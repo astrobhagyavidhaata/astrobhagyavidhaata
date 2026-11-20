@@ -15,8 +15,13 @@
     chatOriginalNext = section.nextSibling;
     chatPlaceholder = document.createComment("AI chat original position");
     chatOriginalParent.insertBefore(chatPlaceholder, section);
+    const focusedElement = section.contains(document.activeElement) ? document.activeElement : null;
     document.body.appendChild(section);
     document.body.classList.add("ai-chat-expanded");
+    // Moving the panel to the document root can blur the textarea on some mobile browsers.
+    if (focusedElement && typeof focusedElement.focus === "function") {
+      focusedElement.focus({ preventScroll: true });
+    }
   }
 
   function collapseChat() {
