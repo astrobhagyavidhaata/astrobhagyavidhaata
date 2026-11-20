@@ -127,7 +127,7 @@ module.exports=async function(req,res,env={}){
     const selectedLanguage=String(body.language||"").toLowerCase().split("-")[0];
     const language=selectedLanguage==="hi"?"hi":selectedLanguage==="en"?"en":((hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en");
     // Owner-only override: the credential is verified by hash on the server; never store the plaintext in source.
-    const ownerPasswordHash="2b5c3317a71a166ba40ac789cfbd246c7ea51ac1db6a603181edebc5738c788a";
+    const ownerPasswordHash=String(env?.ASTRO_OWNER_PASSWORD_SHA256||"");
     const suppliedQuestion=question.trim();
     const firstLine=suppliedQuestion.split(/\r?\n/,1)[0].replace(/^(?:owner|मालिक)\s*[:：-]\s*/i,"").trim();
     const remainingQuestion=suppliedQuestion.includes("\n")?suppliedQuestion.slice(suppliedQuestion.indexOf("\n")+1).trim():"";
