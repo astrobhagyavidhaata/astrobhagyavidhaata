@@ -89,7 +89,7 @@ export default {
         return Response.json({
           success: true,
           configured: Boolean(bindings.GEMINI_API_KEY),
-          model: "gemini-2.5-flash-lite"
+          model: "gemini-3.5-flash-lite"
         }, { headers: { "Cache-Control": "no-store" } });
       }
 
