@@ -111,7 +111,6 @@
  const initialLanguage=supported.has(picker.value)?picker.value:"en";
  picker.value=initialLanguage;
  setLanguage(initialLanguage);
- applyGoogleTranslation(initialLanguage);
  observer.observe(document.body,{subtree:true,childList:true,characterData:true});
  window.AstroLanguage={set:setLanguage,get:()=>current,translate:(value)=>translateAstroText(value,current)};
 })();
