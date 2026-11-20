@@ -165,6 +165,7 @@
     @media(max-width:360px){.support-actions,.support-topics{grid-template-columns:1fr}}
     footer{text-align:center;padding:20px 14px;color:#a99bbd;font-size:12px;line-height:1.7}
 
+    #kundliMatching>summary{list-style-position:inside;padding:4px 0}#kundliMatching[open]>summary{margin-bottom:12px}#kundliMatchResult{margin-top:14px;line-height:1.6}.match-score{font-size:24px;font-weight:800;color:var(--app-orange-dark);margin:12px 0}.match-table{width:100%;border-collapse:collapse;font-size:13px}.match-table th,.match-table td{padding:8px 5px;border-bottom:1px solid #e5e5e5;text-align:left}.match-table th{color:var(--app-orange-dark)}.dasha-schedule-scroll{max-height:140px;overflow-y:auto;overscroll-behavior:contain;border:1px solid #e4e4e4;border-radius:8px;padding:6px;margin-top:8px}
     .ai-astrologer{margin:14px 0 12px;padding:16px;border:1px solid #f0c7a8;border-radius:12px;background:#fffaf6}
     .ai-astrologer h2{margin-top:0;color:#dc5705!important}
     .ai-chat-messages{max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin:12px 0}
@@ -285,6 +286,8 @@
         </div>
         <input id="dob" name="dob" type="hidden">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
+        <label for="birthGender">लिंग</label>
+        <select id="birthGender" name="gender" required><option value="">लिंग चुनें</option><option value="male">पुरुष (Male)</option><option value="female">महिला (Female)</option></select>
         <label>जन्म समय</label>
         <div class="birth-time-selects" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
           <select id="birthHour" aria-label="जन्म का घंटा" required><option value="">घंटा</option></select>
@@ -371,11 +374,23 @@
         function goAstroSlide(idx){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||idx<0||idx>=btns.length)return;vp.scrollTo({left:vp.clientWidth*idx,behavior:"smooth"});btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
         function syncAstroTabOnScroll(){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||!vp.clientWidth)return;const idx=Math.max(0,Math.min(btns.length-1,Math.round(vp.scrollLeft/vp.clientWidth)));btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
       </script><div id="kTxt" aria-hidden="true"></div></div>
-      <section id="kundliMatching" class="panel" aria-labelledby="kundliMatchingTitle">
-        <h2 id="kundliMatchingTitle">💑 वैदिक कुंडली मिलान (36 गुण मिलान)</h2>
-        <p class="chat-info">विवाह मिलान के लिए वर और वधू की जन्म-तिथि, जन्म-समय और जन्म-स्थान के आधार पर अष्टकूट तथा 36 गुणों का मिलान किया जाता है।</p>
-        <p class="chat-info">यह मिलान अनुभाग जोड़ा गया है। गुणों की वास्तविक गणना और विस्तृत परिणाम अभी इस संस्करण में उपलब्ध नहीं हैं।</p>
-      </section>
+      <details id="kundliMatching" class="panel" aria-labelledby="kundliMatchingTitle">
+        <summary id="kundliMatchingTitle" style="cursor:pointer;color:var(--app-orange-dark);font-weight:700;font-size:19px">💑 वैदिक कुंडली मिलान (36 गुण मिलान)</summary>
+        <p class="chat-info">वर और वधू की जन्म जानकारी भरें। दोनों की चंद्र राशि, जन्म नक्षत्र और मंगल की स्थिति से पारंपरिक अष्टकूट तथा मंगल दोष का आकलन होगा।</p>
+        <form id="kundliMatchForm">
+          <h3>वर (लड़का)</h3>
+          <label for="matchGroomDate">जन्म तारीख</label><input id="matchGroomDate" type="date" required>
+          <label for="matchGroomTime">जन्म समय</label><input id="matchGroomTime" type="time" required>
+          <label for="matchGroomPlace">जन्म स्थान</label><input id="matchGroomPlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
+          <h3>वधू (लड़की)</h3>
+          <label for="matchBrideDate">जन्म तारीख</label><input id="matchBrideDate" type="date" required>
+          <label for="matchBrideTime">जन्म समय</label><input id="matchBrideTime" type="time" required>
+          <label for="matchBridePlace">जन्म स्थान</label><input id="matchBridePlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
+          <button id="runKundliMatch" type="submit">गुण मिलान करें</button>
+          <p id="kundliMatchStatus" role="status" aria-live="polite"></p>
+        </form>
+        <div id="kundliMatchResult" aria-live="polite"></div>
+      </details>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
         <p class="chat-info">अपनी जन्म कुंडली के आधार पर कृत्रिम बुद्धिमत्ता ज्योतिषी से सीधे सवाल पूछें।</p>
