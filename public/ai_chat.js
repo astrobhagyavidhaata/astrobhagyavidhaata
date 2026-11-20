@@ -4,6 +4,35 @@
   const endpoint = "/api/consultation";
   const byId = id => document.getElementById(id);
   let busy = false;
+  let chatPlaceholder = null;
+  let chatOriginalParent = null;
+  let chatOriginalNext = null;
+
+  function expandChat() {
+    const section = byId("aiAstrologer");
+    if (!section || document.body.classList.contains("ai-chat-expanded")) return;
+    chatOriginalParent = section.parentNode;
+    chatOriginalNext = section.nextSibling;
+    chatPlaceholder = document.createComment("AI chat original position");
+    chatOriginalParent.insertBefore(chatPlaceholder, section);
+    document.body.appendChild(section);
+    document.body.classList.add("ai-chat-expanded");
+  }
+
+  function collapseChat() {
+    const section = byId("aiAstrologer");
+    if (!section || !document.body.classList.contains("ai-chat-expanded")) return;
+    if (chatPlaceholder?.parentNode) {
+      chatPlaceholder.parentNode.insertBefore(section, chatPlaceholder);
+      chatPlaceholder.remove();
+    } else if (chatOriginalParent) {
+      chatOriginalParent.insertBefore(section, chatOriginalNext);
+    }
+    document.body.classList.remove("ai-chat-expanded");
+    chatPlaceholder = null;
+    chatOriginalParent = null;
+    chatOriginalNext = null;
+  }
   let activeController = null;
   let requestSequence = 0;
   const history = [];
@@ -33,6 +62,7 @@
     if (status) status.textContent = "";
     const button = byId("aiAstrologerSend");
     if (button) button.disabled = false;
+    collapseChat();
   };
 
   function chartContext() {
@@ -105,6 +135,7 @@
         activeController = null;
         busy = false;
         if (button) button.disabled = false;
+        collapseChat();
       }
     }
   }
@@ -116,6 +147,14 @@
     const button = byId("aiAstrologerSend");
     const input = byId("aiAstrologerQuestion");
     button?.addEventListener("click", sendQuestion);
+    input?.addEventListener("focus", expandChat);
+    input?.addEventListener("blur", () => {
+      // Keep the full-screen chat open while a request is running or the send
+      // button is being tapped; otherwise restore the compact panel on blur.
+      window.setTimeout(() => {
+        if (!busy && document.activeElement !== button) collapseChat();
+      }, 220);
+    });
     input?.addEventListener("keydown", event => {
       if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendQuestion(); }
     });
