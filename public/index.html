@@ -371,9 +371,14 @@
         function goAstroSlide(idx){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||idx<0||idx>=btns.length)return;vp.scrollTo({left:vp.clientWidth*idx,behavior:"smooth"});btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
         function syncAstroTabOnScroll(){const vp=document.getElementById("astroSlideViewport");const btns=document.querySelectorAll("#astroSlideNav .astro-tab-btn");if(!vp||!vp.clientWidth)return;const idx=Math.max(0,Math.min(btns.length-1,Math.round(vp.scrollLeft/vp.clientWidth)));btns.forEach((b,i)=>b.classList.toggle("active",i===idx));}
       </script><div id="kTxt" aria-hidden="true"></div></div>
+      <section id="kundliMatching" class="panel" aria-labelledby="kundliMatchingTitle">
+        <h2 id="kundliMatchingTitle">💑 वैदिक कुंडली मिलान (36 गुण मिलान)</h2>
+        <p class="chat-info">विवाह मिलान के लिए वर और वधू की जन्म-तिथि, जन्म-समय और जन्म-स्थान के आधार पर अष्टकूट तथा 36 गुणों का मिलान किया जाता है।</p>
+        <p class="chat-info">यह मिलान अनुभाग जोड़ा गया है। गुणों की वास्तविक गणना और विस्तृत परिणाम अभी इस संस्करण में उपलब्ध नहीं हैं।</p>
+      </section>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ AI ज्योतिषी से अपना सवाल पूछें</h2>
-        <p class="chat-info">अपनी जन्म कुंडली के आधार पर AI ज्योतिषी से सीधे सवाल पूछें। सवाल पूछने के लिए लॉगिन या सक्रिय सत्र की आवश्यकता नहीं है।</p>
+        <p class="chat-info">अपनी जन्म कुंडली के आधार पर कृत्रिम बुद्धिमत्ता ज्योतिषी से सीधे सवाल पूछें।</p>
         <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
         <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
         <textarea id="aiAstrologerQuestion" rows="3" maxlength="4000" placeholder="उदाहरण: मेरी नौकरी और करियर के योग कैसे हैं?"></textarea>
