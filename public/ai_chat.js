@@ -129,6 +129,16 @@
     }
     const button = byId("aiAstrologerSend");
     const input = byId("aiAstrologerQuestion");
+    const syncVisualViewport = () => {
+      const viewport = window.visualViewport;
+      if (!viewport) return;
+      document.documentElement.style.setProperty("--ai-visual-height", Math.max(240, viewport.height) + "px");
+      document.documentElement.style.setProperty("--ai-visual-top", Math.max(0, viewport.offsetTop) + "px");
+    };
+    syncVisualViewport();
+    window.visualViewport?.addEventListener("resize", syncVisualViewport);
+    window.visualViewport?.addEventListener("scroll", syncVisualViewport);
+    window.addEventListener("resize", syncVisualViewport, { passive: true });
     button?.addEventListener("click", sendQuestion);
     input?.addEventListener("focus", expandChat);
     input?.addEventListener("keydown", event => {
