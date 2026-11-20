@@ -4,40 +4,18 @@
   const endpoint = "/api/consultation";
   const byId = id => document.getElementById(id);
   let busy = false;
-  let chatPlaceholder = null;
-  let chatOriginalParent = null;
-  let chatOriginalNext = null;
 
+  // Keep the chat in its original DOM position. Reparenting a focused textarea
+  // to document.body causes mobile browsers to blur it and immediately collapse.
   function expandChat() {
-    const section = byId("aiAstrologer");
-    if (!section || document.body.classList.contains("ai-chat-expanded")) return;
-    chatOriginalParent = section.parentNode;
-    chatOriginalNext = section.nextSibling;
-    chatPlaceholder = document.createComment("AI chat original position");
-    chatOriginalParent.insertBefore(chatPlaceholder, section);
-    const focusedElement = section.contains(document.activeElement) ? document.activeElement : null;
-    document.body.appendChild(section);
+    if (!byId("aiAstrologer")) return;
     document.body.classList.add("ai-chat-expanded");
-    // Moving the panel to the document root can blur the textarea on some mobile browsers.
-    if (focusedElement && typeof focusedElement.focus === "function") {
-      focusedElement.focus({ preventScroll: true });
-    }
   }
 
   function collapseChat() {
-    const section = byId("aiAstrologer");
-    if (!section || !document.body.classList.contains("ai-chat-expanded")) return;
-    if (chatPlaceholder?.parentNode) {
-      chatPlaceholder.parentNode.insertBefore(section, chatPlaceholder);
-      chatPlaceholder.remove();
-    } else if (chatOriginalParent) {
-      chatOriginalParent.insertBefore(section, chatOriginalNext);
-    }
     document.body.classList.remove("ai-chat-expanded");
-    chatPlaceholder = null;
-    chatOriginalParent = null;
-    chatOriginalNext = null;
   }
+
   let activeController = null;
   let requestSequence = 0;
   const history = [];
@@ -85,6 +63,7 @@
     const question = input?.value.trim();
     if (!question) { if (status) status.textContent = "कृपया अपना सवाल लिखें।"; return; }
     if (question.length > 4000) { if (status) status.textContent = "प्रश्न 4000 अक्षरों से छोटा रखें।"; return; }
+    expandChat();
     busy = true;
     const requestId = ++requestSequence;
     const controller = new AbortController();
@@ -121,7 +100,6 @@
           await wait(delay);
         } catch (error) {
           if (error.name === "AbortError" || error.permanent === true || requestId !== requestSequence) throw error;
-          // Network disconnects are transient; keep retrying with a capped delay.
           attempt++;
           const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
           if (status) status.textContent = "कनेक्शन में अस्थायी रुकावट है। आपका सवाल सुरक्षित है—फिर से प्रयास हो रहा है...";
@@ -154,8 +132,6 @@
     button?.addEventListener("click", sendQuestion);
     input?.addEventListener("focus", expandChat);
     input?.addEventListener("blur", () => {
-      // Keep the full-screen chat open while a request is running or the send
-      // button is being tapped; otherwise restore the compact panel on blur.
       window.setTimeout(() => {
         if (!busy && document.activeElement !== button) collapseChat();
       }, 220);
