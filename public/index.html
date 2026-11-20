@@ -348,12 +348,10 @@
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
         <label>जन्म तारीख</label>
-        <div class="birth-date-selects" style="display:grid;grid-template-columns:1fr 1.35fr 1.2fr;gap:8px">
-          <select id="dobDay" aria-label="जन्म का दिन" required><option value="">दिन</option></select>
-          <select id="dobMonth" aria-label="जन्म का महीना" required><option value="">महीना</option>
-            <option value="1">जनवरी</option><option value="2">फ़रवरी</option><option value="3">मार्च</option><option value="4">अप्रैल</option><option value="5">मई</option><option value="6">जून</option><option value="7">जुलाई</option><option value="8">अगस्त</option><option value="9">सितंबर</option><option value="10">अक्टूबर</option><option value="11">नवंबर</option><option value="12">दिसंबर</option>
-          </select>
-          <select id="dobYear" aria-label="जन्म का साल" required><option value="">साल</option></select>
+        <div class="birth-date-selects" style="display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:8px">
+          <input id="dobDay" type="number" inputmode="numeric" min="1" max="31" value="24" placeholder="दिन" aria-label="जन्म का दिन" required>
+          <input id="dobMonth" type="number" inputmode="numeric" min="1" max="12" value="7" placeholder="महीना (1–12)" aria-label="जन्म का महीना (1 से 12)" required>
+          <input id="dobYear" type="number" inputmode="numeric" min="1" max="2030" value="1990" placeholder="वर्ष जैसे 1990" aria-label="जन्म का साल" required>
         </div>
         <input id="dob" name="dob" type="hidden">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
@@ -376,14 +374,21 @@
         const day = byId("dobDay"), month = byId("dobMonth"), year = byId("dobYear");
         const hour = byId("birthHour"), minute = byId("birthMinute"), ampm = byId("birthAmPm");
         if (!day || !month || !year || !hour || !minute || !ampm) return;
-        for (let n = 1; n <= 31; n++) day.add(new Option(String(n), String(n)));
-        for (let n = 1920; n <= 2030; n++) year.add(new Option(String(n), String(n)));
         for (let n = 1; n <= 12; n++) hour.add(new Option(String(n), String(n)));
         for (let n = 0; n <= 59; n++) minute.add(new Option(String(n).padStart(2, "0"), String(n).padStart(2, "0")));
+        hour.value = "8";
+        minute.value = "30";
+        ampm.value = "AM";
         const updateDate = () => {
           const d = Number(day.value), m = Number(month.value), y = Number(year.value);
           const target = byId("dob");
-          if (!d || !m || !y) { target.value = ""; return; }
+          if (m >= 1 && m <= 12 && y >= 1) {
+            const maxDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+            day.max = String(maxDay);
+          } else {
+            day.max = "31";
+          }
+          if (!d || !m || !y || m > 12 || d > 31 || y > 2030) { target.value = ""; return; }
           const check = new Date(Date.UTC(y, m - 1, d));
           target.value = check.getUTCFullYear() === y && check.getUTCMonth() === m - 1 && check.getUTCDate() === d
             ? y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0") : "";
@@ -394,8 +399,13 @@
           if (ampm.value === "PM") h += 12;
           byId("birthTime").value = String(h).padStart(2, "0") + ":" + minute.value;
         };
-        [day, month, year].forEach(el => el.addEventListener("change", updateDate));
+        [day, month, year].forEach(el => {
+          el.addEventListener("input", updateDate);
+          el.addEventListener("change", updateDate);
+        });
         [hour, minute, ampm].forEach(el => el.addEventListener("change", updateTime));
+        updateDate();
+        updateTime();
       })();
       </script>
       <div id="message" role="status" aria-live="polite"></div>
