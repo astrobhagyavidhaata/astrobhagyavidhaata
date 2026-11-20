@@ -131,11 +131,6 @@
     const input = byId("aiAstrologerQuestion");
     button?.addEventListener("click", sendQuestion);
     input?.addEventListener("focus", expandChat);
-    input?.addEventListener("blur", () => {
-      window.setTimeout(() => {
-        if (!busy && document.activeElement !== button) collapseChat();
-      }, 220);
-    });
     input?.addEventListener("keydown", event => {
       if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendQuestion(); }
     });
