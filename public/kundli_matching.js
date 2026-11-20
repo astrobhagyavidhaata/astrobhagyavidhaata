@@ -132,7 +132,8 @@
     const assessment=document.createElement("p");assessment.textContent=total>=18?"परंपरागत मानक के अनुसार 18 या अधिक गुण का मिलान स्वीकार्य माना जाता है।": "परंपरागत 18 गुण के मानक से यह मिलान कम है; विवाह निर्णय से पहले विस्तृत व्यक्तिगत कुंडली परीक्षण करें।";root.appendChild(assessment);
     const mtitle=document.createElement("h3");mtitle.textContent="मंगल दोष";root.appendChild(mtitle);
     const mtext=document.createElement("p");mtext.textContent="वर: "+(marsG?.dosha?"मंगल दोष के संकेत हैं":"मंगल दोष नहीं")+". लग्न से भाव "+marsG?.fromAsc+", चंद्र से भाव "+marsG?.fromMoon+"। वधू: "+(marsB?.dosha?"मंगल दोष के संकेत हैं":"मंगल दोष नहीं")+". लग्न से भाव "+marsB?.fromAsc+", चंद्र से भाव "+marsB?.fromMoon+"।";root.appendChild(mtext);
-    const note=document.createElement("p");note.className="match-note";note.textContent="यह परिणाम वर्तमान खगोलीय गणना और मुहूर्त चिंतामणि की पारंपरिक अष्टकूट तालिका पर आधारित है। अयनांश में रैखिक सन्निकटन है; पूर्ण विवाह निर्णय से पहले दोनों की संपूर्ण कुंडली भी देखें।";root.appendChild(note);\n    root.appendChild(renderD1Panel(groom,"वर"));root.appendChild(renderD1Panel(bride,"वधू"));
+    const note=document.createElement("p");note.className="match-note";note.textContent="यह परिणाम वर्तमान खगोलीय गणना और मुहूर्त चिंतामणि की पारंपरिक अष्टकूट तालिका पर आधारित है। अयनांश में रैखिक सन्निकटन है; पूर्ण विवाह निर्णय से पहले दोनों की संपूर्ण कुंडली भी देखें।";root.appendChild(note);
+    root.appendChild(renderD1Panel(groom,"वर"));root.appendChild(renderD1Panel(bride,"वधू"));
   }
   document.addEventListener("DOMContentLoaded",()=>{
     const form=$("kundliMatchForm");if(!form)return;
