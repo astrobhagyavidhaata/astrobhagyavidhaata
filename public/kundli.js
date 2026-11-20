@@ -862,32 +862,6 @@
       }
     }
   }
-  async function requestInitialConsultation(chart){
-    const status=$("aiInitialSummary");
-    if(status)status.textContent="एस्ट्रो भाग्य विधाता ऐप AI आपकी कुंडली का प्रारंभिक विश्लेषण तैयार कर रहा है…";
-    const chartContext={
-      d1:chart.d1||null,d9:chart.d9||null,vargas:chart.vargas||{},
-      taraChart:chart.taraChart||[],currentTaraBala:chart.currentTaraBala||null,
-      gochar:chart.gochar||chart.transits||null,dasha:chart.dasha||{}
-    };
-    try{
-      const response=await fetch("/api/consultation",{
-        method:"POST",credentials:"same-origin",
-        headers:{"Content-Type":"application/json","Accept":"application/json"},
-        body:JSON.stringify({
-          question:"मेरी अभी बनी जन्म कुंडली का संक्षिप्त प्रारंभिक समन्वित परिचय दें। D1, D9, ग्रहों के नक्षत्र-पाद, नवतारा/तारा बल, उपलब्ध गोचर और वर्तमान महादशा-अंतर्दशा को साथ पढ़ें। केवल उपलब्ध गणना डेटा का उपयोग करें।",
-          chartContext,language:window.AstroLanguage?.get?.()||$("preferredLanguage")?.value||"hi"
-        })
-      });
-      const data=await response.json();
-      if(!response.ok||!data.success||!data.answer)throw new Error(data.message||"AI उत्तर उपलब्ध नहीं है।");
-      window.AstroInitialConsultation=data.answer;
-      if(status)status.textContent=data.answer;
-      const host=$("ai-response-box");
-      if(host&&!host.dataset.initialConsultation){const item=document.createElement("div");item.className="ai-chat-message assistant";item.textContent=data.answer;host.appendChild(item);host.dataset.initialConsultation="true";}
-      document.dispatchEvent(new CustomEvent("astro:ai-consultation-ready",{detail:{answer:data.answer,chartContext}}));
-    }catch(error){if(status)status.textContent="AI कनेक्शन: "+(error.message||"अभी उपलब्ध नहीं है।");}
-  }
 
   function saveKundliLocally(chart, details, location) {
     const existing = JSON.parse(localStorage.getItem(SAVED_KUNDALIS_KEY) || "[]");
@@ -987,7 +961,6 @@
 
       await saveAstroSession(details,chart,location);
       document.dispatchEvent(new CustomEvent("astro:kundli-ready", { detail: chart }));
-      requestInitialConsultation(chart);
       if (details.saveToAccount) {
         try {
           saveKundliLocally(chart, details, location);
