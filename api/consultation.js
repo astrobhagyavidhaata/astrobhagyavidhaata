@@ -113,7 +113,7 @@ module.exports=async function(req,res,env={}){
     const language=selectedLanguage==="hi"?"hi":selectedLanguage==="en"?"en":((hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en");
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
     // Use the current low-latency Gemini 3.5 Flash-Lite model.
-    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
+    const answer=await askGemini({question:privateSafeQuestion,chartContext,conversationHistory:[],language,apiKey:geminiApiKey,model:"gemini-3.5-flash-lite",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI"});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
