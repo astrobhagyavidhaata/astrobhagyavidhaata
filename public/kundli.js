@@ -990,6 +990,8 @@
 
   async function handleSubmit(event) {
     event.preventDefault();
+    // A new chart always starts a fresh AI consultation.
+    window.resetAstroChat?.();
 
     const form = event.currentTarget;
 
