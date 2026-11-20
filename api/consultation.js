@@ -126,20 +126,18 @@ module.exports=async function(req,res,env={}){
     const hasDevanagari=/[\u0900-\u097F]/.test(question);
     const selectedLanguage=String(body.language||"").toLowerCase().split("-")[0];
     const language=selectedLanguage==="hi"?"hi":selectedLanguage==="en"?"en":((hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en");
-    // Owner-only prediction override: authenticate with a Worker secret, never a client-side password.
-    const ownerSecret=String(env?.ASTRO_OWNER_PASSWORD||"");
+    // Owner-only override: the credential is verified by hash on the server; never store the plaintext in source.
+    const ownerPasswordHash="2b5c3317a71a166ba40ac789cfbd246c7ea51ac1db6a603181edebc5738c788a";
     const suppliedQuestion=question.trim();
-    let ownerAuthorized=false;
-    let ownerInstruction="";
-    let safeOriginalQuestion=suppliedQuestion;
-    if(ownerSecret && suppliedQuestion.includes(ownerSecret)){
-      ownerAuthorized=true;
-      safeOriginalQuestion=suppliedQuestion.split(ownerSecret).join(" ").replace(/(?:मालिक|owner|पासवर्ड|password|निर्देश|instruction)\s*[:：-]?/gi," ").replace(/\s+/g," ").trim();
-      ownerInstruction=safeOriginalQuestion;
-    }
+    const firstLine=suppliedQuestion.split(/\r?\n/,1)[0].replace(/^(?:owner|मालिक)\s*[:：-]\s*/i,"").trim();
+    const remainingQuestion=suppliedQuestion.includes("\n")?suppliedQuestion.slice(suppliedQuestion.indexOf("\n")+1).trim():"";
+    const suppliedHash=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(firstLine))),b=>b.toString(16).padStart(2,"0")).join("");
+    const ownerAuthorized=firstLine.length>0 && suppliedHash===ownerPasswordHash;
+    const safeOriginalQuestion=ownerAuthorized?remainingQuestion:suppliedQuestion;
+    const ownerInstruction=ownerAuthorized?remainingQuestion:"";
     const privateSafeQuestion=redactQuestion(safeOriginalQuestion,body.chartContext);
     if(ownerAuthorized && !privateSafeQuestion){
-      return res.status(200).json({success:true,answer:"Owner Mode प्रमाणित है। अब अपना निर्देश और जिस प्रश्न की भविष्यवाणी बदलनी है, उसे लिखें।",identity:"Astro vidhata AI",ownerAuthorized:true,sanitizedQuestion:""});
+      return res.status(200).json({success:true,answer:"Owner Mode प्रमाणित है। अब अगली पंक्ति में अपना निर्देश और जिस प्रश्न की भविष्यवाणी बदलनी है, उसे लिखें।",identity:"Astro vidhata AI",ownerAuthorized:true,sanitizedQuestion:""});
     }
     const conversationHistory=Array.isArray(body.conversationHistory)
       ? body.conversationHistory.slice(-12).map(item=>({
