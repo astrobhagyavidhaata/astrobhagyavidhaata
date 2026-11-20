@@ -171,12 +171,20 @@
         tbody.appendChild(tr);
       }
       table.appendChild(tbody);panel.appendChild(table);
+      // Start collapsed so the first tap opens the planet/nakshatra table.
+      panel.hidden=true;
     }
     nav.querySelectorAll("[data-chart-target]").forEach(button=>{
       button.onclick=()=>{
         nav.querySelectorAll("[data-chart-target]").forEach(item=>item.classList.toggle("active",item===button));
         const target=button.dataset.chartTarget;
-        if(target==="planetNakshatra"){const panel=$("planetNakshatra");panel.hidden=!panel.hidden;if(!panel.hidden)panel.scrollIntoView({behavior:"smooth",block:"nearest"});return;}
+        const nakshatraPanel=$("planetNakshatra");
+        if(target==="planetNakshatra"){
+          if(nakshatraPanel)nakshatraPanel.hidden=false;
+          if(nakshatraPanel)nakshatraPanel.scrollIntoView({behavior:"smooth",block:"nearest"});
+          return;
+        }
+        if(nakshatraPanel)nakshatraPanel.hidden=true;
         const card=$(target);if(card)card.scrollIntoView({behavior:"smooth",block:"nearest",inline:"start"});
       };
     });
