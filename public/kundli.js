@@ -267,12 +267,12 @@
       const schedule=Array.isArray(dasha.mahadashas)?dasha.mahadashas:[];
       if(schedule.length){
         schedule.forEach(mdItem=>{
-          const mdDetails=document.createElement("details");mdDetails.className="dasha-period";
+          const mdDetails=document.createElement("details");mdDetails.className="dasha-period";mdDetails.open=false;
           const mdSummary=document.createElement("summary");mdSummary.textContent=localizeChartText(mdItem.planet)+" महादशा  •  "+periodRange(mdItem)+(mdItem.planet===activeMD?"  |  अभी चल रही":"");
           mdDetails.appendChild(mdSummary);
           const adList=document.createElement("div");adList.className="dasha-subperiod-list";
           (mdItem.antardashas||[]).forEach(adItem=>{
-            const adDetails=document.createElement("details");adDetails.className="dasha-subperiod";
+            const adDetails=document.createElement("details");adDetails.className="dasha-subperiod";adDetails.open=false;
             const adSummary=document.createElement("summary");adSummary.textContent=localizeChartText(mdItem.planet)+" / "+localizeChartText(adItem.planet)+"  •  "+periodRange(adItem)+(mdItem.planet===activeMD&&adItem.planet===activeAD?"  |  वर्तमान":"");
             adDetails.appendChild(adSummary);
             const pdTable=document.createElement("table");pdTable.className="dasha-date-table";
@@ -383,7 +383,7 @@
 
       const deckStyle=document.getElementById("dashaSlideStyle")||document.createElement("style");
       deckStyle.id="dashaSlideStyle";
-      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-slide-card{flex:0 0 100%;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
+      deckStyle.textContent=".dasha-slide-tabs{margin:8px 0 10px}.dasha-slide-viewport{display:flex;align-items:flex-start;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:2px 1px 10px}.dasha-slide-card{flex:0 0 100%;align-self:flex-start;height:max-content;min-width:0;scroll-snap-align:start;border:1px solid #66547f;border-radius:10px;background:#181326;padding:10px;box-sizing:border-box;overflow-wrap:anywhere}.dasha-slide-card h4{margin:4px 0 9px}.dasha-slide-card .dasha-current-card{margin:7px 0;padding:9px}.dasha-slide-card .dasha-current-card p{font-size:12px;line-height:1.45;margin:5px 0}.dasha-slide-card .dasha-period{margin:6px 0}.dasha-slide-card .dasha-period>summary,.dasha-slide-card .dasha-subperiod>summary{padding:9px;font-size:13px}.dasha-slide-card .nakshatra-panel{margin:7px 0}.dasha-slide-card .dasha-subperiod-list{padding:0 7px 7px}";
       if(!deckStyle.isConnected)document.head.appendChild(deckStyle);
 
       const summarySlide=document.createElement("section");summarySlide.className="dasha-slide-card";
@@ -418,11 +418,23 @@
         button.addEventListener("click",()=>{viewport.scrollTo({left:viewport.clientWidth*index,behavior:"smooth"});tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});});
         tabs.appendChild(button);viewport.appendChild(item.node);
       });
+      // Match the viewport height to the visible slide, not the tallest hidden slide.
+      const syncViewportHeight=()=>{
+        const index=Math.max(0,Math.min(2,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));
+        const activeSlide=slides[index]?.node;
+        if(activeSlide)viewport.style.height=Math.ceil(activeSlide.getBoundingClientRect().height)+"px";
+      };
       let slideFrame=0;
-      viewport.addEventListener("scroll",()=>{if(slideFrame)return;slideFrame=requestAnimationFrame(()=>{slideFrame=0;const index=Math.max(0,Math.min(2,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});});},{passive:true});
+      viewport.addEventListener("scroll",()=>{if(slideFrame)return;slideFrame=requestAnimationFrame(()=>{slideFrame=0;const index=Math.max(0,Math.min(2,Math.round(viewport.scrollLeft/Math.max(1,viewport.clientWidth))));tabs.querySelectorAll("button").forEach((tab,i)=>{tab.classList.toggle("active",i===index);tab.setAttribute("aria-selected",String(i===index));});syncViewportHeight();});},{passive:true});
       dashaFolder.replaceChildren();
       if(heading)dashaFolder.appendChild(heading);
       dashaFolder.append(tabs,viewport);
+      if(typeof ResizeObserver!=="undefined"){
+        const slideResizeObserver=new ResizeObserver(syncViewportHeight);
+        slides.forEach(item=>slideResizeObserver.observe(item.node));
+      }
+      window.addEventListener("resize",syncViewportHeight,{passive:true});
+      requestAnimationFrame(syncViewportHeight);
     }
 
     const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
