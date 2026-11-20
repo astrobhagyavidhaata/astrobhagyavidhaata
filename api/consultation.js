@@ -66,6 +66,7 @@ function compactChartContext(source){
   });
   const transit=source.gochar||source.transits||null;
   return stripPersonalFields({
+    gender: source.gender || null,
     d1:pickChart(source.d1),
     d9:pickChart(source.d9),
     taraBala:source.currentTaraBala||null,
@@ -106,7 +107,7 @@ module.exports=async function(req,res,env={}){
     const chartContext=compactChartContext(liveChartContext);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
     const lowerQuestion=question.toLowerCase();
-    const hinglishPattern=/\b(main|mai|mujhe|mera|meri|mere|hum|ham|aap|apka|apki|kab|kahan|kaha|kaise|kyu|kyun|kya|hai|hain|tha|thi|hoga|hogi|jaunga|jaungi|jaoge|milega|milega|batao|bataiye|kundli|shaadi|naukri|videsh|paisa|ghar|mera)\b/i;
+    const hinglishPattern=/\b(main|mai|mujhe|mera|meri|mere|hum|ham|aap|apka|apki|kab|kahan|kaha|kaise|kyu|kyun|kya|hai|hain|tha|thi|hoga|hogi|jaunga|jaungi|jaoge|milega|batao|bataiye|kundli|shaadi|naukri|videsh|paisa|ghar|partner|husband|wife|career|job|marriage|love|relationship)\b/i;
     const hasDevanagari=/[\u0900-\u097F]/.test(question);
     const language=(hasDevanagari||hinglishPattern.test(lowerQuestion))?"hi":"en";
     const privateSafeQuestion=redactQuestion(question.trim(),body.chartContext);
