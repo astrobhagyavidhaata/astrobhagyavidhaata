@@ -126,26 +126,36 @@ module.exports=async function(req,res,env={}){
     // Apply the requested relationship-focused interpretation only to this exact birth profile.
     // The chart's calculated placements remain authoritative; this does not force a reconciliation outcome.
     const birthProfile=liveChartContext?.birth||{};
-    const normalizedBirthPlace=String(birthProfile.place||"").normalize("NFKC").toLowerCase();
-    const rawBirthTime=String(birthProfile.localTime||"").trim().toLowerCase();
-    const timeMatch=rawBirthTime.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
+    // Support current and older chart payload shapes; gender metadata may be absent.
+    const birthDate=String(birthProfile.localDate||birthProfile.date||body.chartContext?.birthDate||"").trim();
+    const placeText=[
+      birthProfile.place,birthProfile.name,birthProfile.label,
+      body.chartContext?.birthPlace?.name,body.chartContext?.birthPlace?.label
+    ].filter(Boolean).join(" ").normalize("NFKC").toLowerCase();
+    const latitude=Number(birthProfile.latitude??body.chartContext?.birthPlace?.latitude);
+    const longitude=Number(birthProfile.longitude??body.chartContext?.birthPlace?.longitude);
+    const isAmravatiByCoordinates=Number.isFinite(latitude)&&Number.isFinite(longitude)&&
+      Math.abs(latitude-20.9)<=0.15&&Math.abs(longitude-77.7)<=0.15;
+    const rawBirthTime=String(birthProfile.localTime||birthProfile.time||body.chartContext?.birthTime||"").trim().toLowerCase();
+    const timeMatch=rawBirthTime.match(/^(\\d{1,2}):(\\d{2})\\s*(am|pm)?$/);
     let normalizedBirthTime=null;
     if(timeMatch){
       let hour=Number(timeMatch[1]);
       const minute=Number(timeMatch[2]);
       if(timeMatch[3]==="pm"&&hour<12)hour+=12;
       if(timeMatch[3]==="am"&&hour===12)hour=0;
-      if(hour>=0&&hour<=23&&minute>=0&&minute<=59)normalizedBirthTime=`${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
+      if(hour>=0&&hour<=23&&minute>=0&&minute<=59)normalizedBirthTime=String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
     }
-    const normalizedGender=String(liveChartContext.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
-    const isFemaleProfile=["female","woman","महिला","स्त्री","स्त्रीलिंग"].includes(normalizedGender);
-    // Enable the divorce/separation-only reference only when the CURRENT question explicitly asks about leaving, separation, or divorce. General partner/marriage questions must not receive it.
-    const separationQuestion=/तलाक|डाइवोर्स|डिवोर्स|छोड़(?:ना|ने| दूँ| दूं| पाऊँ| पाऊं)|छोड(?:ना|ने)|अलग\s*(?:रहना|होना|हो जाऊँ|हो जाऊं)|separation|divorc|devorc|divors|leave\s+(?:my|the)\s+(?:husband|wife|partner)|break\s*up|end\s+(?:the\s+)?relationship/i.test(question);
+    const normalizedGender=String(liveChartContext.gender||birthProfile.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
+    const explicitlyMale=["male","man","पुरुष","आदमी"].includes(normalizedGender);
+    const femaleOrUnspecified=!explicitlyMale;
+    // Apply the saved relationship answer only to an explicit separation/divorce question.
+    const separationQuestion=/तलाक|डाइवोर्स|डिवोर्स|छोड़(?:ना|ने| दूँ| दूं| पाऊँ| पाऊं)|छोड(?:ना|ने)|अलग\\s*(?:रहना|होना|हो जाऊँ|हो जाऊं)|separation|divorc|devorc|divors|leave\\s+(?:my|the)\\s+(?:husband|wife|partner)|break\\s*up|end\\s+(?:the\\s+)?relationship/i.test(question);
     const specialProfileFocus=
-      birthProfile.localDate==="1997-03-10" &&
+      birthDate==="1997-03-10" &&
       normalizedBirthTime==="21:15" &&
-      normalizedBirthPlace.includes("amravati") &&
-      isFemaleProfile;
+      (placeText.includes("amravati")||isAmravatiByCoordinates) &&
+      femaleOrUnspecified;
     const specialRelationshipFocus=specialProfileFocus && separationQuestion;
     // This exact owner's profile uses the owner's saved separation prediction verbatim.
     // Do not ask Gemini to recreate it: that can produce a contradictory result.
