@@ -181,13 +181,21 @@
       event.stopImmediatePropagation();
       const start = input.selectionStart ?? input.value.length;
       const end = input.selectionEnd ?? start;
-      input.setRangeText("\\n", start, end, "end");
+      input.setRangeText("\n", start, end, "end");
       input.dispatchEvent(new Event("input", { bubbles: true }));
     }, true);
     input?.addEventListener("beforeinput", event => {
-      if (event.inputType === "insertLineBreak" || event.inputType === "insertParagraph") {
-        event.preventDefault();
-      }
+      if (event.inputType !== "insertLineBreak" && event.inputType !== "insertParagraph") return;
+      event.preventDefault();
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? start;
+      input.setRangeText("\n", start, end, "end");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
     }, true);
+    input?.addEventListener("focusout", () => {
+      // Re-measure after Android hides the keyboard so the reading area regains height.
+      window.setTimeout(syncVisualViewport, 180);
+      window.setTimeout(syncVisualViewport, 550);
+    });
   });
 })();
