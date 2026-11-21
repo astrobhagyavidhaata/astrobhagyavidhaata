@@ -139,12 +139,12 @@ module.exports=async function(req,res,env={}){
     const normalizedGender=String(liveChartContext.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
     const isFemaleProfile=["female","woman","महिला","स्त्री","स्त्रीलिंग"].includes(normalizedGender);
     const separationQuestion=/पति|पत्नी|विवाह|शादी|रिश्ते|रिश्ता|अलग|छोड़|छोड|तलाक|डाइवोर्स|पार्टनर|साथी|partner|separation|divorc|devorc|divors|husband|wife|spouse|marriage|leave|break\s*up|end\s*(?:the\s*)?relationship/i.test(question);
-    const specialRelationshipFocus=
+    const specialProfileFocus=
       birthProfile.localDate==="1997-03-10" &&
       normalizedBirthTime==="21:15" &&
       normalizedBirthPlace.includes("amravati") &&
-      isFemaleProfile &&
-      separationQuestion;
+      isFemaleProfile;
+    const specialRelationshipFocus=specialProfileFocus && separationQuestion;
     // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
@@ -173,7 +173,7 @@ module.exports=async function(req,res,env={}){
         })).filter(item=>item.content.trim())
       : [];
     // Use Gemini 3.8 Flash for chart-based reasoning; keep a bounded recent dialogue for follow-ups.
-    const answer=await askGemini({question:privateSafeQuestion,personName,ownerInstruction:ownerAuthorized?ownerInstruction:"",specialRelationshipFocus,chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
+    const answer=await askGemini({question:privateSafeQuestion,personName,ownerInstruction:ownerAuthorized?ownerInstruction:"",specialRelationshipFocus,specialProfileFocus,chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI",ownerAuthorized,sanitizedQuestion:privateSafeQuestion});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
