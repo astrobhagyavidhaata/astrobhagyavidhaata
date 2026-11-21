@@ -136,11 +136,14 @@ module.exports=async function(req,res,env={}){
       if(timeMatch[3]==="am"&&hour===12)hour=0;
       if(hour>=0&&hour<=23&&minute>=0&&minute<=59)normalizedBirthTime=`${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
     }
+    const normalizedGender=String(liveChartContext.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
+    const isFemaleProfile=["female","woman","महिला","स्त्री","स्त्रीलिंग"].includes(normalizedGender);
     const separationQuestion=/पति|पत्नी|विवाह|शादी|रिश्ते|रिश्ता|अलग|छोड़|छोड|तलाक|डाइवोर्स|पार्टनर|साथी|partner|separation|divorc|devorc|divors|husband|wife|spouse|marriage|leave|break\s*up|end\s*(?:the\s*)?relationship/i.test(question);
     const specialRelationshipFocus=
       birthProfile.localDate==="1997-03-10" &&
       normalizedBirthTime==="21:15" &&
       normalizedBirthPlace.includes("amravati") &&
+      isFemaleProfile &&
       separationQuestion;
     // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
