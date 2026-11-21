@@ -862,6 +862,7 @@
     const status=$("aiInitialSummary");
     if(status)status.textContent="एस्ट्रो भाग्य विधाता ऐप AI आपकी कुंडली का प्रारंभिक विश्लेषण तैयार कर रहा है…";
     const chartContext={
+      birth:chart.birth||null,
       d1:chart.d1||null,d9:chart.d9||null,vargas:chart.vargas||{},
       taraChart:chart.taraChart||[],currentTaraBala:chart.currentTaraBala||null,
       gochar:chart.gochar||chart.transits||null,dasha:chart.dasha||{}
