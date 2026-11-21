@@ -528,15 +528,50 @@
     } else addNote(ashtak,"इस जन्म-कुंडली के लिए सत्यापित अष्टकवर्ग डेटा उपलब्ध नहीं है।");
     const strength=makeFolder("4. षड्बल और भावबल — खोलने के लिए स्पर्श करें","shadbalaFolder");
     strength.open=true;
-    const strengthIntro=document.createElement("p");
-    strengthIntro.className="chat-info";
-    strengthIntro.textContent="यहाँ ग्रहों का षड्बल और 12 भावों का भावबल अलग-अलग दिखेगा। अभी इस जन्म-कुंडली के लिए प्रमाणित संख्यात्मक परिणाम इंजन से उपलब्ध नहीं हैं; इसलिए गलत अंक नहीं दिखाए जा रहे हैं।";
-    strength.appendChild(strengthIntro);
     const balaGroups=[
-      ["षड्बल — छह अंग",["स्थान बल (Sthana Bala)","दिक् बल (Dig Bala)","काल बल (Kala Bala)","चेष्टा बल (Cheshta Bala)","नैसर्गिक बल (Naisargika Bala)","दृक् बल (Drik Bala)"]],
+      ["षड्बल — छह अंग",[]],
       ["भावबल — 12 भाव",["प्रथम भाव","द्वितीय भाव","तृतीय भाव","चतुर्थ भाव","पंचम भाव","षष्ठ भाव","सप्तम भाव","अष्टम भाव","नवम भाव","दशम भाव","एकादश भाव","द्वादश भाव"]]
     ];
-    for(const [groupName,items] of balaGroups){
+    const shadbala=chart.shadbala||{};
+    const planetHindi={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि"};
+    const balaLabels=[
+      ["sthanaBala","स्थान बल"],
+      ["digBala","दिक् बल"],
+      ["kalaBala","काल बल"],
+      ["cheshtaBala","चेष्टा बल"],
+      ["naisargikaBala","नैसर्गिक बल"],
+      ["drigBala","दृक् बल"]
+    ];
+    const shadbalaSection=document.createElement("section");
+    const shadbalaHeading=document.createElement("h4");
+    shadbalaHeading.textContent="षड्बल — सात ग्रहों के छह अंग";
+    shadbalaHeading.style.cssText="margin:14px 0 8px;color:#f5c66b";
+    shadbalaSection.appendChild(shadbalaHeading);
+    const shadbalaIntro=document.createElement("p");
+    shadbalaIntro.className="chat-info";
+    shadbalaIntro.textContent="प्रत्येक ग्रह के छह बल, कुल षष्ट्यंश (Virupa), कुल रूप और आवश्यक न्यूनतम रूप नीचे दिए गए हैं। वर्तमान गणना उपलब्ध ग्रह-स्थिति पर आधारित प्रारंभिक अनुमानित मॉडल है; इसे प्रमाणित शास्त्रीय BPHS षड्बल न मानें।";
+    shadbalaSection.appendChild(shadbalaIntro);
+    if(Object.keys(shadbala).length){
+      const scroll=document.createElement("div");scroll.style.cssText="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch";
+      const table=document.createElement("table");table.style.cssText="width:100%;min-width:850px;border-collapse:collapse;font-size:12px";
+      const headers=["ग्रह",...balaLabels.map(x=>x[1]),"कुल षष्ट्यंश","कुल रूप","आवश्यक रूप","स्थिति"];
+      const head=document.createElement("tr");
+      headers.forEach(label=>{const th=document.createElement("th");th.textContent=label;th.style.cssText="padding:8px 6px;text-align:center;white-space:nowrap;color:#f5c66b;border-bottom:1px solid #80633d";head.appendChild(th);});
+      table.appendChild(head);
+      Object.entries(planetHindi).forEach(([key,hindi])=>{
+        const data=shadbala[key];if(!data)return;
+        const row=document.createElement("tr");
+        const values=[hindi,...balaLabels.map(([field])=>Number(data[field]).toFixed(2)),Number(data.totalShashtiamsas).toFixed(2),Number(data.totalRupas).toFixed(2),Number(data.requiredRupas).toFixed(2),data.isStrong?"आवश्यक बल पूरा":"आवश्यक बल से कम"];
+        values.forEach((value,index)=>{const cell=document.createElement(index===0?"th":"td");cell.textContent=String(value);cell.style.cssText="padding:8px 6px;text-align:center;white-space:nowrap;border-bottom:1px solid #493568";if(index===0)cell.style.textAlign="left";if(index===values.length-1)cell.style.color=data.isStrong?"#16834b":"#b45309";row.appendChild(cell);});
+        table.appendChild(row);
+      });
+      scroll.appendChild(table);shadbalaSection.appendChild(scroll);
+      const unitNote=document.createElement("p");unitNote.className="chat-info";unitNote.textContent="60 षष्ट्यंश = 1 रूप। ग्रह का कुल रूप उसके निर्धारित आवश्यक रूप से मिलाकर देखा गया है।";shadbalaSection.appendChild(unitNote);
+    }else{
+      const missing=document.createElement("p");missing.className="chat-info";missing.textContent="इस कुंडली के लिए षड्बल डेटा उपलब्ध नहीं है।";shadbalaSection.appendChild(missing);
+    }
+    strength.appendChild(shadbalaSection);
+    for(const [groupName,items] of balaGroups.slice(1)){
       const section=document.createElement("section");
       const heading=document.createElement("h4");
       heading.textContent=groupName;
@@ -544,12 +579,12 @@
       section.appendChild(heading);
       const list=document.createElement("ul");
       list.style.cssText="margin:0;padding-inline-start:22px;line-height:1.8";
-      for(const item of items){const li=document.createElement("li");li.textContent=item+" — गणना जोड़नी बाकी";list.appendChild(li);}
+      for(const item of items){const li=document.createElement("li");li.textContent=item+" — भावबल की गणना अभी उपलब्ध नहीं है";list.appendChild(li);}
       section.appendChild(list);strength.appendChild(section);
     }
     const note=document.createElement("p");
     note.className="chat-info";
-    note.textContent="ध्यान दें: षड्बल में प्रत्येक ग्रह के लिए रूप (Virupa) और आवश्यक न्यूनतम बल की तुलना भी दी जाएगी। भावबल में प्रत्येक भाव का कुल बल और उसके घटक दिखेंगे।";
+    note.textContent="षड्बल का यह अंक-आधारित मॉडल प्रारंभिक है। पूर्ण शास्त्रीय गणना के लिए उच्च-सटीकता ग्रह-वेग, अयनांश, अयन/दिन-रात्रि तथा अन्य काल-आधारित उपघटकों का सत्यापन आवश्यक है।";
     strength.appendChild(note);
 
     // Route each calculation section into the six horizontal slide cards.
