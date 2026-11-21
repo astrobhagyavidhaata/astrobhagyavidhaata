@@ -127,7 +127,7 @@ module.exports=async function(req,res,env={}){
     const birthProfile=liveChartContext?.birth||{};
     const normalizedBirthPlace=String(birthProfile.place||"").normalize("NFKC").toLowerCase();
     const rawBirthTime=String(birthProfile.localTime||"").trim().toLowerCase();
-    const timeMatch=rawBirthTime.match(/^(\\d{1,2}):(\\d{2})\\s*(am|pm)?$/);
+    const timeMatch=rawBirthTime.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
     let normalizedBirthTime=null;
     if(timeMatch){
       let hour=Number(timeMatch[1]);
