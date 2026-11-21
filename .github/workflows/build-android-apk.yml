@@ -22,6 +22,7 @@ jobs:
           distribution: temurin
           java-version: '17'
       - name: Set up Android SDK
+        # Leave cmdline-tools-version unset so setup-android uses its latest default.
         uses: android-actions/setup-android@v3
       - name: Install Gradle
         uses: gradle/actions/setup-gradle@v4
