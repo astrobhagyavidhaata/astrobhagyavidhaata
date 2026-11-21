@@ -85,6 +85,8 @@
     if (status) status.textContent = "उत्तर तैयार किया जा रहा है...";
     addMessage(question, "user");
     input.value = "";
+    // Close Android keyboard after sending so the answer gets the full reading area.
+    input.blur();
     try {
       const payload = JSON.stringify({
         question,
@@ -168,8 +170,6 @@
     window.addEventListener("resize", syncVisualViewport, { passive: true });
     button?.addEventListener("click", sendQuestion);
     input?.addEventListener("focus", expandChat);
-    input?.addEventListener("keydown", event => {
-      if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendQuestion(); }
-    });
+    // Keep the textarea native Enter behavior: insert a new line, never submit.
   });
 })();
