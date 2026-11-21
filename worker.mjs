@@ -51,11 +51,12 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
   let body;
   try { body = await request.json(); }
   catch { return Response.json({ success: false, message: "Invalid JSON body." }, { status: 400 }); }
+  const parsedBody = body && typeof body === "object" && !Array.isArray(body) ? body : {};
   const safeBody = Array.isArray(allowedBodyKeys)
-    ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(body, key)).map(key => [key, body[key]]))
-    : body;
+    ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(parsedBody, key)).map(key => [key, parsedBody[key]]))
+    : parsedBody;
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
-    const profileMatched = isLockedWifeChart(body.chartContext?.birth || body.birthData || body.chartContext || {});
+    const profileMatched = isLockedWifeChart(parsedBody.chartContext?.birth || parsedBody.birthData || parsedBody.chartContext || {});
     safeBody._wifeChartProfileMatched = profileMatched;
     safeBody.lockedProfileRule = profileMatched ? "TULA_1997_03_10_AMRAVATI" : null;
     safeBody.specialInstruction = profileMatched ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।" : "";
