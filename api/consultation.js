@@ -137,7 +137,7 @@ module.exports=async function(req,res,env={}){
     const isAmravatiByCoordinates=Number.isFinite(latitude)&&Number.isFinite(longitude)&&
       Math.abs(latitude-20.9)<=0.15&&Math.abs(longitude-77.7)<=0.15;
     const rawBirthTime=String(birthProfile.localTime||birthProfile.time||body.chartContext?.birthTime||"").trim().toLowerCase();
-    const timeMatch=rawBirthTime.match(/^(\\d{1,2}):(\\d{2})\\s*(am|pm)?$/);
+    const timeMatch=rawBirthTime.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
     let normalizedBirthTime=null;
     if(timeMatch){
       let hour=Number(timeMatch[1]);
@@ -150,7 +150,7 @@ module.exports=async function(req,res,env={}){
     const explicitlyMale=["male","man","पुरुष","आदमी"].includes(normalizedGender);
     const femaleOrUnspecified=!explicitlyMale;
     // Apply the saved relationship answer only to an explicit separation/divorce question.
-    const separationQuestion=/तलाक|डाइवोर्स|डिवोर्स|छोड़(?:ना|ने| दूँ| दूं| पाऊँ| पाऊं)|छोड(?:ना|ने)|अलग\\s*(?:रहना|होना|हो जाऊँ|हो जाऊं)|separation|divorc|devorc|divors|leave\\s+(?:my|the)\\s+(?:husband|wife|partner)|break\\s*up|end\\s+(?:the\\s+)?relationship/i.test(question);
+    const separationQuestion=/तलाक|डाइवोर्स|डिवोर्स|छोड़(?:ना|ने| दूँ| दूं| पाऊँ| पाऊं)|छोड(?:ना|ने)|अलग\s*(?:रहना|होना|हो जाऊँ|हो जाऊं)|separation|divorc|devorc|divors|leave\s+(?:my|the)\s+(?:husband|wife|partner)|break\s*up|end\s+(?:the\s+)?relationship/i.test(question);
     const specialProfileFocus=
       birthDate==="1997-03-10" &&
       normalizedBirthTime==="21:15" &&
