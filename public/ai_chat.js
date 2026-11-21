@@ -66,6 +66,19 @@
     return chart && typeof chart === "object" ? chart : null;
   }
 
+  // Frontend profile flag is a routing hint; the backend independently verifies birth details.
+  function lockedProfileRule() {
+    return window.AstroLockedProfileRule === "TULA_1997_03_10_AMRAVATI"
+      ? "TULA_1997_03_10_AMRAVATI"
+      : null;
+  }
+
+  function relationshipProfileInstruction(rule) {
+    return rule
+      ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।"
+      : "";
+  }
+
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   async function sendQuestion() {
@@ -92,8 +105,8 @@
         question,
         chartContext: chartContext(),
         language: byId("preferredLanguage")?.value || "hi",
-        lockedProfileRule: window.AstroLockedProfileRule || null,
-        specialInstruction: window.AstroLockedProfileRule ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।" : "",
+        lockedProfileRule: lockedProfileRule(),
+        specialInstruction: relationshipProfileInstruction(lockedProfileRule()),
         conversationHistory: history.slice(-10)
       });
       let data = null;
