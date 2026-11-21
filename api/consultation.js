@@ -149,6 +149,20 @@ module.exports=async function(req,res,env={}){
     const normalizedGender=String(liveChartContext.gender||birthProfile.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
     const explicitlyMale=["male","man","पुरुष","आदमी"].includes(normalizedGender);
     const femaleOrUnspecified=!explicitlyMale;
+    // Normalize supported date formats before checking the one owner-authorized reference profile.
+    const normalizedBirthDate = (() => {
+      let match = birthDate.match(/^(\\d{4})[-/](\\d{1,2})[-/](\\d{1,2})$/);
+      if (match) return match[1] + "-" + String(Number(match[2])).padStart(2,"0") + "-" + String(Number(match[3])).padStart(2,"0");
+      match = birthDate.match(/^(\\d{1,2})[-/](\\d{1,2})[-/](\\d{4})$/);
+      if (match) return match[3] + "-" + String(Number(match[2])).padStart(2,"0") + "-" + String(Number(match[1])).padStart(2,"0");
+      return "";
+    })();
+    const specialProfileFocus = normalizedBirthDate === "1997-03-10" &&
+      normalizedBirthTime === "21:15" &&
+      (placeText.includes("amravati") || isAmravatiByCoordinates) &&
+      femaleOrUnspecified;
+    const specialRelationshipFocus = specialProfileFocus &&
+      /छोड़|छोड|अलग|तलाक|डाइवोर्स|separat|divorc|break.?up|leave|end relationship/i.test(question);
     // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.\n    // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
