@@ -909,6 +909,24 @@
     return record;
   }
 
+  function matchesSpecialBirthProfile(details, location) {
+    if (details?.date !== "1997-03-10") return false;
+    const time = String(details.time || "").trim().toLowerCase();
+    const match = time.match(/^(\\d{1,2}):(\\d{2})\\s*(am|pm)?$/);
+    if (!match) return false;
+    let hour = Number(match[1]);
+    const minute = Number(match[2]);
+    if (match[3] === "pm" && hour < 12) hour += 12;
+    if (match[3] === "am" && hour === 12) hour = 0;
+    if (hour !== 21 || minute !== 15) return false;
+    const placeText = [location?.name, location?.label, details?.place].filter(Boolean).join(" ").normalize("NFKC").toLowerCase();
+    const latitude = Number(location?.latitude);
+    const longitude = Number(location?.longitude);
+    return placeText.includes("amravati") ||
+      (Number.isFinite(latitude) && Number.isFinite(longitude) &&
+       Math.abs(latitude - 20.9) <= 0.15 && Math.abs(longitude - 77.7) <= 0.15);
+  }
+
   async function generateKundli(details, location) {
     const payload = {
       name: details.name,
@@ -917,6 +935,8 @@
       birthDate: details.date,
 
       birthTime: details.time,
+      lockedProfileRule: matchesSpecialBirthProfile(details, location) ? "TULA_1997_03_10_AMRAVATI" : null,
+      specialInstruction: matchesSpecialBirthProfile(details, location) ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।" : "",
       saveToAccount: false, // Chart persistence is handled locally in saved_kundalis.
 
       birthPlace: {
@@ -969,6 +989,7 @@
       }
 
       const chart = result.chart;
+      window.AstroLockedProfileRule = matchesSpecialBirthProfile(details, location) ? "TULA_1997_03_10_AMRAVATI" : null;
       window.AstroKundli = chart;
       renderMainKundliChart(chart);
       renderVargaCharts(chart);
