@@ -169,7 +169,25 @@
     window.visualViewport?.addEventListener("scroll", syncVisualViewport);
     window.addEventListener("resize", syncVisualViewport, { passive: true });
     button?.addEventListener("click", sendQuestion);
+    input?.setAttribute("enterkeyhint", "enter");
     input?.addEventListener("focus", expandChat);
-    // Keep the textarea native Enter behavior: insert a new line, never submit.
+    // Android keyboards sometimes expose their blue action key as a submit action.
+    // Always make Enter insert a newline in this textarea; sending is only via the
+    // separate "सवाल भेजें" button.
+    input?.addEventListener("keydown", event => {
+      if (event.key !== "Enter" || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? start;
+      input.setRangeText("\\n", start, end, "end");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }, true);
+    input?.addEventListener("beforeinput", event => {
+      if (event.inputType === "insertLineBreak" || event.inputType === "insertParagraph") {
+        event.preventDefault();
+      }
+    }, true);
   });
 })();
