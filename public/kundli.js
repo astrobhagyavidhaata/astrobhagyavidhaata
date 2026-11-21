@@ -873,17 +873,65 @@
     },null,null,true).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
   }
   async function restoreAstroSession(form){
-    // A chart is shown only after the user submits fresh birth details.
-    window.AstroKundli=null;
-    selectedBirthPlace=null;
-    const panel=$("kBox");if(panel)panel.style.display="none";
-    const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=true;
-    const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=true;
+    // Restore the last working kundli after Android/WebView process recreation.
+    let saved=readAstroSession();
+    let backup=null;
+    try{backup=await readAstroSessionDB();}catch(error){console.warn("IndexedDB session backup unavailable:",error);}
+    if((!saved||!saved.chart)&&backup?.chart){
+      const sameBirth=!saved?.birthDetails||(
+        saved.birthDetails.date===backup.birthDetails?.date&&
+        saved.birthDetails.time===backup.birthDetails?.time&&
+        saved.birthDetails.place===backup.birthDetails?.place
+      );
+      if(sameBirth)saved={...backup,...saved,chart:backup.chart,location:saved?.location||backup.location};
+    }
+    if(!saved?.birthDetails)return;
+
+    const details=saved.birthDetails;
     if(form){
-      for(const id of ["name","dob","birthGender","birthTime","birthPlace"]){
-        const field=$(id);if(field)field.value="";
+      const set=(id,value)=>{const field=$(id);if(field&&value!==undefined&&value!==null)field.value=String(value);};
+      set("name",details.name||"");
+      set("birthGender",details.gender||"");
+      set("dob",details.date||"");
+      set("birthTime",details.time||"");
+      set("birthPlace",details.place||"");
+
+      // Keep the visible date/time selectors synchronized with their hidden form values.
+      if(/^\\d{4}-\\d{2}-\\d{2}$/.test(details.date||"")){
+        const [year,month,day]=details.date.split("-");
+        set("dobDay",String(Number(day)));
+        set("dobMonth",String(Number(month)));
+        set("dobYear",year);
+      }
+      if(/^\\d{2}:\\d{2}$/.test(details.time||"")){
+        let [hour,minute]=details.time.split(":").map(Number);
+        const ampm=hour>=12?"PM":"AM";
+        hour=hour%12||12;
+        set("birthHour",String(hour));
+        set("birthMinute",String(minute).padStart(2,"0"));
+        set("birthAmPm",ampm);
       }
     }
+
+    const loc=saved.location;
+    selectedBirthPlace=loc?{
+      ...loc,
+      label:[loc.name||details.place,loc.admin1,loc.country].filter(Boolean).join(", ")
+    }:null;
+
+    const chart=saved.chart;
+    if(!chart||typeof chart!=="object")return;
+    window.AstroKundli=chart;
+    window.AstroLockedProfileRule=matchesSpecialBirthProfile(details,loc||{name:details.place})?"TULA_1997_03_10_AMRAVATI":null;
+    renderMainKundliChart(chart);
+    renderVargaCharts(chart);
+    renderAstrologyCalculations(chart);
+    const panel=$("kBox");if(panel)panel.style.display="block";
+    const launch=$("aiAstrologerLaunch");if(launch)launch.hidden=false;
+    const aiPanel=$("aiAstrologer");if(aiPanel)aiPanel.hidden=false;
+    const message=$("message");
+    if(message){message.style.display="block";message.textContent="आपकी पिछली जन्म जानकारी और कुंडली वापस लोड हो गई है।";}
+    document.dispatchEvent(new CustomEvent("astro:kundli-ready",{detail:chart}));
   }
 
   function saveKundliLocally(chart, details, location) {
