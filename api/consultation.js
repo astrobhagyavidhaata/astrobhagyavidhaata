@@ -2,6 +2,7 @@
 
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
+const {getProfileSpecificSeparationAnswer}=require("../lib/relationship-reference");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
 const PRIVATE_FIELD_KEYS = new Set([
@@ -146,6 +147,21 @@ module.exports=async function(req,res,env={}){
       normalizedBirthPlace.includes("amravati") &&
       isFemaleProfile;
     const specialRelationshipFocus=specialProfileFocus && separationQuestion;
+    // This exact owner's profile uses the owner's saved separation prediction verbatim.
+    // Do not ask Gemini to recreate it: that can produce a contradictory result.
+    if (specialRelationshipFocus) {
+      const savedAnswer = getProfileSpecificSeparationAnswer();
+      if (savedAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: savedAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized: false,
+          specialProfileApplied: true,
+          sanitizedQuestion: redactQuestion(question, body.chartContext)
+        });
+      }
+    }
     // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
