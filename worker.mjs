@@ -3,6 +3,32 @@ import kundliHandler from "./api/kundli.js";
 import gocharHandler from "./api/gochar.js";
 import panchangHandler from "./api/panchang.js";
 
+// Recognize the explicitly configured birth profile for chart-specific context only.
+function isLockedWifeChart(birthData = {}) {
+  if (!birthData || typeof birthData !== "object") return false;
+  const dateRaw = String(birthData.localDate || birthData.birthDate || birthData.dateOfBirth || birthData.dob || "").trim().toLowerCase();
+  const date = dateRaw.replace(/\\s+/g, " ");
+  const dateMatches = ["1997-03-10", "10/03/1997", "10-03-1997", "10 march 1997", "10 mar 1997"].includes(date);
+  const timeRaw = String(birthData.localTime || birthData.birthTime || birthData.timeOfBirth || birthData.time || "").trim().toLowerCase();
+  const time = timeRaw.replace(/\\s+/g, " ");
+  let minutes = null;
+  const hm = time.match(/^(\\d{1,2}):(\\d{2})(?:\\s*(am|pm))?$/);
+  if (hm) {
+    let hour = Number(hm[1]);
+    const minute = Number(hm[2]);
+    if (hm[3] === "pm" && hour < 12) hour += 12;
+    if (hm[3] === "am" && hour === 12) hour = 0;
+    if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) minutes = hour * 60 + minute;
+  }
+  const timeMatches = minutes !== null && Math.abs(minutes - (21 * 60 + 15)) <= 1;
+  const place = String(birthData.place || birthData.birthPlace || birthData.location || "").normalize("NFKC").toLowerCase();
+  const lat = Number(birthData.latitude ?? birthData.lat);
+  const lon = Number(birthData.longitude ?? birthData.lon ?? birthData.lng);
+  const placeMatches = place.includes("amravati") ||
+    (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat - 20.9) <= 0.15 && Math.abs(lon - 77.7) <= 0.15);
+  return dateMatches && timeMatches && placeMatches;
+}
+
 function createResponse() {
   let statusCode = 200;
   const headers = new Headers();
@@ -28,6 +54,9 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
   const safeBody = Array.isArray(allowedBodyKeys)
     ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(body, key)).map(key => [key, body[key]]))
     : body;
+  if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
+    safeBody._wifeChartProfileMatched = isLockedWifeChart(body.chartContext?.birth || body.birthData || body.chartContext || {});
+  }
   const headers = Object.fromEntries(request.headers.entries());
   const req = {
     method: request.method,
@@ -129,7 +158,7 @@ export default {
       // Route AI consultation through the shared Gemini handler so chart context,
       // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        const response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language"]);
+        const response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "_wifeChartProfileMatched"]);
         const headers = new Headers(response.headers);
         corsHeaders.forEach((value,key)=>headers.set(key,value));
         return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
