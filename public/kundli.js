@@ -479,6 +479,66 @@
       scheduleViewportMeasure();
     }
 
+    // Put the active Mahadasha / Antardasha interpretation after all chart sections.
+    const phalHost=$("dashaPhalResult");
+    if(phalHost){
+      phalHost.replaceChildren();
+      const phalTitle=document.createElement("h3");phalTitle.textContent="दशा–अंतर्दशा का फल";phalHost.appendChild(phalTitle);
+      const activeDasha=chart.dasha?.current||{};
+      const ascIndex=Number(chart.d1?.ascendant?.rashiIndex);
+      const chartPlanets=chart.d1?.planets||{};
+      const signLords=["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
+      const houseTopics=["स्वभाव, स्वास्थ्य और जीवन-दिशा","धन, वाणी और परिवार","साहस, प्रयास और भाई-बहन","माता, घर, सुख और संपत्ति","संतान, शिक्षा, बुद्धि और रचनात्मकता","ऋण, रोग, प्रतियोगिता और सेवा","विवाह, साझेदारी और संबंध","परिवर्तन, शोध और साझा संसाधन","भाग्य, धर्म, गुरु और उच्च शिक्षा","कर्म, नौकरी, व्यवसाय और प्रतिष्ठा","आय, लाभ, मित्र और इच्छापूर्ति","व्यय, विदेश, एकांत और आध्यात्मिकता"];
+      const naturalMeanings={सूर्य:"आत्मविश्वास, नेतृत्व, पिता, प्रशासन और अधिकार",चंद्र:"मन, भावनाएँ, माता, घर और जनसंपर्क",मंगल:"साहस, ऊर्जा, भूमि, संपत्ति और प्रतिस्पर्धा",बुध:"बुद्धि, संवाद, लेखन, व्यापार और गणना",गुरु:"ज्ञान, शिक्षा, गुरु, संतान, सलाह और विस्तार",शुक्र:"प्रेम, विवाह, कला, सुख-सुविधा और धन",शनि:"अनुशासन, श्रम, जिम्मेदारी, देरी और स्थायित्व",राहु:"महत्वाकांक्षा, तकनीक, विदेशी संपर्क और असामान्य अवसर",केतु:"शोध, वैराग्य, आध्यात्मिकता और अलगाव"};
+      const ruledHouses=planet=>{
+        if(!Number.isInteger(ascIndex)||ascIndex<0||ascIndex>11)return [];
+        const houses=[];
+        for(let house=1;house<=12;house++)if(signLords[(ascIndex+house-1)%12]===planet)houses.push(house);
+        return houses;
+      };
+      const makeLordText=planet=>{
+        const p=chartPlanets[planet]||{};
+        const house=Number(p.house);
+        const ruled=ruledHouses(planet);
+        const ruledText=ruled.length?ruled.map(h=>h+"वें भाव ("+houseTopics[h-1]+")").join(" तथा "):"भाव-स्वामित्व उपलब्ध नहीं";
+        const placedText=Number.isInteger(house)&&house>=1&&house<=12?"जन्म कुंडली के "+house+"वें भाव ("+houseTopics[house-1]+") में स्थित":"भाव स्थिति उपलब्ध नहीं";
+        const sign=p.rashi||"राशि उपलब्ध नहीं";
+        const retro=p.retrograde?" ग्रह वक्री है।":"";
+        const combust=p.combustion?" ग्रह अस्त स्थिति में है।":"";
+        return {planet,house,ruledText,placedText,sign,retro,combust,natural:naturalMeanings[planet]||"ग्रह के सामान्य कारकत्व"};
+      };
+      const md=activeDasha.mahadasha,ad=activeDasha.antardasha,pd=activeDasha.pratyantardasha;
+      if(md&&ad){
+        const mdInfo=makeLordText(md),adInfo=makeLordText(ad);
+        const period=document.createElement("p");period.className="chat-info";
+        period.textContent="वर्तमान अवधि: "+md+" महादशा / "+ad+" अंतर्दशा"+(pd?" / "+pd+" प्रत्यंतरदशा":"")+".";
+        phalHost.appendChild(period);
+        const addLordCard=(label,info)=>{
+          const card=document.createElement("div");card.className="dasha-insight-card";
+          const heading=document.createElement("strong");heading.textContent=label+" — "+info.planet;card.appendChild(heading);
+          const p=document.createElement("p");p.textContent=info.planet+" के सामान्य कारकत्व: "+info.natural+"।";card.appendChild(p);
+          const q=document.createElement("p");q.textContent="भाव स्वामित्व: "+info.ruledText+"।";card.appendChild(q);
+          const r=document.createElement("p");r.textContent="स्थिति: "+info.sign+" राशि में, "+info.placedText+"।"+info.retro+info.combust;card.appendChild(r);
+          phalHost.appendChild(card);
+        };
+        addLordCard("महादशा स्वामी",mdInfo);
+        addLordCard("अंतर्दशा स्वामी",adInfo);
+        const combined=document.createElement("div");combined.className="dasha-insight-card";
+        const title=document.createElement("strong");title.textContent="इस अवधि में किन क्षेत्रों के फल सक्रिय हो सकते हैं";combined.appendChild(title);
+        const summary=document.createElement("p");
+        summary.textContent="इस अवधि में "+md+" के कारकत्व और उसके स्वामित्व वाले भावों के विषय लंबे समय की मुख्य पृष्ठभूमि बनेंगे। "+ad+" के कारकत्व तथा उसके स्वामित्व/स्थिति वाले भाव उन विषयों को निकट अवधि में सक्रिय करेंगे। फल का स्वरूप दोनों ग्रहों की राशि, भाव, दृष्टि, युति, बल और गोचर के संयुक्त प्रभाव से बदलेगा।";
+        combined.appendChild(summary);
+        const topics=document.createElement("p");
+        topics.textContent="मुख्य विचार: "+mdInfo.natural+" तथा "+adInfo.natural+"; साथ में "+mdInfo.ruledText+" और "+adInfo.ruledText+" से जुड़े विषय।";
+        combined.appendChild(topics);phalHost.appendChild(combined);
+        const caution=document.createElement("p");caution.className="chat-info";
+        caution.textContent="यह जन्म-कुंडली के ग्रह-स्वामित्व और स्थिति पर आधारित ज्योतिषीय संकेत हैं, निश्चित घटना या गारंटी नहीं। सटीक फलादेश के लिए ग्रह-दृष्टि, युति, योग, षड्बल और गोचर का संयुक्त परीक्षण आवश्यक है।";
+        phalHost.appendChild(caution);
+      }else{
+        const unavailable=document.createElement("p");unavailable.className="chat-info";unavailable.textContent="वर्तमान महादशा और अंतर्दशा उपलब्ध होने पर उनका फल यहाँ दिखेगा।";phalHost.appendChild(unavailable);
+      }
+    }
+
     const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
     const av=chart.ashtakavarga;
     if(av?.validation?.passed && av.bhinna && av.sarva){
@@ -528,15 +588,50 @@
     } else addNote(ashtak,"इस जन्म-कुंडली के लिए सत्यापित अष्टकवर्ग डेटा उपलब्ध नहीं है।");
     const strength=makeFolder("4. षड्बल और भावबल — खोलने के लिए स्पर्श करें","shadbalaFolder");
     strength.open=true;
-    const strengthIntro=document.createElement("p");
-    strengthIntro.className="chat-info";
-    strengthIntro.textContent="यहाँ ग्रहों का षड्बल और 12 भावों का भावबल अलग-अलग दिखेगा। अभी इस जन्म-कुंडली के लिए प्रमाणित संख्यात्मक परिणाम इंजन से उपलब्ध नहीं हैं; इसलिए गलत अंक नहीं दिखाए जा रहे हैं।";
-    strength.appendChild(strengthIntro);
     const balaGroups=[
-      ["षड्बल — छह अंग",["स्थान बल (Sthana Bala)","दिक् बल (Dig Bala)","काल बल (Kala Bala)","चेष्टा बल (Cheshta Bala)","नैसर्गिक बल (Naisargika Bala)","दृक् बल (Drik Bala)"]],
+      ["षड्बल — छह अंग",[]],
       ["भावबल — 12 भाव",["प्रथम भाव","द्वितीय भाव","तृतीय भाव","चतुर्थ भाव","पंचम भाव","षष्ठ भाव","सप्तम भाव","अष्टम भाव","नवम भाव","दशम भाव","एकादश भाव","द्वादश भाव"]]
     ];
-    for(const [groupName,items] of balaGroups){
+    const shadbala=chart.shadbala||{};
+    const planetHindi={Sun:"सूर्य",Moon:"चंद्र",Mars:"मंगल",Mercury:"बुध",Jupiter:"गुरु",Venus:"शुक्र",Saturn:"शनि"};
+    const balaLabels=[
+      ["sthanaBala","स्थान बल"],
+      ["digBala","दिक् बल"],
+      ["kalaBala","काल बल"],
+      ["cheshtaBala","चेष्टा बल"],
+      ["naisargikaBala","नैसर्गिक बल"],
+      ["drigBala","दृक् बल"]
+    ];
+    const shadbalaSection=document.createElement("section");
+    const shadbalaHeading=document.createElement("h4");
+    shadbalaHeading.textContent="षड्बल — सात ग्रहों के छह अंग";
+    shadbalaHeading.style.cssText="margin:14px 0 8px;color:#f5c66b";
+    shadbalaSection.appendChild(shadbalaHeading);
+    const shadbalaIntro=document.createElement("p");
+    shadbalaIntro.className="chat-info";
+    shadbalaIntro.textContent="प्रत्येक ग्रह के छह बल, कुल षष्ट्यंश (Virupa), कुल रूप और आवश्यक न्यूनतम रूप नीचे दिए गए हैं। वर्तमान गणना उपलब्ध ग्रह-स्थिति पर आधारित प्रारंभिक अनुमानित मॉडल है; इसे प्रमाणित शास्त्रीय BPHS षड्बल न मानें।";
+    shadbalaSection.appendChild(shadbalaIntro);
+    if(Object.keys(shadbala).length){
+      const scroll=document.createElement("div");scroll.style.cssText="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch";
+      const table=document.createElement("table");table.style.cssText="width:100%;min-width:850px;border-collapse:collapse;font-size:12px";
+      const headers=["ग्रह",...balaLabels.map(x=>x[1]),"कुल षष्ट्यंश","कुल रूप","आवश्यक रूप","स्थिति"];
+      const head=document.createElement("tr");
+      headers.forEach(label=>{const th=document.createElement("th");th.textContent=label;th.style.cssText="padding:8px 6px;text-align:center;white-space:nowrap;color:#f5c66b;border-bottom:1px solid #80633d";head.appendChild(th);});
+      table.appendChild(head);
+      Object.entries(planetHindi).forEach(([key,hindi])=>{
+        const data=shadbala[key];if(!data)return;
+        const row=document.createElement("tr");
+        const values=[hindi,...balaLabels.map(([field])=>Number(data[field]).toFixed(2)),Number(data.totalShashtiamsas).toFixed(2),Number(data.totalRupas).toFixed(2),Number(data.requiredRupas).toFixed(2),data.isStrong?"आवश्यक बल पूरा":"आवश्यक बल से कम"];
+        values.forEach((value,index)=>{const cell=document.createElement(index===0?"th":"td");cell.textContent=String(value);cell.style.cssText="padding:8px 6px;text-align:center;white-space:nowrap;border-bottom:1px solid #493568";if(index===0)cell.style.textAlign="left";if(index===values.length-1)cell.style.color=data.isStrong?"#16834b":"#b45309";row.appendChild(cell);});
+        table.appendChild(row);
+      });
+      scroll.appendChild(table);shadbalaSection.appendChild(scroll);
+      const unitNote=document.createElement("p");unitNote.className="chat-info";unitNote.textContent="60 षष्ट्यंश = 1 रूप। ग्रह का कुल रूप उसके निर्धारित आवश्यक रूप से मिलाकर देखा गया है।";shadbalaSection.appendChild(unitNote);
+    }else{
+      const missing=document.createElement("p");missing.className="chat-info";missing.textContent="इस कुंडली के लिए षड्बल डेटा उपलब्ध नहीं है।";shadbalaSection.appendChild(missing);
+    }
+    strength.appendChild(shadbalaSection);
+    for(const [groupName,items] of balaGroups.slice(1)){
       const section=document.createElement("section");
       const heading=document.createElement("h4");
       heading.textContent=groupName;
@@ -544,12 +639,12 @@
       section.appendChild(heading);
       const list=document.createElement("ul");
       list.style.cssText="margin:0;padding-inline-start:22px;line-height:1.8";
-      for(const item of items){const li=document.createElement("li");li.textContent=item+" — गणना जोड़नी बाकी";list.appendChild(li);}
+      for(const item of items){const li=document.createElement("li");li.textContent=item+" — भावबल की गणना अभी उपलब्ध नहीं है";list.appendChild(li);}
       section.appendChild(list);strength.appendChild(section);
     }
     const note=document.createElement("p");
     note.className="chat-info";
-    note.textContent="ध्यान दें: षड्बल में प्रत्येक ग्रह के लिए रूप (Virupa) और आवश्यक न्यूनतम बल की तुलना भी दी जाएगी। भावबल में प्रत्येक भाव का कुल बल और उसके घटक दिखेंगे।";
+    note.textContent="षड्बल का यह अंक-आधारित मॉडल प्रारंभिक है। पूर्ण शास्त्रीय गणना के लिए उच्च-सटीकता ग्रह-वेग, अयनांश, अयन/दिन-रात्रि तथा अन्य काल-आधारित उपघटकों का सत्यापन आवश्यक है।";
     strength.appendChild(note);
 
     // Route each calculation section into the six horizontal slide cards.
