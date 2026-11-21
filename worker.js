@@ -51,11 +51,12 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
   let body;
   try { body = await request.json(); }
   catch { return Response.json({ success: false, message: "Invalid JSON body." }, { status: 400 }); }
+  const parsedBody = body && typeof body === "object" && !Array.isArray(body) ? body : {};
   const safeBody = Array.isArray(allowedBodyKeys)
-    ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(body, key)).map(key => [key, body[key]]))
-    : body;
+    ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(parsedBody, key)).map(key => [key, parsedBody[key]]))
+    : parsedBody;
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
-    safeBody._wifeChartProfileMatched = isLockedWifeChart(body.chartContext?.birth || body.birthData || body.chartContext || {});
+    safeBody._wifeChartProfileMatched = isLockedWifeChart(parsedBody.chartContext?.birth || parsedBody.birthData || parsedBody.chartContext || {});
   }
   const headers = Object.fromEntries(request.headers.entries());
   const req = {
