@@ -149,30 +149,7 @@ module.exports=async function(req,res,env={}){
     const normalizedGender=String(liveChartContext.gender||birthProfile.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
     const explicitlyMale=["male","man","पुरुष","आदमी"].includes(normalizedGender);
     const femaleOrUnspecified=!explicitlyMale;
-    // Apply the saved relationship answer only to an explicit separation/divorce question.
-    const separationQuestion=/तलाक|डाइवोर्स|डिवोर्स|छोड़(?:ना|ने| दूँ| दूं| पाऊँ| पाऊं)|छोड(?:ना|ने)|अलग\s*(?:रहना|होना|हो जाऊँ|हो जाऊं)|separation|divorc|devorc|divors|leave\s+(?:my|the)\s+(?:husband|wife|partner)|break\s*up|end\s+(?:the\s+)?relationship/i.test(question);
-    const specialProfileFocus=
-      birthDate==="1997-03-10" &&
-      normalizedBirthTime==="21:15" &&
-      (placeText.includes("amravati")||isAmravatiByCoordinates) &&
-      femaleOrUnspecified;
-    const specialRelationshipFocus=specialProfileFocus && separationQuestion;
-    // This exact owner's profile uses the owner's saved separation prediction verbatim.
-    // Do not ask Gemini to recreate it: that can produce a contradictory result.
-    if (specialRelationshipFocus) {
-      const savedAnswer = getProfileSpecificSeparationAnswer();
-      if (savedAnswer) {
-        return res.status(200).json({
-          success: true,
-          answer: savedAnswer,
-          identity: "Astro vidhata AI",
-          ownerAuthorized: false,
-          specialProfileApplied: true,
-          sanitizedQuestion: redactQuestion(question, body.chartContext)
-        });
-      }
-    }
-    // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
+    // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.\n    // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
     const lowerQuestion=question.toLowerCase();
