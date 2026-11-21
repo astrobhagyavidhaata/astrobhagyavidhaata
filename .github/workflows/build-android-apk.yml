@@ -8,7 +8,7 @@ on:
       - '.github/workflows/build-android-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -58,3 +58,15 @@ jobs:
           name: Astro-Bhagya-Vidhata-APK
           path: android-wrapper/Astro-Bhagya-Vidhata.apk
           retention-days: 30
+      - name: Publish direct APK download
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-apk
+          name: Astro Bhagya Vidhata Android App
+          body: Install the APK directly on an Android phone.
+          target_commitish: main
+          files: android-wrapper/Astro-Bhagya-Vidhata.apk
+          overwrite_files: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
