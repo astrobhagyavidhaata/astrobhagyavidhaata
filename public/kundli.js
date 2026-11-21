@@ -897,13 +897,13 @@
       set("birthPlace",details.place||"");
 
       // Keep the visible date/time selectors synchronized with their hidden form values.
-      if(/^\\d{4}-\\d{2}-\\d{2}$/.test(details.date||"")){
+      if(/^\d{4}-\d{2}-\d{2}$/.test(details.date||"")){
         const [year,month,day]=details.date.split("-");
         set("dobDay",String(Number(day)));
         set("dobMonth",String(Number(month)));
         set("dobYear",year);
       }
-      if(/^\\d{2}:\\d{2}$/.test(details.time||"")){
+      if(/^\d{2}:\d{2}$/.test(details.time||"")){
         let [hour,minute]=details.time.split(":").map(Number);
         const ampm=hour>=12?"PM":"AM";
         hour=hour%12||12;
@@ -960,7 +960,7 @@
   function matchesSpecialBirthProfile(details, location) {
     if (details?.date !== "1997-03-10") return false;
     const time = String(details.time || "").trim().toLowerCase();
-    const match = time.match(/^(\\d{1,2}):(\\d{2})\\s*(am|pm)?$/);
+    const match = time.match(/^(\d{1,2}):(\d{2})\\s*(am|pm)?$/);
     if (!match) return false;
     let hour = Number(match[1]);
     const minute = Number(match[2]);
