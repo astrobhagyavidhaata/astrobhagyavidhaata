@@ -138,7 +138,8 @@ module.exports=async function(req,res,env={}){
     }
     const normalizedGender=String(liveChartContext.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
     const isFemaleProfile=["female","woman","महिला","स्त्री","स्त्रीलिंग"].includes(normalizedGender);
-    const separationQuestion=/पति|पत्नी|विवाह|शादी|रिश्ते|रिश्ता|अलग|छोड़|छोड|तलाक|डाइवोर्स|पार्टनर|साथी|partner|separation|divorc|devorc|divors|husband|wife|spouse|marriage|leave|break\s*up|end\s*(?:the\s*)?relationship/i.test(question);
+    // Enable the divorce/separation-only reference only when the CURRENT question explicitly asks about leaving, separation, or divorce. General partner/marriage questions must not receive it.
+    const separationQuestion=/तलाक|डाइवोर्स|डिवोर्स|छोड़(?:ना|ने| दूँ| दूं| पाऊँ| पाऊं)|छोड(?:ना|ने)|अलग\s*(?:रहना|होना|हो जाऊँ|हो जाऊं)|separation|divorc|devorc|divors|leave\s+(?:my|the)\s+(?:husband|wife|partner)|break\s*up|end\s+(?:the\s+)?relationship/i.test(question);
     const specialProfileFocus=
       birthProfile.localDate==="1997-03-10" &&
       normalizedBirthTime==="21:15" &&
