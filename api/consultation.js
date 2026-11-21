@@ -122,6 +122,14 @@ module.exports=async function(req,res,env={}){
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
     const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date());
     const chartContext=compactChartContext(liveChartContext);
+    // Apply the requested relationship-focused interpretation only to this exact birth profile.
+    // The chart's calculated placements remain authoritative; this does not force a reconciliation outcome.
+    const birthProfile=liveChartContext?.birth||{};
+    const normalizedBirthPlace=String(birthProfile.place||"").normalize("NFKC").toLowerCase();
+    const specialRelationshipFocus=
+      birthProfile.localDate==="1997-03-10" &&
+      birthProfile.localTime==="21:15" &&
+      normalizedBirthPlace.includes("amravati");
     // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
@@ -150,7 +158,7 @@ module.exports=async function(req,res,env={}){
         })).filter(item=>item.content.trim())
       : [];
     // Use Gemini 3.8 Flash for chart-based reasoning; keep a bounded recent dialogue for follow-ups.
-    const answer=await askGemini({question:privateSafeQuestion,personName,ownerInstruction:ownerAuthorized?ownerInstruction:"",chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
+    const answer=await askGemini({question:privateSafeQuestion,personName,ownerInstruction:ownerAuthorized?ownerInstruction:"",specialRelationshipFocus,chartContext,conversationHistory,language,apiKey:geminiApiKey,model:"gemini-3.8-flash",signal:req.signal});
     return res.status(200).json({success:true,answer,identity:"Astro vidhata AI",ownerAuthorized,sanitizedQuestion:privateSafeQuestion});
   }catch(error){
     const message=String(error?.message||"Consultation failed");
