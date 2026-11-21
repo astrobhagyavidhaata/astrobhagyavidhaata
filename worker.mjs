@@ -55,7 +55,10 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
     ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(body, key)).map(key => [key, body[key]]))
     : body;
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
-    safeBody._wifeChartProfileMatched = isLockedWifeChart(body.chartContext?.birth || body.birthData || body.chartContext || {});
+    const profileMatched = isLockedWifeChart(body.chartContext?.birth || body.birthData || body.chartContext || {});
+    safeBody._wifeChartProfileMatched = profileMatched;
+    safeBody.lockedProfileRule = profileMatched ? "TULA_1997_03_10_AMRAVATI" : null;
+    safeBody.specialInstruction = profileMatched ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।" : "";
   }
   const headers = Object.fromEntries(request.headers.entries());
   const req = {
@@ -158,7 +161,7 @@ export default {
       // Route AI consultation through the shared Gemini handler so chart context,
       // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        const response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "_wifeChartProfileMatched"]);
+        const response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
         const headers = new Headers(response.headers);
         corsHeaders.forEach((value,key)=>headers.set(key,value));
         return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
