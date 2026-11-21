@@ -479,6 +479,66 @@
       scheduleViewportMeasure();
     }
 
+    // Put the active Mahadasha / Antardasha interpretation after all chart sections.
+    const phalHost=$("dashaPhalResult");
+    if(phalHost){
+      phalHost.replaceChildren();
+      const phalTitle=document.createElement("h3");phalTitle.textContent="दशा–अंतर्दशा का फल";phalHost.appendChild(phalTitle);
+      const activeDasha=chart.dasha?.current||{};
+      const ascIndex=Number(chart.d1?.ascendant?.rashiIndex);
+      const chartPlanets=chart.d1?.planets||{};
+      const signLords=["मंगल","शुक्र","बुध","चंद्र","सूर्य","बुध","शुक्र","मंगल","गुरु","शनि","शनि","गुरु"];
+      const houseTopics=["स्वभाव, स्वास्थ्य और जीवन-दिशा","धन, वाणी और परिवार","साहस, प्रयास और भाई-बहन","माता, घर, सुख और संपत्ति","संतान, शिक्षा, बुद्धि और रचनात्मकता","ऋण, रोग, प्रतियोगिता और सेवा","विवाह, साझेदारी और संबंध","परिवर्तन, शोध और साझा संसाधन","भाग्य, धर्म, गुरु और उच्च शिक्षा","कर्म, नौकरी, व्यवसाय और प्रतिष्ठा","आय, लाभ, मित्र और इच्छापूर्ति","व्यय, विदेश, एकांत और आध्यात्मिकता"];
+      const naturalMeanings={सूर्य:"आत्मविश्वास, नेतृत्व, पिता, प्रशासन और अधिकार",चंद्र:"मन, भावनाएँ, माता, घर और जनसंपर्क",मंगल:"साहस, ऊर्जा, भूमि, संपत्ति और प्रतिस्पर्धा",बुध:"बुद्धि, संवाद, लेखन, व्यापार और गणना",गुरु:"ज्ञान, शिक्षा, गुरु, संतान, सलाह और विस्तार",शुक्र:"प्रेम, विवाह, कला, सुख-सुविधा और धन",शनि:"अनुशासन, श्रम, जिम्मेदारी, देरी और स्थायित्व",राहु:"महत्वाकांक्षा, तकनीक, विदेशी संपर्क और असामान्य अवसर",केतु:"शोध, वैराग्य, आध्यात्मिकता और अलगाव"};
+      const ruledHouses=planet=>{
+        if(!Number.isInteger(ascIndex)||ascIndex<0||ascIndex>11)return [];
+        const houses=[];
+        for(let house=1;house<=12;house++)if(signLords[(ascIndex+house-1)%12]===planet)houses.push(house);
+        return houses;
+      };
+      const makeLordText=planet=>{
+        const p=chartPlanets[planet]||{};
+        const house=Number(p.house);
+        const ruled=ruledHouses(planet);
+        const ruledText=ruled.length?ruled.map(h=>h+"वें भाव ("+houseTopics[h-1]+")").join(" तथा "):"भाव-स्वामित्व उपलब्ध नहीं";
+        const placedText=Number.isInteger(house)&&house>=1&&house<=12?"जन्म कुंडली के "+house+"वें भाव ("+houseTopics[house-1]+") में स्थित":"भाव स्थिति उपलब्ध नहीं";
+        const sign=p.rashi||"राशि उपलब्ध नहीं";
+        const retro=p.retrograde?" ग्रह वक्री है।":"";
+        const combust=p.combustion?" ग्रह अस्त स्थिति में है।":"";
+        return {planet,house,ruledText,placedText,sign,retro,combust,natural:naturalMeanings[planet]||"ग्रह के सामान्य कारकत्व"};
+      };
+      const md=activeDasha.mahadasha,ad=activeDasha.antardasha,pd=activeDasha.pratyantardasha;
+      if(md&&ad){
+        const mdInfo=makeLordText(md),adInfo=makeLordText(ad);
+        const period=document.createElement("p");period.className="chat-info";
+        period.textContent="वर्तमान अवधि: "+md+" महादशा / "+ad+" अंतर्दशा"+(pd?" / "+pd+" प्रत्यंतरदशा":"")+".";
+        phalHost.appendChild(period);
+        const addLordCard=(label,info)=>{
+          const card=document.createElement("div");card.className="dasha-insight-card";
+          const heading=document.createElement("strong");heading.textContent=label+" — "+info.planet;card.appendChild(heading);
+          const p=document.createElement("p");p.textContent=info.planet+" के सामान्य कारकत्व: "+info.natural+"।";card.appendChild(p);
+          const q=document.createElement("p");q.textContent="भाव स्वामित्व: "+info.ruledText+"।";card.appendChild(q);
+          const r=document.createElement("p");r.textContent="स्थिति: "+info.sign+" राशि में, "+info.placedText+"।"+info.retro+info.combust;card.appendChild(r);
+          phalHost.appendChild(card);
+        };
+        addLordCard("महादशा स्वामी",mdInfo);
+        addLordCard("अंतर्दशा स्वामी",adInfo);
+        const combined=document.createElement("div");combined.className="dasha-insight-card";
+        const title=document.createElement("strong");title.textContent="इस अवधि में किन क्षेत्रों के फल सक्रिय हो सकते हैं";combined.appendChild(title);
+        const summary=document.createElement("p");
+        summary.textContent="इस अवधि में "+md+" के कारकत्व और उसके स्वामित्व वाले भावों के विषय लंबे समय की मुख्य पृष्ठभूमि बनेंगे। "+ad+" के कारकत्व तथा उसके स्वामित्व/स्थिति वाले भाव उन विषयों को निकट अवधि में सक्रिय करेंगे। फल का स्वरूप दोनों ग्रहों की राशि, भाव, दृष्टि, युति, बल और गोचर के संयुक्त प्रभाव से बदलेगा।";
+        combined.appendChild(summary);
+        const topics=document.createElement("p");
+        topics.textContent="मुख्य विचार: "+mdInfo.natural+" तथा "+adInfo.natural+"; साथ में "+mdInfo.ruledText+" और "+adInfo.ruledText+" से जुड़े विषय।";
+        combined.appendChild(topics);phalHost.appendChild(combined);
+        const caution=document.createElement("p");caution.className="chat-info";
+        caution.textContent="यह जन्म-कुंडली के ग्रह-स्वामित्व और स्थिति पर आधारित ज्योतिषीय संकेत हैं, निश्चित घटना या गारंटी नहीं। सटीक फलादेश के लिए ग्रह-दृष्टि, युति, योग, षड्बल और गोचर का संयुक्त परीक्षण आवश्यक है।";
+        phalHost.appendChild(caution);
+      }else{
+        const unavailable=document.createElement("p");unavailable.className="chat-info";unavailable.textContent="वर्तमान महादशा और अंतर्दशा उपलब्ध होने पर उनका फल यहाँ दिखेगा।";phalHost.appendChild(unavailable);
+      }
+    }
+
     const ashtak=makeFolder("3. अष्टकवर्ग — भिन्नाष्टकवर्ग और सर्वाष्टकवर्ग","ashtakavargaFolder");
     const av=chart.ashtakavarga;
     if(av?.validation?.passed && av.bhinna && av.sarva){
