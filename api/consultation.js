@@ -136,7 +136,7 @@ module.exports=async function(req,res,env={}){
       if(timeMatch[3]==="am"&&hour===12)hour=0;
       if(hour>=0&&hour<=23&&minute>=0&&minute<=59)normalizedBirthTime=`${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
     }
-    const separationQuestion=/पति|पत्नी|विवाह|शादी|रिश्ते|रिश्ता|अलग|छोड़|तलाक|separation|divorce|husband|wife|marriage|leave/i.test(question);
+    const separationQuestion=/पति|पत्नी|विवाह|शादी|रिश्ते|रिश्ता|अलग|छोड़|छोड|तलाक|डाइवोर्स|पार्टनर|साथी|partner|separation|divorc|devorc|divors|husband|wife|spouse|marriage|leave|break\s*up|end\s*(?:the\s*)?relationship/i.test(question);
     const specialRelationshipFocus=
       birthProfile.localDate==="1997-03-10" &&
       normalizedBirthTime==="21:15" &&
