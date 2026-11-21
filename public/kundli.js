@@ -960,7 +960,7 @@
   function matchesSpecialBirthProfile(details, location) {
     if (details?.date !== "1997-03-10") return false;
     const time = String(details.time || "").trim().toLowerCase();
-    const match = time.match(/^(\d{1,2}):(\d{2})\\s*(am|pm)?$/);
+    const match = time.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
     if (!match) return false;
     let hour = Number(match[1]);
     const minute = Number(match[2]);
