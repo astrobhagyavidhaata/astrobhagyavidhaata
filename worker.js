@@ -157,7 +157,7 @@ export default {
       // Route AI consultation through the shared Gemini handler so chart context,
       // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        const response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
+        const response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
         const headers = new Headers(response.headers);
         corsHeaders.forEach((value,key)=>headers.set(key,value));
         return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
