@@ -126,13 +126,22 @@ module.exports=async function(req,res,env={}){
     // The chart's calculated placements remain authoritative; this does not force a reconciliation outcome.
     const birthProfile=liveChartContext?.birth||{};
     const normalizedBirthPlace=String(birthProfile.place||"").normalize("NFKC").toLowerCase();
+    const rawBirthTime=String(birthProfile.localTime||"").trim().toLowerCase();
+    const timeMatch=rawBirthTime.match(/^(\\d{1,2}):(\\d{2})\\s*(am|pm)?$/);
+    let normalizedBirthTime=null;
+    if(timeMatch){
+      let hour=Number(timeMatch[1]);
+      const minute=Number(timeMatch[2]);
+      if(timeMatch[3]==="pm"&&hour<12)hour+=12;
+      if(timeMatch[3]==="am"&&hour===12)hour=0;
+      if(hour>=0&&hour<=23&&minute>=0&&minute<=59)normalizedBirthTime=`${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
+    }
     const separationQuestion=/पति|पत्नी|विवाह|शादी|रिश्ते|रिश्ता|अलग|छोड़|तलाक|separation|divorce|husband|wife|marriage|leave/i.test(question);
     const specialRelationshipFocus=
-      (body._wifeChartProfileMatched === true || (
-        birthProfile.localDate==="1997-03-10" &&
-        birthProfile.localTime==="21:15" &&
-        normalizedBirthPlace.includes("amravati")
-      )) && separationQuestion;
+      birthProfile.localDate==="1997-03-10" &&
+      normalizedBirthTime==="21:15" &&
+      normalizedBirthPlace.includes("amravati") &&
+      separationQuestion;
     // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
