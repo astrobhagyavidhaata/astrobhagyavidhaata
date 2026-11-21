@@ -111,6 +111,7 @@
       });
       let data = null;
       let attempt = 0;
+      const maxRetries = 4;
       while (true) {
         try {
           const response = await fetch(endpoint, {
@@ -125,14 +126,24 @@
           const retryable = data.retryable === true || [408, 425, 429, 500, 502, 503, 504].includes(response.status);
           if (!retryable) { const permanentError = new Error(data.message || "AI सेवा अभी उपलब्ध नहीं है।"); permanentError.permanent = true; throw permanentError; }
           attempt++;
+          if (attempt >= maxRetries) {
+            const busyError = new Error("AI सर्वर अभी लगातार व्यस्त है। आपका सवाल इस प्रयास में पूरा नहीं हो पाया। कृपया थोड़ी देर बाद फिर से भेजें।");
+            busyError.permanent = true;
+            throw busyError;
+          }
           const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
-          if (status) status.textContent = "अभी सर्वर पर अधिक प्रश्न हैं। आपका सवाल सुरक्षित है—उत्तर के लिए अपने आप दोबारा प्रयास हो रहा है...";
+          if (status) status.textContent = "अभी सर्वर व्यस्त है। आपका सवाल सुरक्षित है—कुछ देर में फिर कोशिश होगी (" + attempt + "/" + maxRetries + ")...";
           await wait(delay);
         } catch (error) {
           if (error.name === "AbortError" || error.permanent === true || requestId !== requestSequence) throw error;
           attempt++;
+          if (attempt >= maxRetries) {
+            const connectionError = new Error("सर्वर से लगातार संपर्क नहीं हो पाया। आपका सवाल पूरा नहीं हुआ। कृपया नेटवर्क जाँचकर थोड़ी देर बाद फिर भेजें।");
+            connectionError.permanent = true;
+            throw connectionError;
+          }
           const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
-          if (status) status.textContent = "कनेक्शन में अस्थायी रुकावट है। आपका सवाल सुरक्षित है—फिर से प्रयास हो रहा है...";
+          if (status) status.textContent = "कनेक्शन में अस्थायी रुकावट है। फिर कोशिश हो रही है (" + attempt + "/" + maxRetries + ")...";
           await wait(delay);
         }
       }
