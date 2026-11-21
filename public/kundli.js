@@ -989,6 +989,16 @@
       }
 
       const chart = result.chart;
+      // Preserve the exact birth inputs with the chart so the consultation API can
+      // independently verify the special profile instead of trusting a client flag.
+      chart.birth = {
+        ...(chart.birth && typeof chart.birth === "object" ? chart.birth : {}),
+        localDate: details.date,
+        localTime: details.time,
+        place: location.name || location.label || details.place || "",
+        latitude: location.latitude,
+        longitude: location.longitude
+      };
       window.AstroLockedProfileRule = matchesSpecialBirthProfile(details, location) ? "TULA_1997_03_10_AMRAVATI" : null;
       window.AstroKundli = chart;
       renderMainKundliChart(chart);
