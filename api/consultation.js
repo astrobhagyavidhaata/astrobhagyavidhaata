@@ -74,6 +74,8 @@ function compactChartContext(source){
   const transit=source.gochar||source.transits||null;
   return stripPersonalFields({
     gender: source.gender || null,
+    // Birth date is intentionally passed as astrology input; other direct identifiers stay redacted.
+    birthDateForAstrology: source.birth?.localDate || null,
     calculation: source.calculation || null,
     d1:pickChart(source.d1),
     d9:pickChart(source.d9),
