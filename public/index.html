@@ -41,6 +41,10 @@
     html[lang^="ur"] input,html[lang^="ur"] textarea,html[lang^="ur"] select,
     html[lang^="ar"] input,html[lang^="ar"] textarea,html[lang^="ar"] select{direction:rtl;text-align:right;font-family:"Noto Nastaliq Urdu",serif}
     html[lang^="ur"] button,html[lang^="ar"] button{font-family:"Noto Nastaliq Urdu",serif}
+    .apk-download-wrap{max-width:760px;margin:12px auto;padding:0 14px}
+    .apk-download-button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin:0;padding:14px 16px;border:2px solid #c65a00;border-radius:12px;background:linear-gradient(135deg,#f39b32,#d35400);color:#fff!important;text-decoration:none;font-size:16px;font-weight:800;box-shadow:0 4px 12px rgba(160,75,0,.2)}
+    .apk-download-button:active{transform:translateY(1px)}
+    .apk-download-note{margin:6px 0 0;text-align:center;color:#6b5545;font-size:12px}
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,sans-serif;background:#100d1c;color:#fff}
     header{background:#211638;border-bottom:1px solid #493568;padding:18px 14px;text-align:center}
@@ -335,6 +339,10 @@
 </head>
 <body>
   <header class="app-header"><div class="header-title"><h1>🔱 एस्ट्रो भाग्य विधाता</h1><p>वैदिक ज्योतिष एवं व्यक्तिगत जन्म कुंडली</p></div><div class="language-picker notranslate"><label for="preferredLanguage">भाषा</label><select id="preferredLanguage" onchange="changeAppLanguage(this.value)" aria-label="भाषा चुनें / Choose language"><option value="hi">हिन्दी</option><option value="en">English</option></select></div><div class="header-actions"><button type="button" id="shareAppButton" class="secondary">↗ शेयर</button><button type="button" id="installAppButton">⬇ ऐप इंस्टॉल</button></div></header>
+  <div class="apk-download-wrap">
+    <a class="apk-download-button" href="https://github.com/astrobhagyavidhaata/astrobhagyavidhaata/releases/download/android-apk/Astro-Bhagya-Vidhata.apk" download="Astro-Bhagya-Vidhata.apk">📱 Android App डाउनलोड करें (APK)</a>
+    <p class="apk-download-note">Android फोन के लिए सीधे APK डाउनलोड करें</p>
+  </div>
   
   <main>
     <nav id="appPageTabs" class="app-page-tabs" aria-label="ऐप के पेज">
@@ -561,6 +569,10 @@
 
     </div>
   </main>
+  <div class="apk-download-wrap">
+    <a class="apk-download-button" href="https://github.com/astrobhagyavidhaata/astrobhagyavidhaata/releases/download/android-apk/Astro-Bhagya-Vidhata.apk" download="Astro-Bhagya-Vidhata.apk">📱 Android App डाउनलोड करें (APK)</a>
+    <p class="apk-download-note">ZIP की जरूरत नहीं — APK सीधे डाउनलोड करें</p>
+  </div>
   <footer>© 2026 Astro Bhagya Vidhata<br>वैदिक ज्योतिषीय परामर्श<br>ज्योतिषीय मार्गदर्शन निश्चित भविष्य की गारंटी नहीं है।</footer>
 
   <script>
