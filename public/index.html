@@ -292,7 +292,7 @@
 
     /* Keep the AI astrologer directly below birth details; remove the oversized blank gap. */
     #aiAstrologer{display:block!important;margin:8px 0 12px!important;padding:12px!important;scroll-margin-top:8px}
-    #aiAstrologer h2{margin:0 0 6px!important;font-size:19px!important}
+    #aiAstrologer h2{margin:0 0 2px!important;font-size:12px!important;line-height:1.15!important;font-weight:600!important}
     #aiAstrologer .chat-info{margin:4px 0 8px!important;line-height:1.4!important}
     #ai-response-box:empty{display:none!important}
     #aiAstrologer label{margin:8px 0 5px!important}
@@ -326,7 +326,7 @@
     }
     body.ai-chat-expanded #aiAstrologerSend{flex:0 0 auto!important;margin:8px 0!important}
     body.ai-chat-expanded #aiAstrologerStatus{flex:0 0 auto!important;min-height:22px!important}
-    body.ai-chat-expanded #aiAstrologer h2{flex:0 0 auto!important}
+    body.ai-chat-expanded #aiAstrologer h2{flex:0 0 auto!important;margin:0 0 2px!important;font-size:11px!important;line-height:1.1!important}
     body.ai-chat-expanded #aiAstrologer .chat-info{flex:0 0 auto!important}
     body.ai-chat-expanded #aiAstrologer label{flex:0 0 auto!important}
 
@@ -410,8 +410,7 @@
       </script>
       <div id="message" role="status" aria-live="polite"></div>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
-        <h2 id="aiAstrologerTitle">✨ कृत्रिम बुद्धिमत्ता ज्योतिषी से अपना सवाल पूछें</h2>
-        <p class="chat-info">अपनी जन्म कुंडली के आधार पर कृत्रिम बुद्धिमत्ता ज्योतिषी से सीधे सवाल पूछें।</p>
+        <h2 id="aiAstrologerTitle">✨ ज्योतिष AI</h2>
         <div id="ai-response-box" class="ai-chat-messages" role="log" aria-live="polite" aria-readonly="true"></div>
         <label for="aiAstrologerQuestion">अपना सवाल लिखें</label>
         <textarea id="aiAstrologerQuestion" lang="hi-IN" spellcheck="true" autocorrect="on" autocomplete="off" rows="3" maxlength="4000" placeholder="उदाहरण: मेरी नौकरी और करियर के योग कैसे हैं?"></textarea>
