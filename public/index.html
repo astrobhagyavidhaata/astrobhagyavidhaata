@@ -335,6 +335,8 @@
     body.ai-chat-expanded #aiAstrologer .chat-info{flex:0 0 auto!important}
     body.ai-chat-expanded #aiAstrologer label{flex:0 0 auto!important}
 
+  
+    .private-knowledge-item{margin:10px 0;padding:12px;border:1px solid #66547f;border-radius:10px;background:#181326}.private-knowledge-item strong,.private-knowledge-item small{display:block}.private-knowledge-item small{color:#c7b5df;margin-top:4px}.private-knowledge-item p{font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.private-knowledge-actions{display:flex;gap:8px}.private-knowledge-actions button{margin:0;flex:1;padding:10px;font-size:13px}.private-knowledge-hint{color:#cbbbdc;font-size:12px;line-height:1.5}
   </style>
 </head>
 <body>
@@ -351,6 +353,7 @@
       <button type="button" data-app-tab="panchang">पंचांग</button>
       <button type="button" data-app-tab="gochar">गोचर</button>
       <button type="button" data-app-tab="help">सहायता</button>
+      <button type="button" data-app-tab="private-knowledge">🔒 निजी ज्ञान</button>
     </nav>
     <div id="appSwipeDeck" class="app-swipe-deck">
     <section class="panel app-page-panel" data-app-page="kundli">
@@ -570,6 +573,49 @@
       </details>
     </section>
 
+    <section class="panel app-page-panel" data-app-page="private-knowledge" id="privateKnowledgePanel">
+      <h2>🔒 मेरा निजी ज्योतिषीय ज्ञान</h2>
+      <p class="chat-info">यह विभाग पासवर्ड से सुरक्षित है। यहाँ लिखा ज्ञान एन्क्रिप्ट होकर सेव होगा और Gemini को नहीं भेजा जाएगा। ग्राहक के सवालों से इसका मिलान सॉफ्टवेयर करेगा।</p>
+      <div id="privateKnowledgeStatus" role="status" aria-live="polite" class="chat-info"></div>
+      <div id="privateKnowledgeAuth">
+        <div id="privateKnowledgeSetup">
+          <label for="privateKnowledgeSetupCode">एक बार इस्तेमाल होने वाला सेटअप कोड</label>
+          <input id="privateKnowledgeSetupCode" type="password" autocomplete="one-time-code" placeholder="सेटअप कोड डालें">
+          <label for="privateKnowledgeNewPassword">अपना निजी पासवर्ड बनाएँ (कम-से-कम 12 अक्षर)</label>
+          <input id="privateKnowledgeNewPassword" type="password" autocomplete="new-password" minlength="12" placeholder="नया मजबूत पासवर्ड">
+          <label for="privateKnowledgeConfirmPassword">पासवर्ड दोबारा लिखें</label>
+          <input id="privateKnowledgeConfirmPassword" type="password" autocomplete="new-password" minlength="12" placeholder="पासवर्ड की पुष्टि">
+          <button type="button" id="privateKnowledgeSetupButton">निजी पासवर्ड सेट करें</button>
+        </div>
+        <div id="privateKnowledgeLogin" hidden>
+          <label for="privateKnowledgePassword">निजी पासवर्ड</label>
+          <input id="privateKnowledgePassword" type="password" autocomplete="current-password" placeholder="अपना पासवर्ड डालें">
+          <button type="button" id="privateKnowledgeLoginButton">लॉगिन करें</button>
+        </div>
+      </div>
+      <div id="privateKnowledgeEditor" hidden>
+        <div class="legal-details">
+          <strong>अपना ज्ञान सीधे हिंदी में लिखें</strong>
+          <label for="privateKnowledgeTitle">विषय / शीर्षक</label>
+          <input id="privateKnowledgeTitle" maxlength="160" placeholder="जैसे: सप्तम भाव में शनि">
+          <label for="privateKnowledgeCategory">श्रेणी</label>
+          <input id="privateKnowledgeCategory" maxlength="80" placeholder="जैसे: विवाह, करियर, धन, स्वास्थ्य">
+          <label for="privateKnowledgeHindi">तुम्हारा निजी ज्ञान (हिंदी)</label>
+          <textarea id="privateKnowledgeHindi" rows="7" maxlength="30000" placeholder="अपना पूरा ज्योतिषीय ज्ञान यहाँ लिखें..."></textarea>
+          <button type="button" id="privateKnowledgeVoice" class="secondary">🎙️ बोलकर हिंदी में लिखें</button>
+          <label for="privateKnowledgeEnglish">अंग्रेज़ी में उत्तर (वैकल्पिक)</label>
+          <textarea id="privateKnowledgeEnglish" rows="4" maxlength="30000" placeholder="यदि अंग्रेज़ी ग्राहक को अंग्रेज़ी उत्तर चाहिए, तो यहाँ उसका अंग्रेज़ी रूप भी लिखें।"></textarea>
+          <p class="private-knowledge-hint">अंग्रेज़ी सवालों के शब्दों का हिंदी ज्ञान से मिलान हो सकता है। पूरी तरह सही अंग्रेज़ी उत्तर के लिए अंग्रेज़ी रूप भी यहाँ सुरक्षित करें। यह रूप भी एन्क्रिप्ट रहेगा।</p>
+          <button type="button" id="privateKnowledgeSave">ज्ञान सुरक्षित करें</button>
+          <button type="button" id="privateKnowledgeNew" class="secondary">नया ज्ञान लिखें</button>
+        </div>
+        <h3>सेव किया हुआ निजी ज्ञान</h3>
+        <div id="privateKnowledgeList"></div>
+        <button type="button" id="privateKnowledgeLogout" class="secondary">लॉगआउट</button>
+      </div>
+    </section>
+
+
 
     </div>
   </main>
@@ -599,6 +645,6 @@
     })();
   </script>
   <script src="/app.js"></script>
-  <script src="/kundli.js?v=7d997ec"></script><script src="/background_resume.js"></script><script src="kundli_matching.js?v=koota-meaning-1"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script>
+  <script src="/kundli.js?v=7d997ec"></script><script src="/background_resume.js"></script><script src="kundli_matching.js?v=koota-meaning-1"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script><script src="/private-knowledge.js?v=1"></script>
 </body>
 </html>
