@@ -1,7 +1,7 @@
 import consultationHandler from "./api/consultation.js";
 import kundliHandler from "./api/kundli.js";
 import gocharHandler from "./api/gochar.js";
-import panchangHandler from "./api/panchang.js";
+import panchangHandler from "./api/panchang.js";\nimport privateKnowledgeHandler, { privateKnowledgeAnswer } from "./api/private-knowledge.js";
 
 // Recognize the explicitly configured birth profile for chart-specific context only.
 function isLockedWifeChart(birthData = {}) {
@@ -152,6 +152,34 @@ export default {
           configured: Boolean(bindings.GEMINI_API_KEY),
           model: "gemini-3.8-flash"
         }, { headers: { "Cache-Control": "no-store" } });
+      }
+
+      if (url.pathname === "/api/private-knowledge") {
+        return await privateKnowledgeHandler(request, bindings);
+      }
+
+      // Search the owner's separately encrypted knowledge before any Gemini request.
+      // Keep the explicitly protected 10-Mar-1997 Amravati profile on its existing path.
+      if (url.pathname === "/api/consultation" && request.method === "POST" && bindings.PRIVATE_KNOWLEDGE_DB) {
+        try {
+          const incoming = await request.clone().json();
+          const birth = incoming.chartContext?.birth || incoming.birthData || incoming.chartContext || {};
+          if (!isLockedWifeChart(birth)) {
+            const question = String(incoming.question || incoming.content || "").trim();
+            if (question) {
+              const language = String(incoming.language || (/^[\\s\\S]*[\\u0900-\\u097f]/.test(question) ? "hi" : "en"));
+              const privateAnswer = await privateKnowledgeAnswer(question, language, bindings);
+              if (privateAnswer) {
+                const answer = privateAnswer.translationMissing
+                  ? "इस विषय का निजी ज्ञान हिंदी में उपलब्ध है; इसका अंग्रेज़ी अनुवाद अभी दर्ज नहीं है।"
+                  : privateAnswer.answer;
+                return Response.json({ success: true, answer, identity: "Astro Bhagya Vidhata", privateKnowledge: true, translationMissing: Boolean(privateAnswer.translationMissing) }, { headers: { "Cache-Control": "no-store" } });
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Private knowledge lookup failed:", error?.message || error);
+        }
       }
 
       // Route AI consultation through the shared Gemini handler so chart context,
