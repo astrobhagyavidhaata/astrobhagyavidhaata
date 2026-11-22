@@ -109,7 +109,7 @@ async function findAnswer(question, language, env) {
   scored.sort((a, b) => b.score - a.score);
   if (!scored.length || scored[0].score < 2) return null;
   const note = scored[0].note;
-  const english = language === "en";
+  const english = /^en(?:-|$)/i.test(String(language || ""));
   const text = english ? String(note.contentEn || "") : String(note.content || "");
   if (english && !text.trim()) return { translationMissing: true, answer: "", title: note.title || "" };
   return { translationMissing: false, answer: fourLines(text), title: note.title || "" };
@@ -149,10 +149,21 @@ export default async function handlePrivateKnowledge(request, env = {}) {
       return json({ success: true, message: "पासवर्ड सुरक्षित रूप से सेट हो गया।" }, 200, { "Set-Cookie": session.cookie });
     }
     if (action === "login") {
+      const ipHash = await sha(request.headers.get("CF-Connecting-IP") || "unknown");
+      const attempt = await db.prepare("SELECT attempts, window_start, blocked_until FROM owner_login_attempts WHERE ip_hash = ?").bind(ipHash).first();
+      if (attempt && Number(attempt.blocked_until) > now()) return json({ success: false, message: "बहुत बार गलत पासवर्ड डाला गया। 15 मिनट बाद कोशिश करें।" }, 429);
       const row = await db.prepare("SELECT password_salt, password_hash FROM owner_auth WHERE id = 1").first();
       if (!row) return json({ success: false, message: "पहले निजी ज्ञान का पासवर्ड सेट करें।" }, 409);
       const supplied = await passwordHash(String(body.password || ""), row.password_salt);
-      if (!constantEqual(supplied, row.password_hash)) return json({ success: false, message: "पासवर्ड गलत है।" }, 401);
+      if (!constantEqual(supplied, row.password_hash)) {
+        const sameWindow = attempt && now() - Number(attempt.window_start) < 900;
+        const attempts = sameWindow ? Number(attempt.attempts) + 1 : 1;
+        const windowStart = sameWindow ? Number(attempt.window_start) : now();
+        const blockedUntil = attempts >= 8 ? now() + 900 : 0;
+        await db.prepare("INSERT INTO owner_login_attempts (ip_hash, attempts, window_start, blocked_until) VALUES (?, ?, ?, ?) ON CONFLICT(ip_hash) DO UPDATE SET attempts=excluded.attempts, window_start=excluded.window_start, blocked_until=excluded.blocked_until").bind(ipHash, attempts, windowStart, blockedUntil).run();
+        return json({ success: false, message: "पासवर्ड गलत है।" }, 401);
+      }
+      await db.prepare("DELETE FROM owner_login_attempts WHERE ip_hash = ?").bind(ipHash).run();
       const session = await issueSession(db);
       return json({ success: true, message: "लॉगिन सफल।" }, 200, { "Set-Cookie": session.cookie });
     }
