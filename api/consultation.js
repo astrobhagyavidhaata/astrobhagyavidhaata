@@ -137,7 +137,7 @@ module.exports=async function(req,res,env={}){
     const isAmravatiByCoordinates=Number.isFinite(latitude)&&Number.isFinite(longitude)&&
       Math.abs(latitude-20.9)<=0.15&&Math.abs(longitude-77.7)<=0.15;
     const rawBirthTime=String(birthProfile.localTime||birthProfile.time||body.chartContext?.birthTime||"").trim().toLowerCase();
-    const timeMatch=rawBirthTime.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
+    const timeMatch=rawBirthTime.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/);
     let normalizedBirthTime=null;
     if(timeMatch){
       let hour=Number(timeMatch[1]);
@@ -151,15 +151,16 @@ module.exports=async function(req,res,env={}){
     const femaleOrUnspecified=!explicitlyMale;
     // Normalize supported date formats before checking the one owner-authorized reference profile.
     const normalizedBirthDate = (() => {
-      let match = birthDate.match(/^(\\d{4})[-/](\\d{1,2})[-/](\\d{1,2})$/);
+      const value = birthDate.normalize("NFKC").trim();
+      let match = value.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:$|T)/);
       if (match) return match[1] + "-" + String(Number(match[2])).padStart(2,"0") + "-" + String(Number(match[3])).padStart(2,"0");
-      match = birthDate.match(/^(\\d{1,2})[-/](\\d{1,2})[-/](\\d{4})$/);
+      match = value.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
       if (match) return match[3] + "-" + String(Number(match[2])).padStart(2,"0") + "-" + String(Number(match[1])).padStart(2,"0");
       return "";
     })();
     const specialProfileFocus = normalizedBirthDate === "1997-03-10" &&
       normalizedBirthTime === "21:15" &&
-      (placeText.includes("amravati") || isAmravatiByCoordinates) &&
+      (placeText.includes("amravati") || placeText.includes("अमरावती") || isAmravatiByCoordinates) &&
       femaleOrUnspecified;
     const specialRelationshipFocus = specialProfileFocus &&
       /छोड़|छोड|अलग|तलाक|डाइवोर्स|separat|divorc|break.?up|leave|end relationship/i.test(question);
