@@ -534,7 +534,6 @@
       if(host&&page){host.replaceChildren();host.appendChild(page);page.classList.add("active");}
     });
     if(vargaFolder&&slide("slide-shodashvarga"))slide("slide-shodashvarga").appendChild(vargaFolder);
-    if(strengthPage)strengthPage.remove();
     root.replaceChildren();
     const detailTabs=$("kundliDetailTabs");if(detailTabs)detailTabs.replaceChildren();
     const heading=(host,label)=>{if(!host)return;const h=document.createElement("h3");h.textContent=label;host.appendChild(h);};
