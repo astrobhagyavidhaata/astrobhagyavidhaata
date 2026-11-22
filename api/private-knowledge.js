@@ -6,7 +6,7 @@ const now = () => Math.floor(Date.now() / 1000);
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), {
   status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...headers }
 });
-const b64 = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes)));
+const b64 = bytes => { const data = new Uint8Array(bytes); let binary = ""; for (let i = 0; i < data.length; i += 0x8000) binary += String.fromCharCode(...data.subarray(i, i + 0x8000)); return btoa(binary); };
 const unb64 = value => Uint8Array.from(atob(value), c => c.charCodeAt(0));
 const hex = bytes => [...new Uint8Array(bytes)].map(x => x.toString(16).padStart(2, "0")).join("");
 async function sha(value) { return hex(await crypto.subtle.digest("SHA-256", encoder.encode(value))); }
