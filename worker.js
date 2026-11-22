@@ -196,6 +196,14 @@ export default {
       // Route AI consultation through the shared Gemini handler so chart context,
       // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
+        // The exact owner-authorized profile must not be cut down to the generic four-line limit.
+        try {
+          const incoming = await request.clone().json();
+          const birth = incoming.chartContext?.birth || incoming.birthData || incoming.chartContext || {};
+          consultationProtectedProfile = isLockedWifeChart(birth);
+        } catch (_) {
+          consultationProtectedProfile = false;
+        }
         let response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
         if (!consultationProtectedProfile) {
           const payload = await response.clone().json().catch(() => null);
