@@ -480,11 +480,11 @@
         <p class="chat-info">वर और वधू की जन्म जानकारी भरें। दोनों की चंद्र राशि, जन्म नक्षत्र और मंगल की स्थिति से पारंपरिक अष्टकूट तथा मंगल दोष का आकलन होगा।</p>
         <form id="kundliMatchForm">
           <h3>वर (लड़का)</h3>
-          <label for="matchGroomDate">जन्म तारीख</label><input id="matchGroomDate" type="date" required>
+          <label for="matchGroomDate">जन्म तारीख</label><input id="matchGroomDate" type="text" inputmode="numeric" autocomplete="bday" placeholder="DD/MM/YYYY" aria-label="वर की जन्म तारीख (दिन/महीना/वर्ष)" maxlength="10" required>
           <label for="matchGroomTime">जन्म समय</label><input id="matchGroomTime" type="time" required>
           <label for="matchGroomPlace">जन्म स्थान</label><input id="matchGroomPlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
           <h3>वधू (लड़की)</h3>
-          <label for="matchBrideDate">जन्म तारीख</label><input id="matchBrideDate" type="date" required>
+          <label for="matchBrideDate">जन्म तारीख</label><input id="matchBrideDate" type="text" inputmode="numeric" autocomplete="off" placeholder="DD/MM/YYYY" aria-label="वधू की जन्म तारीख (दिन/महीना/वर्ष)" maxlength="10" required>
           <label for="matchBrideTime">जन्म समय</label><input id="matchBrideTime" type="time" required>
           <label for="matchBridePlace">जन्म स्थान</label><input id="matchBridePlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
           <button id="runKundliMatch" type="submit">गुण मिलान करें</button>
