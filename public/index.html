@@ -486,7 +486,7 @@
             <input id="matchGroomYear" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="साल (YYYY)" aria-label="वर जन्म साल" maxlength="4" required>
           </div>
           <label>जन्म समय (घंटा, मिनट और सुबह/शाम)</label><div class="match-time-parts" style="display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px;margin:6px 0 12px"><input id="matchGroomHour" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="घंटा" aria-label="वर जन्म समय घंटा" required><input id="matchGroomMinute" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="मिनट" aria-label="वर जन्म समय मिनट" required><select id="matchGroomPeriod" aria-label="वर सुबह या शाम" required><option value="AM">सुबह (AM)</option><option value="PM">शाम (PM)</option></select></div>
-          <label for="matchGroomPlace">जन्म स्थान</label><input id="matchGroomPlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
+          <label for="matchGroomPlace">जन्म स्थान</label><input id="matchGroomPlace" type="text" maxlength="150" placeholder="शहर का नाम लिखें (जैसे Ludhiana)" autocomplete="off" required><div id="matchGroomPlaceSuggestions" role="listbox" aria-label="वर जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:180px;overflow-y:auto"></div>
           <h3>वधू (लड़की)</h3>
           <label for="matchBrideDate">जन्म तारीख</label><div class="match-date-parts" style="display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:8px;margin:6px 0 12px">
             <input id="matchBrideDate" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="दिन (DD)" aria-label="वधू जन्म दिन" maxlength="2" required>
@@ -494,7 +494,7 @@
             <input id="matchBrideYear" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="साल (YYYY)" aria-label="वधू जन्म साल" maxlength="4" required>
           </div>
           <label>जन्म समय (घंटा, मिनट और सुबह/शाम)</label><div class="match-time-parts" style="display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px;margin:6px 0 12px"><input id="matchBrideHour" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="घंटा" aria-label="वधू जन्म समय घंटा" required><input id="matchBrideMinute" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="मिनट" aria-label="वधू जन्म समय मिनट" required><select id="matchBridePeriod" aria-label="वधू सुबह या शाम" required><option value="AM">सुबह (AM)</option><option value="PM">शाम (PM)</option></select></div>
-          <label for="matchBridePlace">जन्म स्थान</label><input id="matchBridePlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
+          <label for="matchBridePlace">जन्म स्थान</label><input id="matchBridePlace" type="text" maxlength="150" placeholder="शहर का नाम लिखें (जैसे Amravati)" autocomplete="off" required><div id="matchBridePlaceSuggestions" role="listbox" aria-label="वधू जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:180px;overflow-y:auto"></div>
           <button id="runKundliMatch" type="submit">गुण मिलान करें</button>
           <p id="kundliMatchStatus" role="status" aria-live="polite"></p>
         </form>
@@ -599,6 +599,6 @@
     })();
   </script>
   <script src="/app.js"></script>
-  <script src="/kundli.js?v=7d997ec"></script><script src="/background_resume.js"></script><script src="kundli_matching.js?v=e1822bd"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script>
+  <script src="/kundli.js?v=7d997ec"></script><script src="/background_resume.js"></script><script src="kundli_matching.js?v=place-autocomplete-1"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script>
 </body>
 </html>
