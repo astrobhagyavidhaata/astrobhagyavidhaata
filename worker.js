@@ -30,6 +30,14 @@ function isLockedWifeChart(birthData = {}) {
   return dateMatches && timeMatches && placeMatches;
 }
 
+function limitAnswerLines(value) {
+  const clean = String(value || "").replace(/\r/g, "").trim();
+  if (!clean) return clean;
+  let lines = clean.split("\n").map(line => line.trim()).filter(Boolean);
+  if (lines.length === 1) lines = clean.split(/(?<=[.!?।])\s+/).map(line => line.trim()).filter(Boolean);
+  return lines.slice(0, 4).join("\n");
+}
+
 function createResponse() {
   let statusCode = 200;
   const headers = new Headers();
@@ -155,7 +163,7 @@ export default {
         }, { headers: { "Cache-Control": "no-store" } });
       }
 
-      if (url.pathname === "/api/private-knowledge") {
+      let consultationProtectedProfile = false;\n\n      if (url.pathname === "/api/private-knowledge") {
         return await privateKnowledgeHandler(request, bindings);
       }
 
@@ -186,7 +194,14 @@ export default {
       // Route AI consultation through the shared Gemini handler so chart context,
       // privacy filtering, safety checks, and model fallback stay consistent.
       if (url.pathname === "/api/consultation") {
-        const response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
+        let response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
+        if (!consultationProtectedProfile) {
+          const payload = await response.clone().json().catch(() => null);
+          if (payload && typeof payload.answer === "string") {
+            payload.answer = limitAnswerLines(payload.answer);
+            response = Response.json(payload, { status: response.status, headers: response.headers });
+          }
+        }
         const headers = new Headers(response.headers);
         corsHeaders.forEach((value,key)=>headers.set(key,value));
         return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
