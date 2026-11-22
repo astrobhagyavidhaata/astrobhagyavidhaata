@@ -165,8 +165,11 @@ module.exports=async function(req,res,env={}){
       (normalizedBirthDate === "1997-03-10" &&
       normalizedBirthTime === "21:15" &&
       (placeText.includes("amravati") || placeText.includes("अमरावती") || isAmravatiByCoordinates));
-    const specialRelationshipFocus = specialProfileFocus &&
-      /छोड़|छोड|अलग|तलाक|डाइवोर्स|separat|divorc|break.?up|leave|end relationship/i.test(question);
+    // Speech-to-text sometimes converts "divorce" to "device". Treat it as
+    // divorce intent only when the same question is explicitly about the husband.
+    const divorceIntent = /छोड़|छोड|अलग|तलाक|डाइवोर्स|separat|divorc|device|break.?up|leave|end relationship/i.test(question) &&
+      /पति|पती|husband|spouse|marriage|विवाह|शादी/i.test(question);
+    const specialRelationshipFocus = specialProfileFocus && divorceIntent;
     // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.
     // The excluded profile keeps its separate reference path; do not attach the new global calculation framework.
     if (specialProfileFocus) { chartContext.advancedAstrology = null; if (chartContext.gochar) chartContext.gochar.signPeriods = null; }
@@ -187,6 +190,21 @@ module.exports=async function(req,res,env={}){
     const safeOriginalQuestion=ownerAuthorized?remainingQuestion:suppliedQuestion;
     const ownerInstruction=ownerAuthorized?remainingQuestion:"";
     const privateSafeQuestion=redactQuestion(safeOriginalQuestion,body.chartContext);
+    // HARD LOCK: exact protected-profile divorce questions must use the owner's
+    // saved answer verbatim. Never send these questions to Gemini for rewriting.
+    if (specialProfileFocus && divorceIntent) {
+      const ownerAuthoredAnswer = getProfileSpecificSeparationAnswer();
+      console.info("[PROFILE_LOCK] divorce_intent=true; source=owner_relationship_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer));
+      return res.status(200).json({
+        success: true,
+        answer: ownerAuthoredAnswer || "इस प्रश्न के लिए मालिक का सुरक्षित लिखित फलादेश उपलब्ध नहीं है। इसलिए कोई नया अनुमान नहीं दिया जाएगा।",
+        identity: "Astro vidhata AI",
+        ownerAuthorized,
+        predictionSource: "owner-locked-archive",
+        predictionLocked: true,
+        sanitizedQuestion: privateSafeQuestion
+      });
+    }
     if(ownerAuthorized && !privateSafeQuestion){
       return res.status(200).json({success:true,answer:"Owner Mode प्रमाणित है। अब अगली पंक्ति में अपना निर्देश और जिस प्रश्न की भविष्यवाणी बदलनी है, उसे लिखें।",identity:"Astro vidhata AI",ownerAuthorized:true,sanitizedQuestion:""});
     }
