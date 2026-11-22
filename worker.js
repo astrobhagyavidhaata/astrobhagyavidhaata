@@ -163,7 +163,9 @@ export default {
         }, { headers: { "Cache-Control": "no-store" } });
       }
 
-      let consultationProtectedProfile = false;\n\n      if (url.pathname === "/api/private-knowledge") {
+      let consultationProtectedProfile = false;
+
+      if (url.pathname === "/api/private-knowledge") {
         return await privateKnowledgeHandler(request, bindings);
       }
 
