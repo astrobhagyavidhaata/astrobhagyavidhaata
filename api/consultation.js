@@ -106,7 +106,7 @@ function compactChartContext(source){
     },
     gochar:transit?{
       asOf:transit.asOf,ayanamsa:transit.ayanamsa,houseSystem:transit.houseSystem,
-      accuracyNote:transit.accuracyNote,natalMoonRashi:transit.natalMoonRashi,natalAscendantRashi:transit.natalAscendantRashi,
+      accuracyNote:transit.accuracyNote,signPeriods:transit.signPeriods||null,natalMoonRashi:transit.natalMoonRashi,natalAscendantRashi:transit.natalAscendantRashi,
       planets:(transit.planets||[]).map(p=>({
         name:p.name,longitude:p.longitude,rashi:p.rashi,rashiIndex:p.rashiIndex,degreeInRashi:p.degreeInRashi,
         nakshatra:p.nakshatra,pada:p.pada,navamsa:p.navamsa,houseFromMoon:p.houseFromMoon,houseFromAscendant:p.houseFromAscendant,retrograde:p.retrograde,taraBala:p.taraBala
