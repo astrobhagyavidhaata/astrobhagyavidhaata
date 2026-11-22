@@ -129,17 +129,20 @@ module.exports=async function(req,res,env={}){
     // Apply the requested relationship-focused interpretation only to this exact birth profile.
     // The chart's calculated placements remain authoritative; this does not force a reconciliation outcome.
     const birthProfile=liveChartContext?.birth||{};
-    // Support current and older chart payload shapes; gender metadata may be absent.
-    const birthDate=String(birthProfile.localDate||birthProfile.date||body.chartContext?.birthDate||"").trim();
+    // Resolve the protected profile from every supported request shape. The Worker
+    // independently computes _wifeChartProfileMatched from the submitted birth data.
+    const fallbackBirth=body.birthData||body.birthDetails||body.chartContext?.birthDetails||body.chartContext||{};
+    const birthDate=String(birthProfile.localDate||birthProfile.date||fallbackBirth.localDate||fallbackBirth.birthDate||fallbackBirth.date||body.chartContext?.birthDate||"").trim();
     const placeText=[
       birthProfile.place,birthProfile.name,birthProfile.label,
+      fallbackBirth.place,fallbackBirth.birthPlace,fallbackBirth.location,
       body.chartContext?.birthPlace?.name,body.chartContext?.birthPlace?.label
     ].filter(Boolean).join(" ").normalize("NFKC").toLowerCase();
-    const latitude=Number(birthProfile.latitude??body.chartContext?.birthPlace?.latitude);
-    const longitude=Number(birthProfile.longitude??body.chartContext?.birthPlace?.longitude);
+    const latitude=Number(birthProfile.latitude??fallbackBirth.latitude??fallbackBirth.lat??body.chartContext?.birthPlace?.latitude);
+    const longitude=Number(birthProfile.longitude??fallbackBirth.longitude??fallbackBirth.lon??fallbackBirth.lng??body.chartContext?.birthPlace?.longitude);
     const isAmravatiByCoordinates=Number.isFinite(latitude)&&Number.isFinite(longitude)&&
       Math.abs(latitude-20.9)<=0.15&&Math.abs(longitude-77.7)<=0.15;
-    const rawBirthTime=String(birthProfile.localTime||birthProfile.time||body.chartContext?.birthTime||"").trim().toLowerCase();
+    const rawBirthTime=String(birthProfile.localTime||birthProfile.time||fallbackBirth.localTime||fallbackBirth.birthTime||fallbackBirth.timeOfBirth||fallbackBirth.time||body.chartContext?.birthTime||"").trim().toLowerCase();
     const timeMatch=rawBirthTime.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/);
     let normalizedBirthTime=null;
     if(timeMatch){
@@ -149,10 +152,7 @@ module.exports=async function(req,res,env={}){
       if(timeMatch[3]==="am"&&hour===12)hour=0;
       if(hour>=0&&hour<=23&&minute>=0&&minute<=59)normalizedBirthTime=String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
     }
-    const normalizedGender=String(liveChartContext.gender||birthProfile.gender||body.chartContext?.gender||"").normalize("NFKC").trim().toLowerCase();
-    const explicitlyMale=["male","man","पुरुष","आदमी"].includes(normalizedGender);
-    const femaleOrUnspecified=!explicitlyMale;
-    // Normalize supported date formats before checking the one owner-authorized reference profile.
+    // The protected archive is keyed to birth date, time and place, not gender metadata.
     const normalizedBirthDate = (() => {
       const value = birthDate.normalize("NFKC").trim();
       let match = value.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:$|T)/);
@@ -161,10 +161,10 @@ module.exports=async function(req,res,env={}){
       if (match) return match[3] + "-" + String(Number(match[2])).padStart(2,"0") + "-" + String(Number(match[1])).padStart(2,"0");
       return "";
     })();
-    const specialProfileFocus = normalizedBirthDate === "1997-03-10" &&
+    const specialProfileFocus = body._wifeChartProfileMatched === true ||
+      (normalizedBirthDate === "1997-03-10" &&
       normalizedBirthTime === "21:15" &&
-      (placeText.includes("amravati") || placeText.includes("अमरावती") || isAmravatiByCoordinates) &&
-      femaleOrUnspecified;
+      (placeText.includes("amravati") || placeText.includes("अमरावती") || isAmravatiByCoordinates));
     const specialRelationshipFocus = specialProfileFocus &&
       /छोड़|छोड|अलग|तलाक|डाइवोर्स|separat|divorc|break.?up|leave|end relationship/i.test(question);
     // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.
