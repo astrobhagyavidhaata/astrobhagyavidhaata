@@ -485,7 +485,7 @@
             <input id="matchGroomMonth" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="महीना (MM)" aria-label="वर जन्म महीना" maxlength="2" required>
             <input id="matchGroomYear" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="साल (YYYY)" aria-label="वर जन्म साल" maxlength="4" required>
           </div>
-          <label for="matchGroomTime">जन्म समय</label><input id="matchGroomTime" type="time" required>
+          <label>जन्म समय (घंटा, मिनट और सुबह/शाम)</label><div class="match-time-parts" style="display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px;margin:6px 0 12px"><input id="matchGroomHour" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="घंटा" aria-label="वर जन्म समय घंटा" required><input id="matchGroomMinute" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="मिनट" aria-label="वर जन्म समय मिनट" required><select id="matchGroomPeriod" aria-label="वर सुबह या शाम" required><option value="AM">सुबह (AM)</option><option value="PM">शाम (PM)</option></select></div>
           <label for="matchGroomPlace">जन्म स्थान</label><input id="matchGroomPlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
           <h3>वधू (लड़की)</h3>
           <label for="matchBrideDate">जन्म तारीख</label><div class="match-date-parts" style="display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:8px;margin:6px 0 12px">
@@ -493,7 +493,7 @@
             <input id="matchBrideMonth" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="महीना (MM)" aria-label="वधू जन्म महीना" maxlength="2" required>
             <input id="matchBrideYear" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="साल (YYYY)" aria-label="वधू जन्म साल" maxlength="4" required>
           </div>
-          <label for="matchBrideTime">जन्म समय</label><input id="matchBrideTime" type="time" required>
+          <label>जन्म समय (घंटा, मिनट और सुबह/शाम)</label><div class="match-time-parts" style="display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px;margin:6px 0 12px"><input id="matchBrideHour" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="घंटा" aria-label="वधू जन्म समय घंटा" required><input id="matchBrideMinute" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="मिनट" aria-label="वधू जन्म समय मिनट" required><select id="matchBridePeriod" aria-label="वधू सुबह या शाम" required><option value="AM">सुबह (AM)</option><option value="PM">शाम (PM)</option></select></div>
           <label for="matchBridePlace">जन्म स्थान</label><input id="matchBridePlace" type="text" maxlength="150" placeholder="शहर या गाँव" required>
           <button id="runKundliMatch" type="submit">गुण मिलान करें</button>
           <p id="kundliMatchStatus" role="status" aria-live="polite"></p>
