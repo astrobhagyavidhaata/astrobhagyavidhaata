@@ -21,19 +21,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Use preinstalled Android SDK
-        shell: bash
-        run: |
-          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
-          if [ -z "$SDK_ROOT" ] || [ ! -d "$SDK_ROOT" ]; then
-            echo "GitHub runner Android SDK was not found in ANDROID_HOME or ANDROID_SDK_ROOT."
-            exit 1
-          fi
-          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
-          echo "Using preinstalled Android SDK at: $SDK_ROOT"
-          ls -la "$SDK_ROOT/platforms"
-          ls -la "$SDK_ROOT/build-tools"
       - name: Install Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
