@@ -5,3 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 
 assets = { directory = "./public", binding = "ASSETS" }
 # Redeploy trigger for the latest special-profile reference update.
+
+[[d1_databases]]
+binding = "PRIVATE_KNOWLEDGE_DB"
+database_name = "astro-bhagya-private-knowledge"
+database_id = "532656a2-eb7e-4bfc-b7df-26d0e91a583c"
