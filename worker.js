@@ -168,7 +168,7 @@ export default {
           if (!isLockedWifeChart(birth)) {
             const question = String(incoming.question || incoming.content || "").trim();
             if (question) {
-              const language = String(incoming.language || (/^[\\s\\S]*[\\u0900-\\u097f]/.test(question) ? "hi" : "en"));
+              const language = String(incoming.language || (/[\u0900-\u097f]/.test(question) ? "hi" : "en"));
               const privateAnswer = await privateKnowledgeAnswer(question, language, bindings);
               if (privateAnswer) {
                 const answer = privateAnswer.translationMissing
