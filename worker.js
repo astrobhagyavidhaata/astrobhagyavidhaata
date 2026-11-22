@@ -1,7 +1,8 @@
 import consultationHandler from "./api/consultation.js";
 import kundliHandler from "./api/kundli.js";
 import gocharHandler from "./api/gochar.js";
-import panchangHandler from "./api/panchang.js";\nimport privateKnowledgeHandler, { privateKnowledgeAnswer } from "./api/private-knowledge.js";
+import panchangHandler from "./api/panchang.js";
+import privateKnowledgeHandler, { privateKnowledgeAnswer } from "./api/private-knowledge.js";
 
 // Recognize the explicitly configured birth profile for chart-specific context only.
 function isLockedWifeChart(birthData = {}) {
