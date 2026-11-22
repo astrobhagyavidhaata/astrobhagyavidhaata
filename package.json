@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build:worker": "node --check worker.mjs && node --check server.js && node --check lib/gemini.js && node --check api/consultation.js && node --check kundli.js && node --check public/kundli.js && node --check public/kundli_matching.js && node --check public/ai_chat.js && node --check public/i18n.js && node --check public/kundli-history.js && node --check public/panchang.js && node --check public/gochar.js",
+    "build:worker": "node --check worker.mjs && node --check server.js && node --check lib/gemini.js && node --check api/consultation.js && node --check api/private-knowledge.js && node --check kundli.js && node --check public/kundli.js && node --check public/kundli_matching.js && node --check public/ai_chat.js && node --check public/private-knowledge.js && node --check public/i18n.js && node --check public/kundli-history.js && node --check public/panchang.js && node --check public/gochar.js",
     "check": "find . -path './node_modules' -prune -o -name '*.js' -print0 | xargs -0 -n1 node --check",
     "test": "node --test"
   },
