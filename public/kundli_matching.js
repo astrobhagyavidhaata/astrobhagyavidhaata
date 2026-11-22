@@ -80,8 +80,23 @@
     if(!list.length)throw new Error("यह जन्म स्थान नहीं मिला: "+place);
     const p=list[0];return {name:p.name,region:p.admin1||"",country:p.country||"",country_code:p.country_code||"",latitude:p.latitude,longitude:p.longitude,elevation:p.elevation||null};
   }
+  function normalizeBirthDate(value){
+    const raw=String(value||"").trim();
+    const m=raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+    if(m){
+      const day=Number(m[1]),month=Number(m[2]),year=Number(m[3]);
+      const d=new Date(Date.UTC(year,month-1,day));
+      if(d.getUTCFullYear()!==year||d.getUTCMonth()!==month-1||d.getUTCDate()!==day)throw new Error("कृपया सही जन्म तारीख DD/MM/YYYY में डालें।");
+      return year+"-"+String(month).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+    }
+    if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){
+      const d=new Date(raw+"T00:00:00Z");
+      if(!Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===raw)return raw;
+    }
+    throw new Error("जन्म तारीख DD/MM/YYYY में डालें, जैसे 05/09/2008।");
+  }
   async function buildChart(prefix){
-    const date=$(prefix+"Date").value,time=$(prefix+"Time").value,place=$(prefix+"Place").value.trim();
+    const date=normalizeBirthDate($(prefix+"Date").value),time=$(prefix+"Time").value,place=$(prefix+"Place").value.trim();
     const location=await locate(place);
     const response=await fetch("/api/kundli",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({name:prefix==="matchGroom"?"वर":"वधू",gender:prefix==="matchGroom"?"male":"female",birthDate:date,birthTime:time,birthPlace:location,saveToAccount:false,calculationPreferences:{zodiac:"sidereal",ayanamsa:"lahiri",houseSystem:"whole_sign"}})});
     const data=await response.json().catch(()=>({}));
