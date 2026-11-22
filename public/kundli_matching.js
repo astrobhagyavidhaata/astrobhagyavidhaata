@@ -72,8 +72,49 @@
     const bad=[1,2,4,7,8,12];
     return {fromAsc,fromMoon,ascDosha:bad.includes(fromAsc),moonDosha:bad.includes(fromMoon),dosha:bad.includes(fromAsc)||bad.includes(fromMoon)};
   }
-  async function locate(place){
-    const url="https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(place)+"&count=5&language="+(english()?"en":"hi")+"&format=json";
+  const placeSearchState={};
+  const placeLabel=p=>[p.name,p.admin1,p.country].filter(Boolean).join(", ");
+  async function searchPlaceSuggestions(prefix,query){
+    const input=$(prefix+"Place"),box=$(prefix+"PlaceSuggestions");
+    if(!input||!box)return;
+    const seq=(placeSearchState[prefix]?.seq||0)+1;
+    placeSearchState[prefix]={seq};
+    if(query.trim().length<2){box.replaceChildren();box.style.display="none";return;}
+    try{
+      const url="https://geocoding-api.open-meteo.com/v1/search?"+new URLSearchParams({name:query.trim(),count:"8",language:"en",format:"json"});
+      const response=await fetch(url,{headers:{Accept:"application/json"}});
+      if(!response.ok)throw new Error("स्थान खोज विफल");
+      const data=await response.json();
+      if(placeSearchState[prefix]?.seq!==seq)return;
+      box.replaceChildren();
+      (Array.isArray(data.results)?data.results:[]).forEach(p=>{
+        const button=document.createElement("button");
+        button.type="button";button.setAttribute("role","option");
+        button.textContent=placeLabel(p);
+        button.style.cssText="display:block;width:100%;padding:10px 12px;text-align:left;background:#211a32;color:#fff;border:0;border-bottom:1px solid #493568";
+        button.addEventListener("click",()=>{
+          input.value=placeLabel(p);
+          input.dataset.selectedLocation=JSON.stringify({name:p.name,region:p.admin1||"",country:p.country||"",country_code:p.country_code||"",latitude:p.latitude,longitude:p.longitude,elevation:p.elevation||null});
+          box.replaceChildren();box.style.display="none";
+        });
+        box.appendChild(button);
+      });
+      box.style.display=box.childElementCount?"block":"none";
+    }catch(error){if(placeSearchState[prefix]?.seq===seq){box.replaceChildren();box.style.display="none";}}
+  }
+  function attachPlaceAutocomplete(prefix){
+    const input=$(prefix+"Place"),box=$(prefix+"PlaceSuggestions");
+    if(!input||!box)return;
+    input.addEventListener("input",()=>{
+      delete input.dataset.selectedLocation;
+      searchPlaceSuggestions(prefix,input.value);
+    });
+    input.addEventListener("blur",()=>setTimeout(()=>{box.style.display="none";},180));
+    input.addEventListener("focus",()=>{if(input.value.trim().length>=2)searchPlaceSuggestions(prefix,input.value);});
+  }
+  async function locate(place,selected){
+    if(selected)return selected;
+    const url="https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(place)+"&count=8&language=en&format=json";
     const response=await fetch(url,{headers:{Accept:"application/json"}});
     if(!response.ok)throw new Error("जन्म स्थान खोजा नहीं जा सका: "+place);
     const data=await response.json();const list=data.results||[];
@@ -99,7 +140,8 @@
     const dateParts=[$(prefix+"Date").value,$(prefix+"Month").value,$(prefix+"Year").value];
     if(dateParts.some(v=>!/^\d+$/.test(String(v||"").trim())))throw new Error("कृपया दिन, महीना और चार अंकों का साल अलग-अलग भरें।");
     const date=normalizeBirthDate(dateParts.join("/"));const hourRaw=String($(prefix+"Hour").value||"").trim(),minuteRaw=String($(prefix+"Minute").value||"").trim(),period=$(prefix+"Period").value;const hour=Number(hourRaw),minute=Number(minuteRaw);if(!/^\d{1,2}$/.test(hourRaw)||hour<1||hour>12||!/^\d{1,2}$/.test(minuteRaw)||minute<0||minute>59)throw new Error("कृपया जन्म समय का घंटा 1 से 12 और मिनट 00 से 59 तक भरें।");const hour24=(hour%12)+(period==="PM"?12:0);const time=String(hour24).padStart(2,"0")+":"+String(minute).padStart(2,"0");const place=$(prefix+"Place").value.trim();
-    const location=await locate(place);
+    const selectedLocation=(()=>{try{return JSON.parse($(prefix+"Place").dataset.selectedLocation||"null");}catch(_){return null;}})();
+    const location=await locate(place,selectedLocation);
     const response=await fetch("/api/kundli",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({name:prefix==="matchGroom"?"वर":"वधू",gender:prefix==="matchGroom"?"male":"female",birthDate:date,birthTime:time,birthPlace:location,saveToAccount:false,calculationPreferences:{zodiac:"sidereal",ayanamsa:"lahiri",houseSystem:"whole_sign"}})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok||!data.success||!data.chart)throw new Error(data.message||"जन्म कुंडली की गणना पूरी नहीं हुई।");
@@ -157,6 +199,8 @@
     root.appendChild(renderD1Panel(groom,t("वर","Groom")));root.appendChild(renderD1Panel(bride,t("वधू","Bride")));
   }
   document.addEventListener("DOMContentLoaded",()=>{
+    attachPlaceAutocomplete("matchGroom");
+    attachPlaceAutocomplete("matchBride");
     const form=$("kundliMatchForm");if(!form)return;
     form.addEventListener("submit",async event=>{
       event.preventDefault();
