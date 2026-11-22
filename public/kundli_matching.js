@@ -98,7 +98,7 @@
   async function buildChart(prefix){
     const dateParts=[$(prefix+"Date").value,$(prefix+"Month").value,$(prefix+"Year").value];
     if(dateParts.some(v=>!/^\d+$/.test(String(v||"").trim())))throw new Error("कृपया दिन, महीना और चार अंकों का साल अलग-अलग भरें।");
-    const date=normalizeBirthDate(dateParts.join("/")),time=$(prefix+"Time").value,place=$(prefix+"Place").value.trim();
+    const date=normalizeBirthDate(dateParts.join("/"));const hourRaw=String($(prefix+"Hour").value||"").trim(),minuteRaw=String($(prefix+"Minute").value||"").trim(),period=$(prefix+"Period").value;const hour=Number(hourRaw),minute=Number(minuteRaw);if(!/^\\d{1,2}$/.test(hourRaw)||hour<1||hour>12||!/^\\d{1,2}$/.test(minuteRaw)||minute<0||minute>59)throw new Error("कृपया जन्म समय का घंटा 1 से 12 और मिनट 00 से 59 तक भरें।");const hour24=(hour%12)+(period==="PM"?12:0);const time=String(hour24).padStart(2,"0")+":"+String(minute).padStart(2,"0");const place=$(prefix+"Place").value.trim();
     const location=await locate(place);
     const response=await fetch("/api/kundli",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({name:prefix==="matchGroom"?"वर":"वधू",gender:prefix==="matchGroom"?"male":"female",birthDate:date,birthTime:time,birthPlace:location,saveToAccount:false,calculationPreferences:{zodiac:"sidereal",ayanamsa:"lahiri",houseSystem:"whole_sign"}})});
     const data=await response.json().catch(()=>({}));
