@@ -133,7 +133,8 @@ export default async function handlePrivateKnowledge(request, env = {}) {
   if (request.method === "POST") {
     let body;
     try { body = await request.json(); } catch { return json({ success: false, message: "Invalid request." }, 400); }
-    if (action === "answer") {\n      const result = await findAnswer(String(body.question || ""), String(body.language || "en"), env);\n      if (!result) return json({ success: true, matched: false });\n      return json({ success: true, matched: true, ...result });\n    }\n    if (action === "setup") {
+    if (action === "answer") {
+      const result = await findAnswer(String(body.question || ""), String(body.language || "en"), env);\n      if (!result) return json({ success: true, matched: false });\n      return json({ success: true, matched: true, ...result });\n    }\n    if (action === "setup") {
       const exists = await db.prepare("SELECT id FROM owner_auth WHERE id = 1").first();
       if (exists) return json({ success: false, message: "Owner password is already set. Please log in." }, 409);
       const bootstrap = await db.prepare("SELECT token_hash FROM private_bootstrap WHERE id = 1").first();
