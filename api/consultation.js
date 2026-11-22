@@ -78,6 +78,7 @@ function compactChartContext(source){
     // Birth date is intentionally passed as astrology input; other direct identifiers stay redacted.
     birthDateForAstrology: source.birth?.localDate || null,
     calculation: source.calculation || null,
+    advancedAstrology: source.advancedAstrology || null,
     d1:pickChart(source.d1),
     d9:pickChart(source.d9),
     natalPlanetaryPositions: Object.fromEntries(Object.entries(source.d1?.planets||{}).map(([name,planet])=>[name,pickPlanet(planet)])),
