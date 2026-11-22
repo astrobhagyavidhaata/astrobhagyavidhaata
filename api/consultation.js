@@ -123,7 +123,8 @@ module.exports=async function(req,res,env={}){
     const question=body.question||body.content;
     if(typeof question!=="string"||!question.trim())return res.status(400).json({success:false,message:"कृपया अपना प्रश्न लिखें।"});
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
-    const wantsDetailedMoonTransit = /विस्तृत.*(?:चंद्र|चन्द्र).*गोचर|चंद्र.*गोचर.*रिपोर्ट|चन्द्र.*गोचर.*रिपोर्ट|detailed.*moon.*transit|moon.*transit.*report/i.test(question);\n    const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date(), {includeTransitDates:wantsDetailedMoonTransit});
+    const wantsDetailedMoonTransit = /विस्तृत.*(?:चंद्र|चन्द्र).*गोचर|चंद्र.*गोचर.*रिपोर्ट|चन्द्र.*गोचर.*रिपोर्ट|detailed.*moon.*transit|moon.*transit.*report/i.test(question);
+    const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date(), {includeTransitDates:wantsDetailedMoonTransit});
     const chartContext=compactChartContext(liveChartContext);
     // Apply the requested relationship-focused interpretation only to this exact birth profile.
     // The chart's calculated placements remain authoritative; this does not force a reconciliation outcome.
