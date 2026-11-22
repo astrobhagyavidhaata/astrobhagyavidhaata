@@ -96,7 +96,9 @@
     throw new Error("जन्म तारीख DD/MM/YYYY में डालें, जैसे 05/09/2008।");
   }
   async function buildChart(prefix){
-    const date=normalizeBirthDate($(prefix+"Date").value),time=$(prefix+"Time").value,place=$(prefix+"Place").value.trim();
+    const dateParts=[$(prefix+"Date").value,$(prefix+"Month").value,$(prefix+"Year").value];
+    if(dateParts.some(v=>!/^\d+$/.test(String(v||"").trim())))throw new Error("कृपया दिन, महीना और चार अंकों का साल अलग-अलग भरें।");
+    const date=normalizeBirthDate(dateParts.join("/")),time=$(prefix+"Time").value,place=$(prefix+"Place").value.trim();
     const location=await locate(place);
     const response=await fetch("/api/kundli",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({name:prefix==="matchGroom"?"वर":"वधू",gender:prefix==="matchGroom"?"male":"female",birthDate:date,birthTime:time,birthPlace:location,saveToAccount:false,calculationPreferences:{zodiac:"sidereal",ayanamsa:"lahiri",houseSystem:"whole_sign"}})});
     const data=await response.json().catch(()=>({}));
