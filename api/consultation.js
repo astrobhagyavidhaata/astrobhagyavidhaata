@@ -78,6 +78,7 @@ function compactChartContext(source){
     // Birth date is intentionally passed as astrology input; other direct identifiers stay redacted.
     birthDateForAstrology: source.birth?.localDate || null,
     calculation: source.calculation || null,
+    ashtakavarga: source.ashtakavarga || null,
     advancedAstrology: source.advancedAstrology || null,
     d1:pickChart(source.d1),
     d9:pickChart(source.d9),
@@ -165,7 +166,9 @@ module.exports=async function(req,res,env={}){
       femaleOrUnspecified;
     const specialRelationshipFocus = specialProfileFocus &&
       /छोड़|छोड|अलग|तलाक|डाइवोर्स|separat|divorc|break.?up|leave|end relationship/i.test(question);
-    // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.\    // Keep the explicitly excluded 10-Mar-1997 profile outside the new global calculation framework.\n    if (specialProfileFocus) chartContext.advancedAstrology = null;\nn    // Keep the chart holder name separate from astrological facts; use it only for respectful personalization.
+    // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.
+    // The excluded profile keeps its separate reference path; do not attach the new global calculation framework.
+    if (specialProfileFocus) chartContext.advancedAstrology = null;
     const personName=String(liveChartContext?.name || body.chartContext?.name || "").trim().slice(0,100);
     // Choose output language from the actual question: Devanagari and Hinglish are Hindi.
     const lowerQuestion=question.toLowerCase();
