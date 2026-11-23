@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { getProfilePersonalityReference, getProfileSpecificSeparationAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileHusbandWorkAnswer } = require("../lib/relationship-reference");
+const { getProfilePersonalityReference, getProfileSpecificSeparationAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileHusbandWorkAnswer, areProfilePredictionsLocked } = require("../lib/relationship-reference");
 
 test("combined Hinglish capability and husband question returns both topics", () => {
   const answer = getProfilePersonalityReference(true, "Main kya kya kar sakti hun aur Mera Pati kaisa hai");
@@ -100,4 +100,12 @@ test("all locked profile topics return only their matching owner-authored paragr
   const husband = getProfileHusbandWorkAnswer(true, "Mera pati kaisa hoga aur kya kaam karega?");
   assert.match(husband, /^आपकी जन्म कुंडली के सप्तम भाव/);
   assert.equal(getProfileHusbandWorkAnswer(true, "मेरा स्वभाव कैसा है?"), "");
+});
+
+
+test("locked birth profile serves its saved owner answers instead of globally blocking predictions", () => {
+  assert.equal(areProfilePredictionsLocked(), false);
+  const answer = getProfileNatureAnswer(true, "Mera nature kaisa hai?");
+  assert.match(answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव/);
+  assert.equal(answer.split("\\n\\n").length, 2);
 });
