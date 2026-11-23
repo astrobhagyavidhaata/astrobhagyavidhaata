@@ -876,6 +876,17 @@
 
     const chart=saved.chart;
     if(!chart||typeof chart!=="object")return;
+    // Older saved charts may not carry their birth metadata. Restore it from the
+    // saved birth record so the consultation Worker can match the exact profile.
+    const savedLocation=saved.location||{};
+    chart.birth={
+      ...(chart.birth&&typeof chart.birth==="object"?chart.birth:{}),
+      localDate:chart.birth?.localDate||details.localDate||details.date||"",
+      localTime:chart.birth?.localTime||details.localTime||details.time||"",
+      place:chart.birth?.place||[savedLocation.name||details.place,savedLocation.admin1,savedLocation.country].filter(Boolean).join(", "),
+      latitude:chart.birth?.latitude??savedLocation.latitude??details.latitude,
+      longitude:chart.birth?.longitude??savedLocation.longitude??details.longitude
+    };
     window.AstroKundli=chart;
     window.AstroLockedProfileRule=matchesSpecialBirthProfile(details,loc||{name:details.place})?"TULA_1997_03_10_AMRAVATI":null;
     renderMainKundliChart(chart);
