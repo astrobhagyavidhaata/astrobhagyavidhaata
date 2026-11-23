@@ -195,13 +195,15 @@ module.exports=async function(req,res,env={}){
     // Dasha records are returned verbatim from the dedicated archive; relationship
     // separation questions use the owner's saved answer. Never fall through to Gemini.
     if (specialProfileFocus) {
-      const ownerPersonalityAnswer = getProfilePersonalityReference(true, question);
-      const ownerDashaAnswer = !ownerPersonalityAnswer ? getProfileDashaPrediction(true, question) : "";
-      const ownerRelationshipAnswer = !ownerPersonalityAnswer && !ownerDashaAnswer && divorceIntent
+      // Dasha questions have their own single-paragraph authored answer and must
+      // be checked before topic/personality matching.
+      const ownerDashaAnswer = getProfileDashaPrediction(true, question, personName);
+      const ownerPersonalityAnswer = !ownerDashaAnswer ? getProfilePersonalityReference(true, question) : "";
+      const ownerRelationshipAnswer = !ownerDashaAnswer && !ownerPersonalityAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer()
         : "";
-      const ownerAuthoredAnswer = ownerPersonalityAnswer || ownerDashaAnswer || ownerRelationshipAnswer;
-      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerPersonalityAnswer ? "personality" : ownerDashaAnswer ? "dasha" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
+      const ownerAuthoredAnswer = ownerDashaAnswer || ownerPersonalityAnswer || ownerRelationshipAnswer;
+      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerPersonalityAnswer ? "topic" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
       return res.status(200).json({
         success: true,
         answer: ownerAuthoredAnswer || "इस प्रश्न का मालिक-लिखित उत्तर अभी विशेष संग्रह में दर्ज नहीं है। इसलिए इस कुंडली के लिए कोई सामान्य AI अनुमान नहीं दिया जाएगा।",
