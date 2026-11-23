@@ -223,16 +223,20 @@ module.exports=async function(req,res,env={}){
         ? getProfilePersonalityReference(true, question)
         : "";
       const ownerAuthoredAnswer = ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
-      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
-      return res.status(200).json({
-        success: true,
-        answer: ownerAuthoredAnswer || "इस प्रश्न का सटीक ज्योतिषीय उत्तर देने के लिए अभी पर्याप्त कुंडली-संबंधी जानकारी उपलब्ध नहीं है। कृपया अपना प्रश्न थोड़ा स्पष्ट करें।",
-        identity: "Astro vidhata AI",
-        ownerAuthorized,
-        predictionSource: "owner-locked-archive",
-        predictionLocked: true,
-        sanitizedQuestion: privateSafeQuestion
-      });
+      console.info("[PROFILE_PRIORITY] source=owner_archive; owner_answer_found=" + Boolean(ownerAuthoredAnswer) + "; gemini_fallback=" + !ownerAuthoredAnswer + "; type=" + (ownerDashaAnswer ? "dasha" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
+      // Always return the owner's exact saved text first. Gemini is only used
+      // when this profile has no authored answer matching the user's question.
+      if (ownerAuthoredAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: ownerAuthoredAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-locked-archive",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
     }
     if(ownerAuthorized && !privateSafeQuestion){
       return res.status(200).json({success:true,answer:"Owner Mode प्रमाणित है। अब अगली पंक्ति में अपना निर्देश और जिस प्रश्न की भविष्यवाणी बदलनी है, उसे लिखें।",identity:"Astro vidhata AI",ownerAuthorized:true,sanitizedQuestion:""});
