@@ -863,21 +863,9 @@
       set("birthTime",details.time||"");
       set("birthPlace",details.place||"");
 
-      // Keep the visible date/time selectors synchronized with their hidden form values.
-      if(/^\d{4}-\d{2}-\d{2}$/.test(details.date||"")){
-        const [year,month,day]=details.date.split("-");
-        set("dobDay",String(Number(day)));
-        set("dobMonth",String(Number(month)));
-        set("dobYear",year);
-      }
-      if(/^\d{2}:\d{2}$/.test(details.time||"")){
-        let [hour,minute]=details.time.split(":").map(Number);
-        const ampm=hour>=12?"PM":"AM";
-        hour=hour%12||12;
-        set("birthHour",String(hour));
-        set("birthMinute",String(minute).padStart(2,"0"));
-        set("birthAmPm",ampm);
-      }
+      // Restore the visible mobile-friendly selectors from the saved ISO values.
+      window.AstroBirthInputs?.setDate(details.date||"");
+      window.AstroBirthInputs?.setTime(details.time||"");
     }
 
     const loc=saved.location;
