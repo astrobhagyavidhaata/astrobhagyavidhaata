@@ -29,6 +29,20 @@ test("Hindi combined capability and husband question returns both topics", () =>
   assert.match(answer, /आपके पति का स्वभाव/);
 });
 
+
+test("partner habits question gets a distinct habit-focused answer", () => {
+  const answer = getProfilePersonalityReference(true, "मेरे पार्टनर में क्या-क्या आदतें होंगी");
+  assert.match(answer, /जिम्मेदारी लेना/);
+  assert.match(answer, /ध्यान रखना/);
+  assert.match(answer, /जिद/);
+  assert.ok(!answer.startsWith("आपका जीवनसाथी साहसी"));
+});
+
+test("partner personality question keeps the general personality answer", () => {
+  const answer = getProfilePersonalityReference(true, "मेरा पार्टनर कैसा होगा");
+  assert.match(answer, /^आपका जीवनसाथी साहसी/);
+});
+
 test("disabled profile does not expose owner-authored profile answer", () => {
   assert.equal(getProfilePersonalityReference(false, "Mera Pati kaisa hai"), "");
 });
