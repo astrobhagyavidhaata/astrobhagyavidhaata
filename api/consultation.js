@@ -2,7 +2,7 @@
 
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
-const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer}=require("../lib/relationship-reference");
+const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
@@ -193,6 +193,17 @@ module.exports=async function(req,res,env={}){
     const safeOriginalQuestion=ownerAuthorized?remainingQuestion:suppliedQuestion;
     const ownerInstruction=ownerAuthorized?remainingQuestion:"";
     const privateSafeQuestion=redactQuestion(safeOriginalQuestion,body.chartContext);
+    // The owner can later reopen this profile by changing the single lock switch; no archived paragraph is deleted.
+    if (specialProfileFocus && areProfilePredictionsLocked() && !ownerAuthorized) {
+      return res.status(200).json({
+        success: true,
+        answer: "यह जन्म कुंडली फिलहाल मालिक द्वारा लॉक की गई है। इस कुंडली की भविष्यवाणियाँ अभी उपलब्ध नहीं हैं।",
+        identity: "Astro vidhata AI",
+        predictionLocked: true,
+        predictionSource: "owner-profile-access-lock",
+        sanitizedQuestion: ""
+      });
+    }
     // HARD LOCK: this exact birth profile may receive ONLY owner-authored text.
     // Dasha records are returned verbatim from the dedicated archive; relationship
     // separation questions use the owner's saved answer. Never fall through to Gemini.
