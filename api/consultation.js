@@ -169,7 +169,7 @@ module.exports=async function(req,res,env={}){
     // Speech-to-text sometimes converts "divorce" to "device". Treat it as
     // divorce intent only when the same question is explicitly about the husband.
     const divorceIntent = /छोड़|छोड|अलग|तलाक|डाइवोर्स|separat|divorc|device|break.?up|leave|end relationship/i.test(question) &&
-      /पति|पती|husband|spouse|marriage|विवाह|शादी/i.test(question);
+      /पति|पती|partner|पार्टनर|जीवनसाथी|husband|spouse|marriage|विवाह|शादी|relationship/i.test(question);
     const specialRelationshipFocus = specialProfileFocus && divorceIntent;
     // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.
     // The excluded profile keeps its separate reference path; do not attach the new global calculation framework.
@@ -198,11 +198,14 @@ module.exports=async function(req,res,env={}){
       // Dasha questions have their own single-paragraph authored answer and must
       // be checked before topic/personality matching.
       const ownerDashaAnswer = getProfileDashaPrediction(true, question, personName);
-      const ownerPersonalityAnswer = !ownerDashaAnswer ? getProfilePersonalityReference(true, question) : "";
-      const ownerRelationshipAnswer = !ownerDashaAnswer && !ownerPersonalityAnswer && divorceIntent
+      // Divorce/separation intent must win over the generic partner-topic matcher.
+      const ownerRelationshipAnswer = !ownerDashaAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer()
         : "";
-      const ownerAuthoredAnswer = ownerDashaAnswer || ownerPersonalityAnswer || ownerRelationshipAnswer;
+      const ownerPersonalityAnswer = !ownerDashaAnswer && !ownerRelationshipAnswer
+        ? getProfilePersonalityReference(true, question)
+        : "";
+      const ownerAuthoredAnswer = ownerDashaAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
       console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerPersonalityAnswer ? "topic" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
       return res.status(200).json({
         success: true,
