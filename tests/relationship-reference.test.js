@@ -67,7 +67,9 @@ test("owner-written exact paragraph is returned for husband personality and work
   const { getProfileHusbandWorkAnswer } = require("../lib/relationship-reference");
   const answer = getProfileHusbandWorkAnswer(true, "Mera pati kaisa hoga aur kya kaam karta hoga?");
   assert.match(answer, /^आपकी जन्म कुंडली के सप्तम भाव/);
-  assert.match(answer, /मशीनरी लाइन एस्ट्रोलॉजी ऑनलाइन दुनिया सॉफ्टवेयर/);
+  assert.match(answer, /अत्यंत निडर, स्वाभिमानी, तेज बुद्धि वाला/);
+  assert.match(answer, /आपके सामने बार-बार झुक जाएगा और रिश्ते को बचाने के लिए आपसे माफियां भी मांगेगा/);
+  assert.match(answer, /बाहरी दुनिया व कार्यक्षेत्र में भी बड़ा लाभ और तरक्की प्राप्त होगी/);
   assert.equal(getProfileHusbandWorkAnswer(false, "Mera pati kaisa hoga"), "");
 });
 
