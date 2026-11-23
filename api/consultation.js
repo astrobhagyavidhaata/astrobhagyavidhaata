@@ -170,8 +170,8 @@ module.exports=async function(req,res,env={}){
     // divorce intent only when the same question is explicitly about the husband.
     const divorceIntent = (
       /छोड़|छोड|अलग|तलाक|डाइवोर्स|बदनामी|बदनाम|प्रतिष्ठा|अपमान|हंस रहे|हँस रहे|separat|divorc|devorc|divors|devors|device|break.?up|leave|end relationship|badnaam|badnami|reputation|insult|alag|chhod|chod|separate hona|alag hona|alag rehna|alag rahna|talaq|divorce lena/i.test(question) ||
-      /\\b(?:se|to)\\s+(?:leave|separate|divorce)|\\b(?:lena|len[a-z]*)\\s+chahti|\\b(?:chahti|chahta)\\s+hun/i.test(question)
-    ) && /पति|पती|\\bpati\\b|\\bpatidev\\b|partner|पार्टनर|जीवनसाथी|husband|spouse|marriage|विवाह|शादी|relationship/i.test(question);
+      /\b(?:se|to)\s+(?:leave|separate|divorce)|\b(?:lena|len[a-z]*)\s+chahti|\b(?:chahti|chahta)\s+hun/i.test(question)
+    ) && /पति|पती|\bpati\b|\bpatidev\b|partner|पार्टनर|जीवनसाथी|husband|spouse|marriage|विवाह|शादी|relationship/i.test(question);
     const specialRelationshipFocus = specialProfileFocus && divorceIntent;
     // Never return a stored prediction verbatim; all questions are answered dynamically from relevant retrieved notes and the live chart.
     // The excluded profile keeps its separate reference path; do not attach the new global calculation framework.
