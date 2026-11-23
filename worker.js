@@ -9,11 +9,13 @@ function isLockedWifeChart(birthData = {}) {
   if (!birthData || typeof birthData !== "object") return false;
   const dateRaw = String(birthData.localDate || birthData.birthDate || birthData.dateOfBirth || birthData.dob || "").trim().toLowerCase();
   const date = dateRaw.replace(/\s+/g, " ");
-  const dateMatches = ["1997-03-10", "10/03/1997", "10-03-1997", "10 march 1997", "10 mar 1997"].includes(date);
+  const isoDate = date.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|t)/);
+  const dateMatches = ["1997-03-10", "10/03/1997", "10-03-1997", "10 march 1997", "10 mar 1997"].includes(date) ||
+    Boolean(isoDate && isoDate[1] === "1997" && Number(isoDate[2]) === 3 && Number(isoDate[3]) === 10);
   const timeRaw = String(birthData.localTime || birthData.birthTime || birthData.timeOfBirth || birthData.time || "").trim().toLowerCase();
   const time = timeRaw.replace(/\s+/g, " ");
   let minutes = null;
-  const hm = time.match(/^(\d{1,2}):(\d{2})(?:\s*(am|pm))?$/);
+  const hm = time.match(/^(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:\s*(am|pm))?$/);
   if (hm) {
     let hour = Number(hm[1]);
     const minute = Number(hm[2]);
@@ -22,9 +24,10 @@ function isLockedWifeChart(birthData = {}) {
     if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) minutes = hour * 60 + minute;
   }
   const timeMatches = minutes !== null && Math.abs(minutes - (21 * 60 + 15)) <= 1;
-  const place = String(birthData.place || birthData.birthPlace || birthData.location || "").normalize("NFKC").toLowerCase();
-  const lat = Number(birthData.latitude ?? birthData.lat);
-  const lon = Number(birthData.longitude ?? birthData.lon ?? birthData.lng);
+  const location = birthData.location && typeof birthData.location === "object" ? birthData.location : {};
+  const place = String(birthData.place || birthData.birthPlace || location.name || location.label || birthData.location || "").normalize("NFKC").toLowerCase();
+  const lat = Number(birthData.latitude ?? birthData.lat ?? location.latitude);
+  const lon = Number(birthData.longitude ?? birthData.lon ?? birthData.lng ?? location.longitude);
   const placeMatches = place.includes("amravati") ||
     (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat - 20.9) <= 0.15 && Math.abs(lon - 77.7) <= 0.15);
   return dateMatches && timeMatches && placeMatches;
@@ -199,8 +202,8 @@ export default {
         // The exact owner-authorized profile must not be cut down to the generic four-line limit.
         try {
           const incoming = await request.clone().json();
-          const birth = incoming.chartContext?.birth || incoming.birthData || incoming.chartContext || {};
-          consultationProtectedProfile = isLockedWifeChart(birth);
+          const birth = incoming.chartContext?.birth || incoming.birthData || incoming.birthDetails || incoming.chartContext || {};
+          consultationProtectedProfile = incoming.lockedProfileRule === "TULA_1997_03_10_AMRAVATI" || isLockedWifeChart(birth);
         } catch (_) {
           consultationProtectedProfile = false;
         }
