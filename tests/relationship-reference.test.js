@@ -107,5 +107,5 @@ test("locked birth profile serves its saved owner answers instead of globally bl
   assert.equal(areProfilePredictionsLocked(), false);
   const answer = getProfileNatureAnswer(true, "Mera nature kaisa hai?");
   assert.match(answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव/);
-  assert.equal(answer.split("\\n\\n").length, 2);
+  assert.equal(answer.split(/\\n\\n/).length, 2);
 });
