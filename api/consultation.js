@@ -3,6 +3,7 @@
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const {getProfileSpecificSeparationAnswer}=require("../lib/relationship-reference");
+const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
 const PRIVATE_FIELD_KEYS = new Set([
@@ -190,14 +191,19 @@ module.exports=async function(req,res,env={}){
     const safeOriginalQuestion=ownerAuthorized?remainingQuestion:suppliedQuestion;
     const ownerInstruction=ownerAuthorized?remainingQuestion:"";
     const privateSafeQuestion=redactQuestion(safeOriginalQuestion,body.chartContext);
-    // HARD LOCK: exact protected-profile divorce questions must use the owner's
-    // saved answer verbatim. Never send these questions to Gemini for rewriting.
-    if (specialProfileFocus && divorceIntent) {
-      const ownerAuthoredAnswer = getProfileSpecificSeparationAnswer();
-      console.info("[PROFILE_LOCK] divorce_intent=true; source=owner_relationship_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer));
+    // HARD LOCK: this exact birth profile may receive ONLY owner-authored text.
+    // Dasha records are returned verbatim from the dedicated archive; relationship
+    // separation questions use the owner's saved answer. Never fall through to Gemini.
+    if (specialProfileFocus) {
+      const ownerDashaAnswer = getProfileDashaPrediction(true, question);
+      const ownerRelationshipAnswer = !ownerDashaAnswer && divorceIntent
+        ? getProfileSpecificSeparationAnswer()
+        : "";
+      const ownerAuthoredAnswer = ownerDashaAnswer || ownerRelationshipAnswer;
+      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
       return res.status(200).json({
         success: true,
-        answer: ownerAuthoredAnswer || "इस प्रश्न के लिए मालिक का सुरक्षित लिखित फलादेश उपलब्ध नहीं है। इसलिए कोई नया अनुमान नहीं दिया जाएगा।",
+        answer: ownerAuthoredAnswer || "इस प्रश्न का मालिक-लिखित उत्तर अभी विशेष संग्रह में दर्ज नहीं है। इसलिए इस कुंडली के लिए कोई सामान्य AI अनुमान नहीं दिया जाएगा।",
         identity: "Astro vidhata AI",
         ownerAuthorized,
         predictionSource: "owner-locked-archive",
