@@ -61,7 +61,7 @@
     h2{color:#f5c66b;font-size:19px;margin-top:0}
     h3{color:#f5c66b;font-size:16px;margin:18px 0 8px}
     label{display:block;margin:16px 0 7px;color:#e6d9f5;font-size:14px}
-    input,select,textarea{width:100%;padding:13px;border-radius:8px;border:1px solid #66547f;background:#151020;color:#fff;font-size:16px}
+    input,select,textarea{width:100%;padding:13px;border-radius:8px;border:1px solid #66547f;background:#151020;color:#fff;font-size:16px}\n    input[type="date"],input[type="time"]{display:block;min-height:48px;width:100%;color-scheme:light;font:inherit;appearance:auto;-webkit-appearance:auto} input[type="date"]::-webkit-calendar-picker-indicator,input[type="time"]::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer}
     button{width:100%;padding:14px;border:0;border-radius:9px;background:#e8b957;color:#211638;font-size:16px;font-weight:bold;cursor:pointer;margin-top:18px}
     button:disabled{opacity:.6;cursor:not-allowed}
     .secondary{background:#493568;color:white}
@@ -359,67 +359,18 @@
     <section class="panel app-page-panel" data-app-page="kundli">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
-        <label>जन्म तारीख</label>
-        <div class="birth-date-selects" style="display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:8px">
-          <input id="dobDay" type="number" inputmode="numeric" min="1" max="31" value="24" placeholder="दिन" aria-label="जन्म का दिन" required>
-          <input id="dobMonth" type="number" inputmode="numeric" min="1" max="12" value="7" placeholder="महीना (1–12)" aria-label="जन्म का महीना (1 से 12)" required>
-          <input id="dobYear" type="number" inputmode="numeric" min="1" max="2030" value="1990" placeholder="वर्ष जैसे 1990" aria-label="जन्म का साल" required>
-        </div>
-        <input id="dob" name="dob" type="hidden">
+        <label for="dob">जन्म तारीख</label>
+        <input id="dob" name="dob" type="date" autocomplete="bday" required>
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="birthGender">लिंग</label>
         <select id="birthGender" name="gender" required><option value="">लिंग चुनें</option><option value="male">पुरुष</option><option value="female">महिला</option></select>
-        <label>जन्म समय</label>
-        <div class="birth-time-selects" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-          <select id="birthHour" aria-label="जन्म का घंटा" required><option value="">घंटा</option></select>
-          <select id="birthMinute" aria-label="जन्म के मिनट" required><option value="">मिनट</option></select>
-          <select id="birthAmPm" aria-label="सुबह या शाम" required><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select>
-        </div>
-        <input id="birthTime" name="birthTime" type="hidden">
+        <label for="birthTime">जन्म समय</label>
+        <input id="birthTime" name="birthTime" type="time" autocomplete="off" required>
         <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
         <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली इस ब्राउज़र में सुरक्षित करें</label>
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
-      <script>
-      (() => {
-        const byId = id => document.getElementById(id);
-        const day = byId("dobDay"), month = byId("dobMonth"), year = byId("dobYear");
-        const hour = byId("birthHour"), minute = byId("birthMinute"), ampm = byId("birthAmPm");
-        if (!day || !month || !year || !hour || !minute || !ampm) return;
-        for (let n = 1; n <= 12; n++) hour.add(new Option(String(n), String(n)));
-        for (let n = 0; n <= 59; n++) minute.add(new Option(String(n).padStart(2, "0"), String(n).padStart(2, "0")));
-        hour.value = "8";
-        minute.value = "30";
-        ampm.value = "AM";
-        const updateDate = () => {
-          const d = Number(day.value), m = Number(month.value), y = Number(year.value);
-          const target = byId("dob");
-          if (m >= 1 && m <= 12 && y >= 1) {
-            const maxDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
-            day.max = String(maxDay);
-          } else {
-            day.max = "31";
-          }
-          if (!d || !m || !y || m > 12 || d > 31 || y > 2030) { target.value = ""; return; }
-          const check = new Date(Date.UTC(y, m - 1, d));
-          target.value = check.getUTCFullYear() === y && check.getUTCMonth() === m - 1 && check.getUTCDate() === d
-            ? y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0") : "";
-        };
-        const updateTime = () => {
-          if (!hour.value || minute.value === "" || !ampm.value) { byId("birthTime").value = ""; return; }
-          let h = Number(hour.value) % 12;
-          if (ampm.value === "PM") h += 12;
-          byId("birthTime").value = String(h).padStart(2, "0") + ":" + minute.value;
-        };
-        [day, month, year].forEach(el => {
-          el.addEventListener("input", updateDate);
-          el.addEventListener("change", updateDate);
-        });
-        [hour, minute, ampm].forEach(el => el.addEventListener("change", updateTime));
-        updateDate();
-        updateTime();
-      })();
-      </script>
+      
       <div id="message" role="status" aria-live="polite"></div>
       <section id="aiAstrologer" class="ai-astrologer" aria-labelledby="aiAstrologerTitle">
         <h2 id="aiAstrologerTitle">✨ ज्योतिष AI</h2>
