@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { getProfilePersonalityReference } = require("../lib/relationship-reference");
+const { getProfilePersonalityReference, getProfileSpecificSeparationAnswer } = require("../lib/relationship-reference");
 
 test("combined Hinglish capability and husband question returns both topics", () => {
   const answer = getProfilePersonalityReference(true, "Main kya kya kar sakti hun aur Mera Pati kaisa hai");
@@ -45,4 +45,19 @@ test("partner personality question keeps the general personality answer", () => 
 
 test("disabled profile does not expose owner-authored profile answer", () => {
   assert.equal(getProfilePersonalityReference(false, "Mera Pati kaisa hai"), "");
+});
+
+
+test("direct Roman Hindi husband divorce question gets the detailed saved separation analysis", () => {
+  const answer = getProfileSpecificSeparationAnswer("Kya Main Apne Pati se Devorce le sakti hun");
+  assert.match(answer, /वर्तमान में आपके लिए पति से कानूनी अलगाव या तलाक का योग नहीं बनता है/);
+  assert.match(answer, /तारा बल/);
+  assert.match(answer, /नवांश कुंडली में/);
+  assert.ok(!answer.includes("नवांश नवांश में"));
+});
+
+test("direct Roman Hindi question asking whether she can give divorce gets the same dedicated answer", () => {
+  const answer = getProfileSpecificSeparationAnswer("Maine poochha Main Apne pati ko divorce de sakti hun nahin de sakti");
+  assert.match(answer, /कानूनी अलगाव या तलाक का योग नहीं बनता/);
+  assert.match(answer, /दशा प्रभाव/);
 });
