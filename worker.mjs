@@ -7,12 +7,12 @@ import panchangHandler from "./api/panchang.js";
 function isLockedWifeChart(birthData = {}) {
   if (!birthData || typeof birthData !== "object") return false;
   const dateRaw = String(birthData.localDate || birthData.birthDate || birthData.dateOfBirth || birthData.dob || "").trim().toLowerCase();
-  const date = dateRaw.replace(/\\s+/g, " ");
+  const date = dateRaw.replace(/\s+/g, " ");
   const dateMatches = ["1997-03-10", "10/03/1997", "10-03-1997", "10 march 1997", "10 mar 1997"].includes(date);
   const timeRaw = String(birthData.localTime || birthData.birthTime || birthData.timeOfBirth || birthData.time || "").trim().toLowerCase();
-  const time = timeRaw.replace(/\\s+/g, " ");
+  const time = timeRaw.replace(/\s+/g, " ");
   let minutes = null;
-  const hm = time.match(/^(\\d{1,2}):(\\d{2})(?:\\s*(am|pm))?$/);
+  const hm = time.match(/^(\d{1,2}):(\d{2})(?:\s*(am|pm))?$/);
   if (hm) {
     let hour = Number(hm[1]);
     const minute = Number(hm[2]);
