@@ -209,7 +209,7 @@ module.exports=async function(req,res,env={}){
       console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerPersonalityAnswer ? "topic" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
       return res.status(200).json({
         success: true,
-        answer: ownerAuthoredAnswer || "इस प्रश्न का मालिक-लिखित उत्तर अभी विशेष संग्रह में दर्ज नहीं है। इसलिए इस कुंडली के लिए कोई सामान्य AI अनुमान नहीं दिया जाएगा।",
+        answer: ownerAuthoredAnswer || "इस प्रश्न का सटीक ज्योतिषीय उत्तर देने के लिए अभी पर्याप्त कुंडली-संबंधी जानकारी उपलब्ध नहीं है। कृपया अपना प्रश्न थोड़ा स्पष्ट करें।",
         identity: "Astro vidhata AI",
         ownerAuthorized,
         predictionSource: "owner-locked-archive",
