@@ -8,11 +8,13 @@ function isLockedWifeChart(birthData = {}) {
   if (!birthData || typeof birthData !== "object") return false;
   const dateRaw = String(birthData.localDate || birthData.birthDate || birthData.dateOfBirth || birthData.dob || "").trim().toLowerCase();
   const date = dateRaw.replace(/\s+/g, " ");
-  const dateMatches = ["1997-03-10", "10/03/1997", "10-03-1997", "10 march 1997", "10 mar 1997"].includes(date);
+  const isoDate = date.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|t)/);
+  const dateMatches = ["1997-03-10", "10/03/1997", "10-03-1997", "10 march 1997", "10 mar 1997"].includes(date) ||
+    Boolean(isoDate && isoDate[1] === "1997" && Number(isoDate[2]) === 3 && Number(isoDate[3]) === 10);
   const timeRaw = String(birthData.localTime || birthData.birthTime || birthData.timeOfBirth || birthData.time || "").trim().toLowerCase();
   const time = timeRaw.replace(/\s+/g, " ");
   let minutes = null;
-  const hm = time.match(/^(\d{1,2}):(\d{2})(?:\s*(am|pm))?$/);
+  const hm = time.match(/^(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:\s*(am|pm))?$/);
   if (hm) {
     let hour = Number(hm[1]);
     const minute = Number(hm[2]);
@@ -21,9 +23,10 @@ function isLockedWifeChart(birthData = {}) {
     if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) minutes = hour * 60 + minute;
   }
   const timeMatches = minutes !== null && Math.abs(minutes - (21 * 60 + 15)) <= 1;
-  const place = String(birthData.place || birthData.birthPlace || birthData.location || "").normalize("NFKC").toLowerCase();
-  const lat = Number(birthData.latitude ?? birthData.lat);
-  const lon = Number(birthData.longitude ?? birthData.lon ?? birthData.lng);
+  const location = birthData.location && typeof birthData.location === "object" ? birthData.location : {};
+  const place = String(birthData.place || birthData.birthPlace || birthData.location?.name || birthData.location?.label || birthData.location || "").normalize("NFKC").toLowerCase();
+  const lat = Number(birthData.latitude ?? birthData.lat ?? location.latitude);
+  const lon = Number(birthData.longitude ?? birthData.lon ?? birthData.lng ?? location.longitude);
   const placeMatches = place.includes("amravati") ||
     (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat - 20.9) <= 0.15 && Math.abs(lon - 77.7) <= 0.15);
   return dateMatches && timeMatches && placeMatches;
@@ -56,7 +59,9 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
     ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(parsedBody, key)).map(key => [key, parsedBody[key]]))
     : parsedBody;
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
-    const profileMatched = isLockedWifeChart(parsedBody.chartContext?.birth || parsedBody.birthData || parsedBody.chartContext || {});
+    const profileHint = parsedBody.lockedProfileRule === "TULA_1997_03_10_AMRAVATI";
+    const chartBirth = parsedBody.chartContext?.birth || parsedBody.birthData || parsedBody.birthDetails || parsedBody.chartContext || {};
+    const profileMatched = profileHint || isLockedWifeChart(chartBirth);
     safeBody._wifeChartProfileMatched = profileMatched;
     safeBody.lockedProfileRule = profileMatched ? "TULA_1997_03_10_AMRAVATI" : null;
     safeBody.specialInstruction = profileMatched ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।" : "";
