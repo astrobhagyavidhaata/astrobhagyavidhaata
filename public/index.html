@@ -61,7 +61,13 @@
     h2{color:#f5c66b;font-size:19px;margin-top:0}
     h3{color:#f5c66b;font-size:16px;margin:18px 0 8px}
     label{display:block;margin:16px 0 7px;color:#e6d9f5;font-size:14px}
-    input,select,textarea{width:100%;padding:13px;border-radius:8px;border:1px solid #66547f;background:#151020;color:#fff;font-size:16px}\n    input[type="date"],input[type="time"]{display:block;min-height:48px;width:100%;color-scheme:light;font:inherit;appearance:auto;-webkit-appearance:auto} input[type="date"]::-webkit-calendar-picker-indicator,input[type="time"]::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer}
+    input,select,textarea{width:100%;padding:13px;border-radius:8px;border:1px solid #66547f;background:#151020;color:#fff;font-size:16px}
+    .birth-input-grid{display:grid;gap:8px;margin:6px 0 12px}
+    .birth-date-grid{grid-template-columns:1fr 1.25fr 1.35fr}
+    .birth-time-grid{grid-template-columns:1fr 1fr 1.25fr}
+    .birth-input-grid select{min-width:0;min-height:52px;padding:12px 9px;font-size:16px;background:#fff;color:#252525;border:1px solid #b9a9ca;border-radius:10px;touch-action:manipulation}
+    .birth-input-grid select:focus,#birthPlace:focus{outline:3px solid rgba(232,185,87,.45);border-color:#b87915}
+    @media(max-width:360px){.birth-input-grid{gap:6px}.birth-input-grid select{padding:10px 6px;font-size:15px}}\n    input[type="date"],input[type="time"]{display:block;min-height:48px;width:100%;color-scheme:light;font:inherit;appearance:auto;-webkit-appearance:auto} input[type="date"]::-webkit-calendar-picker-indicator,input[type="time"]::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer}
     button{width:100%;padding:14px;border:0;border-radius:9px;background:#e8b957;color:#211638;font-size:16px;font-weight:bold;cursor:pointer;margin-top:18px}
     button:disabled{opacity:.6;cursor:not-allowed}
     .secondary{background:#493568;color:white}
@@ -359,14 +365,24 @@
     <section class="panel app-page-panel" data-app-page="kundli">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
-        <label for="dob">जन्म तारीख</label>
-        <input id="dob" name="dob" type="date" autocomplete="bday" required>
+        <label>जन्म तारीख</label>
+        <div class="birth-input-grid birth-date-grid" role="group" aria-label="जन्म तारीख चुनें">
+          <select id="dobDay" aria-label="जन्म का दिन" required><option value="">दिन</option></select>
+          <select id="dobMonth" aria-label="जन्म का महीना" required><option value="">महीना</option></select>
+          <select id="dobYear" aria-label="जन्म का साल" required><option value="">साल</option></select>
+        </div>
+        <input id="dob" name="dob" type="hidden">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="birthGender">लिंग</label>
         <select id="birthGender" name="gender" required><option value="">लिंग चुनें</option><option value="male">पुरुष</option><option value="female">महिला</option></select>
-        <label for="birthTime">जन्म समय</label>
-        <input id="birthTime" name="birthTime" type="time" autocomplete="off" required>
-        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे Ludhiana)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
+        <label>जन्म समय</label>
+        <div class="birth-input-grid birth-time-grid" role="group" aria-label="जन्म समय चुनें">
+          <select id="birthHour" aria-label="जन्म का घंटा" required><option value="">घंटा</option></select>
+          <select id="birthMinute" aria-label="जन्म के मिनट" required><option value="">मिनट</option></select>
+          <select id="birthAmPm" aria-label="सुबह या शाम" required><option value="">सुबह / शाम</option><option value="AM">सुबह</option><option value="PM">शाम</option></select>
+        </div>
+        <input id="birthTime" name="birthTime" type="hidden">
+        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे: अमरावती, दिल्ली, शिमला)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
         <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली इस ब्राउज़र में सुरक्षित करें</label>
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
@@ -595,6 +611,7 @@
       activate(0);
     })();
   </script>
+  <script src="/birth-inputs.js"></script>
   <script src="/app.js"></script>
   <script src="/kundli.js?v=7d997ec"></script><script src="/background_resume.js"></script><script src="kundli_matching.js?v=koota-meaning-1"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script><script src="/private-knowledge.js?v=1"></script>
 </body>
