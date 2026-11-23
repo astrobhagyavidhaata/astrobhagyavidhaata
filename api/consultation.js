@@ -195,8 +195,7 @@ module.exports=async function(req,res,env={}){
     // Dasha records are returned verbatim from the dedicated archive; relationship
     // separation questions use the owner's saved answer. Never fall through to Gemini.
     if (specialProfileFocus) {
-      const personalityIntent = /स्वभाव|नेचर|nature|personality|मिजाज|व्यवहार|आदत|कैसा\s*हूँ|कैसी\s*हूँ|कैसा\s*है|कैसी\s*है|mere bare|mere baare|about me/i.test(question);
-      const ownerPersonalityAnswer = personalityIntent ? getProfilePersonalityReference(true) : "";
+      const ownerPersonalityAnswer = getProfilePersonalityReference(true, question);
       const ownerDashaAnswer = !ownerPersonalityAnswer ? getProfileDashaPrediction(true, question) : "";
       const ownerRelationshipAnswer = !ownerPersonalityAnswer && !ownerDashaAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer()
