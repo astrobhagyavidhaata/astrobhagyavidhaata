@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { getProfilePersonalityReference, getProfileSpecificSeparationAnswer, getProfileNatureAnswer, getProfileHabitsAnswer } = require("../lib/relationship-reference");
+const { getProfilePersonalityReference, getProfileSpecificSeparationAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileHusbandWorkAnswer } = require("../lib/relationship-reference");
 
 test("combined Hinglish capability and husband question returns both topics", () => {
   const answer = getProfilePersonalityReference(true, "Main kya kya kar sakti hun aur Mera Pati kaisa hai");
@@ -87,4 +87,15 @@ test("owner-written exact habits paragraph is returned for locked profile habits
   assert.match(answer, /आपका मूड किसी मौसम की तरह बहुत तेजी से बदलता है/);
   assert.match(answer, /रचनात्मक कार्य, सजने-संवरने/);
   assert.equal(getProfileHabitsAnswer(false, "मेरी आदतें कैसी हैं?"), "");
+});
+
+test("all locked profile topics return only their matching owner-authored paragraph", () => {
+  const occult = getProfileOccultAnswer(true, "मुझे तंत्र-मंत्र और गूढ़ विद्याओं का शौक है?");
+  assert.match(occult, /^आपकी जन्म कुंडली के अनुसार आपके भीतर सामान्य लोगों/);
+  assert.match(occult, /Sixth Sense/);
+  assert.equal(getProfileOccultAnswer(true, "मेरी आदतें कैसी हैं?"), "");
+
+  const husband = getProfileHusbandWorkAnswer(true, "Mera pati kaisa hoga aur kya kaam karega?");
+  assert.match(husband, /^आपकी जन्म कुंडली के सप्तम भाव/);
+  assert.equal(getProfileHusbandWorkAnswer(true, "मेरा स्वभाव कैसा है?"), "");
 });
