@@ -2,7 +2,7 @@
 
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
-const {getProfileSpecificSeparationAnswer}=require("../lib/relationship-reference");
+const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
@@ -195,12 +195,14 @@ module.exports=async function(req,res,env={}){
     // Dasha records are returned verbatim from the dedicated archive; relationship
     // separation questions use the owner's saved answer. Never fall through to Gemini.
     if (specialProfileFocus) {
-      const ownerDashaAnswer = getProfileDashaPrediction(true, question);
-      const ownerRelationshipAnswer = !ownerDashaAnswer && divorceIntent
+      const personalityIntent = /स्वभाव|नेचर|nature|personality|मिजाज|व्यवहार|आदत|कैसा\s*हूँ|कैसी\s*हूँ|कैसा\s*है|कैसी\s*है|mere bare|mere baare|about me/i.test(question);
+      const ownerPersonalityAnswer = personalityIntent ? getProfilePersonalityReference(true) : "";
+      const ownerDashaAnswer = !ownerPersonalityAnswer ? getProfileDashaPrediction(true, question) : "";
+      const ownerRelationshipAnswer = !ownerPersonalityAnswer && !ownerDashaAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer()
         : "";
-      const ownerAuthoredAnswer = ownerDashaAnswer || ownerRelationshipAnswer;
-      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
+      const ownerAuthoredAnswer = ownerPersonalityAnswer || ownerDashaAnswer || ownerRelationshipAnswer;
+      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerPersonalityAnswer ? "personality" : ownerDashaAnswer ? "dasha" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
       return res.status(200).json({
         success: true,
         answer: ownerAuthoredAnswer || "इस प्रश्न का मालिक-लिखित उत्तर अभी विशेष संग्रह में दर्ज नहीं है। इसलिए इस कुंडली के लिए कोई सामान्य AI अनुमान नहीं दिया जाएगा।",
