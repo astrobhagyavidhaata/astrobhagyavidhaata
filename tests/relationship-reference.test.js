@@ -61,3 +61,12 @@ test("direct Roman Hindi question asking whether she can give divorce gets the s
   assert.match(answer, /कानूनी अलगाव या तलाक का योग नहीं बनता/);
   assert.match(answer, /दशा प्रभाव/);
 });
+
+
+test("owner-written exact paragraph is returned for husband personality and work questions", () => {
+  const { getProfileHusbandWorkAnswer } = require("../lib/relationship-reference");
+  const answer = getProfileHusbandWorkAnswer(true, "Mera pati kaisa hoga aur kya kaam karta hoga?");
+  assert.match(answer, /^आपकी जन्म कुंडली के सप्तम भाव/);
+  assert.match(answer, /मशीनरी लाइन एस्ट्रोलॉजी ऑनलाइन दुनिया सॉफ्टवेयर/);
+  assert.equal(getProfileHusbandWorkAnswer(false, "Mera pati kaisa hoga"), "");
+});
