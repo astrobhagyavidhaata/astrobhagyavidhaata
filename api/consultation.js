@@ -202,7 +202,7 @@ module.exports=async function(req,res,env={}){
       const ownerDashaAnswer = getProfileDashaPrediction(true, question, personName);
       // Divorce/separation intent must win over the generic partner-topic matcher.
       const ownerRelationshipAnswer = !ownerDashaAnswer && divorceIntent
-        ? getProfileSpecificSeparationAnswer()
+        ? getProfileSpecificSeparationAnswer(question)
         : "";
       const ownerPersonalityAnswer = !ownerDashaAnswer && !ownerRelationshipAnswer
         ? getProfilePersonalityReference(true, question)
