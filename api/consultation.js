@@ -2,7 +2,7 @@
 
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
-const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference}=require("../lib/relationship-reference");
+const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
@@ -200,15 +200,16 @@ module.exports=async function(req,res,env={}){
       // Dasha questions have their own single-paragraph authored answer and must
       // be checked before topic/personality matching.
       const ownerDashaAnswer = getProfileDashaPrediction(true, question, personName);
+      const ownerHusbandWorkAnswer = !ownerDashaAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
       // Divorce/separation intent must win over the generic partner-topic matcher.
-      const ownerRelationshipAnswer = !ownerDashaAnswer && divorceIntent
+      const ownerRelationshipAnswer = !ownerDashaAnswer && !ownerHusbandWorkAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer(question)
         : "";
-      const ownerPersonalityAnswer = !ownerDashaAnswer && !ownerRelationshipAnswer
+      const ownerPersonalityAnswer = !ownerDashaAnswer && !ownerHusbandWorkAnswer && !ownerRelationshipAnswer
         ? getProfilePersonalityReference(true, question)
         : "";
-      const ownerAuthoredAnswer = ownerDashaAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
-      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerPersonalityAnswer ? "topic" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
+      const ownerAuthoredAnswer = ownerDashaAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
+      console.info("[PROFILE_LOCK] source=owner_archive; gemini_bypassed=true; answer_found=" + Boolean(ownerAuthoredAnswer) + "; type=" + (ownerDashaAnswer ? "dasha" : ownerHusbandWorkAnswer ? "husband-work" : ownerPersonalityAnswer ? "topic" : ownerRelationshipAnswer ? "relationship" : "unmapped"));
       return res.status(200).json({
         success: true,
         answer: ownerAuthoredAnswer || "इस प्रश्न का सटीक ज्योतिषीय उत्तर देने के लिए अभी पर्याप्त कुंडली-संबंधी जानकारी उपलब्ध नहीं है। कृपया अपना प्रश्न थोड़ा स्पष्ट करें।",
