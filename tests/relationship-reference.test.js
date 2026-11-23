@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { getProfilePersonalityReference, getProfileSpecificSeparationAnswer, getProfileNatureAnswer } = require("../lib/relationship-reference");
+const { getProfilePersonalityReference, getProfileSpecificSeparationAnswer, getProfileNatureAnswer, getProfileHabitsAnswer } = require("../lib/relationship-reference");
 
 test("combined Hinglish capability and husband question returns both topics", () => {
   const answer = getProfilePersonalityReference(true, "Main kya kya kar sakti hun aur Mera Pati kaisa hai");
@@ -78,4 +78,13 @@ test("owner-written two-paragraph nature answer is returned for locked profile n
   assert.match(answer, /आपकी जन्म कुंडली में मन, भावनाओं और सोच के स्तर पर/);
   assert.equal(answer.split("\n\n").length, 2);
   assert.equal(getProfileNatureAnswer(false, "मेरा नेचर कैसा है?"), "");
+});
+
+
+test("owner-written exact habits paragraph is returned for locked profile habits questions", () => {
+  const answer = getProfileHabitsAnswer(true, "मेरी आदतें कैसी हैं?");
+  assert.match(answer, /^आपकी जन्म कुंडली के अनुसार आपके व्यक्तित्व और दैनिक व्यवहार/);
+  assert.match(answer, /आपका मूड किसी मौसम की तरह बहुत तेजी से बदलता है/);
+  assert.match(answer, /रचनात्मक कार्य, सजने-संवरने/);
+  assert.equal(getProfileHabitsAnswer(false, "मेरी आदतें कैसी हैं?"), "");
 });
