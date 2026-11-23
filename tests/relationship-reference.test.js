@@ -76,6 +76,6 @@ test("owner-written two-paragraph nature answer is returned for locked profile n
   const answer = getProfileNatureAnswer(true, "मेरा नेचर कैसा है?");
   assert.match(answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव/);
   assert.match(answer, /आपकी जन्म कुंडली में मन, भावनाओं और सोच के स्तर पर/);
-  assert.equal(answer.split("\\n\\n").length, 2);
+  assert.equal(answer.split("\n\n").length, 2);
   assert.equal(getProfileNatureAnswer(false, "मेरा नेचर कैसा है?"), "");
 });
