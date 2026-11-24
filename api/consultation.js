@@ -132,6 +132,13 @@ module.exports=async function(req,res,env={}){
     const question=body.question||body.content;
     if(typeof question!=="string"||!question.trim())return res.status(400).json({success:false,message:"कृपया अपना प्रश्न लिखें।"});
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
+    const priorUserQuestions = Array.isArray(body.conversationHistory)
+      ? body.conversationHistory.filter(item => item?.role === "user" || item?.role === "human").map(item => String(item?.content || ""))
+      : [];
+    const isContinuationPrompt = value => /^(?:और|aur|aur bhi|और भी|आगे|aage|isko|इसे|थोड़ा और|thoda aur|continue|more|next|detail|विस्तार|आगे बताओ|aur batao|aage batao)/i.test(String(value || "").trim());
+    const archiveQuestion = isContinuationPrompt(question)
+      ? ([...priorUserQuestions].reverse().find(value => !isContinuationPrompt(value)) || question)
+      : question;
     const wantsDetailedMoonTransit = /विस्तृत.*(?:चंद्र|चन्द्र).*गोचर|चंद्र.*गोचर.*रिपोर्ट|चन्द्र.*गोचर.*रिपोर्ट|detailed.*moon.*transit|moon.*transit.*report/i.test(question);
     const liveChartContext=buildLiveAstrologyContext(body.chartContext, new Date(), {includeTransitDates:wantsDetailedMoonTransit});
     const chartContext=compactChartContext(liveChartContext);
@@ -221,7 +228,7 @@ module.exports=async function(req,res,env={}){
       // The 10-Mar-1987 profile has its own parent/maternal-family archive.
       // Do not route it through the separate 1997 relationship/dasha archive.
       if (!parents1987ProfileFocus) {
-        const ownerParents1997Answer = getProfileParents1997Answer(true, question);
+        const ownerParents1997Answer = getProfileParents1997Answer(true, archiveQuestion);
         if (ownerParents1997Answer) {
           return res.status(200).json({
             success: true,
@@ -270,7 +277,7 @@ module.exports=async function(req,res,env={}){
       }
       // Career/work questions for the protected 1997 profile return the owner's
       // complete saved career analysis verbatim, before other broad topic matchers.
-      const ownerCareerDirectAnswer = getProfileCareer1997Answer(specialProfileFocus && !parents1987ProfileFocus, question);
+      const ownerCareerDirectAnswer = getProfileCareer1997Answer(specialProfileFocus && !parents1987ProfileFocus, archiveQuestion);
       if (ownerCareerDirectAnswer) {
         return res.status(200).json({
           success: true,
@@ -284,7 +291,7 @@ module.exports=async function(req,res,env={}){
       }
       // Nature questions for the protected 1997 profile bypass broad topic/dasha/gochar
       // matchers and return the owner's exact saved text before any Gemini fallback.
-      const ownerNatureDirectAnswer = getProfileNatureAnswer(true, question);
+      const ownerNatureDirectAnswer = getProfileNatureAnswer(true, archiveQuestion);
       if (ownerNatureDirectAnswer) {
         return res.status(200).json({
           success: true,
@@ -301,7 +308,7 @@ module.exports=async function(req,res,env={}){
       // before broad dasha/gochar matchers can execute or Gemini can be called.
       // Exact archived Mahadasha/Antardasha readings must win before relationship
       // intent matchers, so a dasha question cannot be hijacked by the divorce answer.
-      const ownerDashaDirectAnswer = getProfileDashaPrediction(specialProfileFocus, question, personName);
+      const ownerDashaDirectAnswer = getProfileDashaPrediction(specialProfileFocus, archiveQuestion, personName);
       if (ownerDashaDirectAnswer) {
         return res.status(200).json({
           success: true,
@@ -314,7 +321,7 @@ module.exports=async function(req,res,env={}){
         });
       }
       // Exact saved divorce conclusion takes priority for the protected Amravati birth profile.
-      const ownerDivorceDirectAnswer = getProfileDivorceAnswer(specialProfileFocus, question);
+      const ownerDivorceDirectAnswer = getProfileDivorceAnswer(specialProfileFocus, archiveQuestion);
       if (ownerDivorceDirectAnswer) {
         return res.status(200).json({
           success: true,
@@ -328,9 +335,9 @@ module.exports=async function(req,res,env={}){
       }
       // A direct "what is my partner like?" question must receive the dedicated
       // owner-authored husband/partner profile, not the unrelated separation conclusion.
-      const isExplicitPartnerProfileQuestion = /पार्टनर|partner|spouse|जीवनसाथी/i.test(question);
+      const isExplicitPartnerProfileQuestion = /पार्टनर|partner|spouse|जीवनसाथी/i.test(archiveQuestion);
       const earlyHusbandWorkAnswer = isExplicitPartnerProfileQuestion
-        ? getProfileHusbandWorkAnswer(true, question)
+        ? getProfileHusbandWorkAnswer(true, archiveQuestion)
         : "";
       if (earlyHusbandWorkAnswer) {
         return res.status(200).json({
@@ -343,7 +350,7 @@ module.exports=async function(req,res,env={}){
           sanitizedQuestion: privateSafeQuestion
         });
       }
-      const lockedMarriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|(?:^|[^a-z])(?:pati|patidev|husband|wife|spouse|partner)(?:$|[^a-z])|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|तलाक|डाइवोर्स|डिवोर्स|अलगाव|separation|divorc|break.?up/i.test(question) &&
+      const lockedMarriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|(?:^|[^a-z])(?:pati|patidev|husband|wife|spouse|partner)(?:$|[^a-z])|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|तलाक|डाइवोर्स|डिवोर्स|अलगाव|separation|divorc|break.?up/i .test(archiveQuestion) &&
         !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
       if (lockedMarriageIntent) {
         // Use the canonical explicit separation wording to retrieve the full
@@ -365,7 +372,7 @@ module.exports=async function(req,res,env={}){
       // Direct husband/marriage and divorce questions must bypass broad transit/dasha
       // matchers. These exact owner-authored archives are returned without Gemini.
       const ownerSeparationDirectAnswer = divorceIntent
-        ? getProfileSpecificSeparationAnswer(question)
+        ? getProfileSpecificSeparationAnswer(archiveQuestion)
         : "";
       if (ownerSeparationDirectAnswer) {
         return res.status(200).json({
@@ -381,7 +388,7 @@ module.exports=async function(req,res,env={}){
       // An unrelated question must not be sent to Gemini for this profile.
       // It may proceed only if it belongs to one of the explicitly archived topics.
       const hasArchivedTopicIntent = /नेचर|स्वभाव|व्यक्तित्व|nature|personality|आदत|habits?|तंत्र|मंत्र|occult|dream|सपना|स्वप्न|माँ|मां|माता|पिता|परिवार|भाई|बहन|parents|family|health|स्वास्थ्य|बीमारी|गुस्सा|क्रोध|anger|hidden.?money|छुपे? पैसे|गहने|धन|गोचर|transit|शनि|राहु|केतु|दशा|महादशा|अंतर्दशा|antar.?dasha|dasha|पति|पती|pati|husband|पत्नी|जीवनसाथी|partner|विवाह|शादी|marriage|relationship|तलाक|divorce|separation/i.test(question);
-      if (!hasArchivedTopicIntent) {
+      if (!hasArchivedTopicIntent && !isContinuationPrompt(question)) {
         return res.status(200).json({
           success: true,
           answer: "इस विशेष जन्म-कुंडली के लिए आपके पूछे गए इस विषय का मालिक द्वारा लिखा हुआ विश्लेषण अभी संग्रह में उपलब्ध नहीं है। इसलिए कोई नया या अनुमानित उत्तर नहीं दिया जाएगा।",
@@ -395,33 +402,33 @@ module.exports=async function(req,res,env={}){
       // Dasha questions have their own single-paragraph authored answer and must
       // be checked before topic/personality matching.
       // Gochar/sibling/father transit text must be matched before dasha's broad planet-name matcher.
-      const ownerParentsAnswer = getProfileParentsPrediction(true, question);
-      const ownerDreamsAnswer = !ownerParentsAnswer ? getProfileDreamsAnswer(true, question) : "";
-      const ownerExternalWomanAnswer = !ownerParentsAnswer && !ownerDreamsAnswer ? getProfileExternalWomanAnswer(true, question) : "";
-      const ownerAngerHealthAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer ? getProfileAngerHealthAnswer(true, question) : "";
-      const ownerHiddenMoneyAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer ? getProfileHiddenMoneyAnswer(true, question) : "";
-      const ownerGocharAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer ? getProfileGocharPrediction(true, question) : "";
-      const ownerDashaAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, question, personName) : "";
+      const ownerParentsAnswer = getProfileParentsPrediction(true, archiveQuestion);
+      const ownerDreamsAnswer = !ownerParentsAnswer ? getProfileDreamsAnswer(true, archiveQuestion) : "";
+      const ownerExternalWomanAnswer = !ownerParentsAnswer && !ownerDreamsAnswer ? getProfileExternalWomanAnswer(true, archiveQuestion) : "";
+      const ownerAngerHealthAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer ? getProfileAngerHealthAnswer(true, archiveQuestion) : "";
+      const ownerHiddenMoneyAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer ? getProfileHiddenMoneyAnswer(true, archiveQuestion) : "";
+      const ownerGocharAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer ? getProfileGocharPrediction(true, archiveQuestion) : "";
+      const ownerDashaAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, archiveQuestion, personName) : "";
       const priorUserQuestions = Array.isArray(body.conversationHistory)
         ? body.conversationHistory.filter(item => item?.role === "user" || item?.role === "human").map(item => String(item?.content || ""))
         : [];
       const lastPriorUserQuestion = priorUserQuestions.at(-1) || "";
       const isNatureFollowUp = /^(?:और|aur|और भी|aur bhi|इसको|isko|इसे|ise|थोड़ा|thoda|ज्यादा|zyada|detail|विस्तार|aur detail|aur gahrai|और गहराई|और विस्तार|समझाओ|samjhao|बताओ|batao)/i.test(question.trim()) &&
         /नेचर|स्वभाव|व्यक्तित्व|nature|personality|mera nature|meri nature|main kaisi|main kaisa|mera swabhav/i.test(lastPriorUserQuestion);
-      const natureQuestion = isNatureFollowUp ? lastPriorUserQuestion : question;
-      const ownerOccultAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, question) : "";
-      const ownerHabitsAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
+      const natureQuestion = archiveQuestion;
+      const ownerOccultAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, archiveQuestion) : "";
+      const ownerHabitsAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, archiveQuestion) : "";
       const ownerNatureAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, natureQuestion) : "";
       // Restore the original exact-profile marriage lock: all husband/partner/
       // marriage-life questions use the saved no-separation analysis verbatim.
       // Career/work questions retain their separate owner-authored husband-work answer.
       const marriageIntent = lockedMarriageIntent;
       const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && marriageIntent
-        ? getProfileSpecificSeparationAnswer(question)
+        ? getProfileSpecificSeparationAnswer(archiveQuestion)
         : "";
-      const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerRelationshipAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
+      const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerRelationshipAnswer ? getProfileHusbandWorkAnswer(true, archiveQuestion) : "";
       const ownerPersonalityAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerRelationshipAnswer && !ownerHusbandWorkAnswer
-        ? getProfilePersonalityReference(true, question)
+        ? getProfilePersonalityReference(true, archiveQuestion)
         : "";
       const ownerAuthoredAnswer = ownerParentsAnswer || ownerDreamsAnswer || ownerExternalWomanAnswer || ownerAngerHealthAnswer || ownerHiddenMoneyAnswer || ownerGocharAnswer || ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
       console.info("[PROFILE_PRIORITY] source=owner_archive; owner_answer_found=" + Boolean(ownerAuthoredAnswer) + "; gemini_fallback=" + !ownerAuthoredAnswer + "; type=" + (ownerParentsAnswer ? "parents-family" : ownerDreamsAnswer ? "dreams" : ownerExternalWomanAnswer ? "external-woman" : ownerAngerHealthAnswer ? "anger-health" : ownerHiddenMoneyAnswer ? "hidden-money" : ownerGocharAnswer ? "gochar" : ownerDashaAnswer ? "dasha" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
