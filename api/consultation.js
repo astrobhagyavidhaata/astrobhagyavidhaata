@@ -268,7 +268,10 @@ module.exports=async function(req,res,env={}){
       const lockedMarriageIntent = /विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|तलाक|डाइवोर्स|डिवोर्स|अलगाव|separation|divorc|break.?up|पति.{0,20}(?:आदत|व्यवहार|कैसा व्यवहार)|(?:आदत|व्यवहार).{0,20}पति|husband.{0,20}(?:habit|behavio)|(?:habit|behavio).{0,20}husband|partner.{0,20}(?:habit|behavio)|(?:habit|behavio).{0,20}partner/i.test(question) &&
         !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
       if (lockedMarriageIntent) {
-        const ownerMarriageDirectAnswer = getProfileSpecificSeparationAnswer(question);
+        // Use the canonical explicit separation wording to retrieve the full
+        // saved marriage conclusion even when the customer asks only "married life"
+        // or "what is my husband like?".
+        const ownerMarriageDirectAnswer = getProfileSpecificSeparationAnswer("क्या मैं अपने पति को छोड़ सकती हूं या तलाक ले सकती हूं?");
         if (ownerMarriageDirectAnswer) {
           return res.status(200).json({
             success: true,
