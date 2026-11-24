@@ -248,6 +248,20 @@ module.exports=async function(req,res,env={}){
           sanitizedQuestion: privateSafeQuestion
         });
       }
+      // Nature questions for the protected 1997 profile bypass broad topic/dasha/gochar
+      // matchers and return the owner's exact saved text before any Gemini fallback.
+      const ownerNatureDirectAnswer = getProfileNatureAnswer(true, question);
+      if (ownerNatureDirectAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: ownerNatureDirectAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-locked-nature-verbatim",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
       // Dasha questions have their own single-paragraph authored answer and must
       // be checked before topic/personality matching.
       // Gochar/sibling/father transit text must be matched before dasha's broad planet-name matcher.
