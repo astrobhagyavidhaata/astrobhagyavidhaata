@@ -68,7 +68,7 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
     ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(parsedBody, key)).map(key => [key, parsedBody[key]]))
     : parsedBody;
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
-    safeBody._wifeChartProfileMatched = isLockedWifeChart(parsedBody.chartContext?.birth || parsedBody.birthData || parsedBody.birthDetails || parsedBody.chartContext || {});
+    safeBody._wifeChartProfileMatched = isLockedWifeChart(parsedBody.birthData || parsedBody.chartContext?.birth || parsedBody.birthDetails || parsedBody.chartContext || {});
   }
   const headers = Object.fromEntries(request.headers.entries());
   const req = {
@@ -207,7 +207,7 @@ export default {
         } catch (_) {
           consultationProtectedProfile = false;
         }
-        let response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
+        let response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "birthData", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
         if (!consultationProtectedProfile) {
           const payload = await response.clone().json().catch(() => null);
           if (payload && typeof payload.answer === "string") {
