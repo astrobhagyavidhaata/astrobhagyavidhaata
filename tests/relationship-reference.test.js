@@ -306,3 +306,15 @@ test("Cloudflare Worker ignores a forged profile flag for a different birth char
   assert.equal(response.status, 503);
   assert.notEqual(payload.predictionLocked, true);
 });
+
+
+test("owner-authored nature matcher accepts short Hindi, Roman Hindi, and generic self-description prompts", () => {
+  const expected = getProfileNatureAnswer(true, "मेरा नेचर कैसा है?");
+  for (const wording of [
+    "nature", "swabhav", "स्वभाव", "व्यक्तित्व",
+    "Mera nature Kaisa hoga", "mere bare me batao",
+    "mere baare mein batao", "Tell me about me"
+  ]) {
+    assert.equal(getProfileNatureAnswer(true, wording), expected, `nature wording did not route: ${wording}`);
+  }
+});
