@@ -4,7 +4,7 @@ const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
-const {getProfileGocharPrediction}=require("../lib/profile-gochar-predictions");
+const {getProfileGocharPrediction,getProfileParentsPrediction}=require("../lib/profile-gochar-predictions");
 const {getProfileParentsAnswer}=require("../lib/profile-parents-1987");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
@@ -250,9 +250,10 @@ module.exports=async function(req,res,env={}){
       // Dasha questions have their own single-paragraph authored answer and must
       // be checked before topic/personality matching.
       // Gochar/sibling/father transit text must be matched before dasha's broad planet-name matcher.
-      const ownerGocharAnswer = getProfileGocharPrediction(true, question);
-      const ownerDashaAnswer = !ownerGocharAnswer ? getProfileDashaPrediction(true, question, personName) : "";
-      const ownerOccultAnswer = !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, question) : "";
+      const ownerParentsAnswer = getProfileParentsPrediction(true, question);
+      const ownerGocharAnswer = !ownerParentsAnswer ? getProfileGocharPrediction(true, question) : "";
+      const ownerDashaAnswer = !ownerParentsAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, question, personName) : "";
+      const ownerOccultAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, question) : "";
       const ownerHabitsAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
       const ownerNatureAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, question) : "";
       const ownerHusbandWorkAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
@@ -263,8 +264,8 @@ module.exports=async function(req,res,env={}){
       const ownerPersonalityAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && !ownerRelationshipAnswer
         ? getProfilePersonalityReference(true, question)
         : "";
-      const ownerAuthoredAnswer = ownerGocharAnswer || ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
-      console.info("[PROFILE_PRIORITY] source=owner_archive; owner_answer_found=" + Boolean(ownerAuthoredAnswer) + "; gemini_fallback=" + !ownerAuthoredAnswer + "; type=" + (ownerGocharAnswer ? "gochar" : ownerDashaAnswer ? "dasha" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
+      const ownerAuthoredAnswer = ownerParentsAnswer || ownerGocharAnswer || ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
+      console.info("[PROFILE_PRIORITY] source=owner_archive; owner_answer_found=" + Boolean(ownerAuthoredAnswer) + "; gemini_fallback=" + !ownerAuthoredAnswer + "; type=" + (ownerParentsAnswer ? "parents-family" : ownerGocharAnswer ? "gochar" : ownerDashaAnswer ? "dasha" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
       // Always return the owner's exact saved text first. Gemini is only used
       // when this profile has no authored answer matching the user's question.
       if (ownerAuthoredAnswer) {
