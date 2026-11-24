@@ -282,11 +282,16 @@ module.exports=async function(req,res,env={}){
       const ownerOccultAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, question) : "";
       const ownerHabitsAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
       const ownerNatureAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, natureQuestion) : "";
-      const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
-      const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && divorceIntent
+      // Restore the original exact-profile marriage lock: all husband/partner/
+      // marriage-life questions use the saved no-separation analysis verbatim.
+      // Career/work questions retain their separate owner-authored husband-work answer.
+      const marriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|\\bpati\\b|\\bpatidev\\b|\\bhusband\\b|\\bwife\\b|\\bspouse\\b|\\bpartner\\b|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता/i.test(question) &&
+        !/काम|नौकरी|व्यवसाय|करियर|career|\\bjob\\b|\\bwork\\b|profession|business|पेशा/i.test(question);
+      const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && marriageIntent
         ? getProfileSpecificSeparationAnswer(question)
         : "";
-      const ownerPersonalityAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && !ownerRelationshipAnswer
+      const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerRelationshipAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
+      const ownerPersonalityAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerRelationshipAnswer && !ownerHusbandWorkAnswer
         ? getProfilePersonalityReference(true, question)
         : "";
       const ownerAuthoredAnswer = ownerParentsAnswer || ownerDreamsAnswer || ownerExternalWomanAnswer || ownerAngerHealthAnswer || ownerHiddenMoneyAnswer || ownerGocharAnswer || ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
@@ -303,7 +308,8 @@ module.exports=async function(req,res,env={}){
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: ownerNatureAnswer ? "owner-locked-nature-verbatim" :
-            ownerDashaAnswer ? "owner-locked-dasha-verbatim" : "owner-authored-verbatim",
+            ownerDashaAnswer ? "owner-locked-dasha-verbatim" :
+            ownerRelationshipAnswer ? "owner-locked-relationship-verbatim" : "owner-authored-verbatim",
           predictionLocked: true,
           sanitizedQuestion: privateSafeQuestion
         });
