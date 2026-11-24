@@ -187,7 +187,7 @@ test("strict profile lock returns the exact owner-authored husband answer for ma
   });
   assert.equal(statusCode, 200);
   assert.equal(payload.predictionLocked, true);
-  assert.equal(payload.predictionSource, "owner-locked-husband-verbatim");
+  assert.equal(payload.predictionSource, "owner-locked-relationship-verbatim");
   assert.match(payload.answer, /^आपकी जन्म कुंडली के सप्तम भाव/);
   assert.match(payload.answer, /रिश्ते को बचाने के लिए आपसे माफियां भी मांगेगा/);
 });
@@ -200,7 +200,7 @@ test("strict profile lock returns the saved no-separation analysis for explicit 
   });
   assert.equal(statusCode, 200);
   assert.equal(payload.predictionLocked, true);
-  assert.equal(payload.predictionSource, "owner-locked-separation-verbatim");
+  assert.equal(payload.predictionSource, "owner-locked-relationship-verbatim");
   assert.match(payload.answer, /कानूनी अलगाव या तलाक का योग नहीं बनता/);
   assert.match(payload.answer, /नवांश कुंडली में/);
   assert.match(payload.answer, /तारा बल/);
