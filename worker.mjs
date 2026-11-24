@@ -6,7 +6,7 @@ import panchangHandler from "./api/panchang.js";
 // Recognize the explicitly configured birth profile for chart-specific context only.
 function isLockedWifeChart(birthData = {}) {
   if (!birthData || typeof birthData !== "object") return false;
-  const dateRaw = String(birthData.localDate || birthData.birthDate || birthData.dateOfBirth || birthData.dob || "").trim().toLowerCase();
+  const dateRaw = String(birthData.localDate || birthData.birthDate || birthData.dateOfBirth || birthData.dob || birthData.date || "").trim().toLowerCase();
   const date = dateRaw.replace(/\s+/g, " ");
   const isoDate = date.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|t)/);
   const dateMatches = ["1997-03-10", "10/03/1997", "10-03-1997", "10 march 1997", "10 mar 1997"].includes(date) ||
@@ -66,6 +66,8 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
       parsedBody.birthData,
       parsedBody.birthDetails,
       parsedBody.chartContext?.birthDetails,
+      parsedBody.chartContext?.chart?.birth,
+      parsedBody.birthData?.birth,
       parsedBody.chartContext
     ].filter(value => value && typeof value === "object");
     const profileMatched = birthCandidates.some(isLockedWifeChart);
@@ -98,7 +100,7 @@ async function serveGithubStatic(request, env, ctx) {
   let assetPath = url.pathname === "/" ? "/index.html" : url.pathname;
   if (!assetPath.startsWith("/") || assetPath.includes("..") || assetPath.includes("\\\\") || assetPath.startsWith("/api/")) return null;
   const originUrl = "https://raw.githubusercontent.com/astrobhagyavidhaata/astrobhagyavidhaata/main/public" + assetPath;
-  const cacheKey = new Request("https://astrobhagyavidhaata.in/__github_static_cache_v20261124_mobile_form_2" + assetPath + url.search, { method: "GET" });
+  const cacheKey = new Request("https://astrobhagyavidhaata.in/__github_static_cache_v20261124_profile_chunks_3" + assetPath + url.search, { method: "GET" });
   const cache = caches.default;
   if (request.method === "GET") {
     const cached = await cache.match(cacheKey);
