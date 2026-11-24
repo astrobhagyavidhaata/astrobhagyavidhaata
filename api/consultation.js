@@ -7,6 +7,7 @@ const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const {getProfileGocharPrediction,getProfileParentsPrediction}=require("../lib/profile-gochar-predictions");
 const {getProfileParentsAnswer}=require("../lib/profile-parents-1987");
 const {getProfileParents1997Answer}=require("../lib/profile-parents-1997");
+const {getProfileCareer1997Answer}=require("../lib/profile-career-1997");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
 const PRIVATE_FIELD_KEYS = new Set([
@@ -259,6 +260,20 @@ module.exports=async function(req,res,env={}){
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-authored-parents-1987",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
+      // Career/work questions for the protected 1997 profile return the owner's
+      // complete saved career analysis verbatim, before other broad topic matchers.
+      const ownerCareerDirectAnswer = getProfileCareer1997Answer(specialProfileFocus && !parents1987ProfileFocus, question);
+      if (ownerCareerDirectAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: ownerCareerDirectAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-locked-career-verbatim",
           predictionLocked: true,
           sanitizedQuestion: privateSafeQuestion
         });
