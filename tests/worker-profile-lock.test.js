@@ -9,7 +9,9 @@ test("Worker locks the protected profile from birth details before consultation"
   const variants = [
     { localDate: "1997-03-10", localTime: "21:15:00", place: "Amravati" },
     { date: "10 March 1997", time: "09:15 PM", location: { latitude: 20.9, longitude: 77.7 } },
-    { birthDate: "1997-03-10", birthTime: "9:15 PM", birthPlace: "Amravati, Maharashtra" }
+    { birthDate: "1997-03-10", birthTime: "9:15 PM", birthPlace: "Amravati, Maharashtra" },
+    { date: "10/03/1997", time: "09:15 PM", location: { name: "Amravati" } },
+    { date: "10 March 1997", time: "21:15:00", location: { latitude: 20.93, longitude: 77.75 } }
   ];
   for (const birthData of variants) {
     const request = new Request("https://astrobhagyavidhaata.in/api/consultation", {
