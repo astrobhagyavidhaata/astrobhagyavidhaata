@@ -115,3 +115,28 @@ test("locked birth profile serves its saved owner answers instead of globally bl
     assert.ok(answer.includes(heading), `missing owner-authored nature section: ${heading}`);
   }
 });
+
+
+test("consultation honors the explicit locked birth profile rule and returns the owner's exact nature archive", async () => {
+  const consultationHandler = require("../api/consultation");
+  let payload;
+  const response = {
+    statusCode: 200,
+    status(code) { this.statusCode = code; return this; },
+    json(value) { payload = value; return this; },
+    setHeader() {}
+  };
+  await consultationHandler({
+    method: "POST",
+    body: {
+      question: "Mujhe mere nature ke bare mein batao",
+      language: "hi",
+      lockedProfileRule: "TULA_1997_03_10_AMRAVATI"
+    }
+  }, response, {});
+  assert.equal(response.statusCode, 200);
+  assert.equal(payload.predictionSource, "owner-locked-nature-verbatim");
+  assert.match(payload.answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव बाहर से देखने में बेहद शांत/);
+  assert.match(payload.answer, /पल-पल बदलने वाला अस्थिर स्वभाव/);
+  assert.doesNotMatch(payload.answer, /तुला लग्न.*न्यायप्रिय.*मीन राशि/);
+});
