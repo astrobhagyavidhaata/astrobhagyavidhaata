@@ -136,7 +136,7 @@ module.exports=async function(req,res,env={}){
     // immediately; the wording may be Hindi, Roman Hindi, or a single keyword.
     const earlyProfileLock = body._wifeChartProfileMatched === true ||
       body.lockedProfileRule === "TULA_1997_03_10_AMRAVATI";
-    const earlyNaturePrompt = /nature|स्वभाव|व्यक्तित्व|व्यक्तित्?व|personality|swabhav|swabhaav|vyaktitva|नेचर|mere?\\s+bare|mere?\\s+baare|about\\s+me|who\\s+am\\s+i/i.test(question.normalize("NFKC"));
+    const earlyNaturePrompt = /nature|स्वभाव|व्यक्तित्व|व्यक्तित्?व|personality|swabhav|swabhaav|vyaktitva|नेचर|mere\\s+ba(?:re|are)(?:\\s+me(?:in)?)?|about\\s+me|who\\s+am\\s+i/i.test(question.normalize("NFKC"));
     if (earlyProfileLock && earlyNaturePrompt) {
       const authoredNature = getProfileNatureAnswer(true, question) || getProfileNatureAnswer(true, "मेरा स्वभाव कैसा है?");
       return res.status(200).json({
