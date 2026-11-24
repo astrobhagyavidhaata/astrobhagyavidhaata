@@ -28,11 +28,11 @@ function protectedProfileAnswer(question, history = []) {
   }
   // Route by the original topic, not by "aur batao" / "aage batao".
   const routeText = String(archiveQuestion || question || "").normalize("NFKC").toLowerCase().trim();
-  const nature = /nature|नेचर|स्वभाव|व्यक्तित्व|पर्सनैलिटी|पर्सनालिटी|personality|swabhav|swabhaav|vyaktitva|mere\\s+ba(?:re|are)(?:\\s+me(?:in)?)?|about\\s+me|myself/i.test(routeText);
+  const nature = /nature|नेचर|स्वभाव|व्यक्तित्व|पर्सनैलिटी|पर्सनालिटी|personality|swabhav|swabhaav|vyaktitva|mere\s+ba(?:re|are)(?:\\s+me(?:in)?)?|about\\s+me|myself/i.test(routeText);
   const parents = /mata.?pita|maa|maata|pita|parents?|mother|father|family|माता|मां|माँ|पिता|मायका|कुटुंब|परिवार/i.test(routeText);
   const dasha = /dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|भविष्य|आने वाला समय|आनेवाला समय|future|aane wala samay|aane wala waqt/i.test(routeText);
   const career = /career|job|business|profession|work|kaam|naukri|vyavasay|karobar|काम|नौकरी|व्यवसाय|बिजनेस|करियर|आजीविका|पेशा|कार्यक्षेत्र/i.test(routeText);
-  const partner = /partner|husband|wife|spouse|pati|patidev|जीवनसाथी|पार्टनर|पति|पती|पत्नी|विवाह|शादी|वैवाहिक|marriage|married\\s+life|relationship|रिश्ता|तलाक|divorc|talaq|separation|छोड़ना|छोडना|छोड़|छोड|अलगाव/i.test(routeText);
+  const partner = /partner|husband|wife|spouse|pati|patidev|जीवनसाथी|पार्टनर|पति|पती|पत्नी|विवाह|शादी|वैवाहिक|marriage|married\s+life|relationship|रिश्ता|तलाक|divorc|talaq|separation|छोड़ना|छोडना|छोड़|छोड|अलगाव/i.test(routeText);
   if (nature) return { answer: getProfileNatureAnswer(true, archiveQuestion) || getProfileNatureAnswer(true, "मेरा स्वभाव कैसा है?"), topic: "nature" };
   if (parents) return { answer: getProfileParents1997Answer(true, archiveQuestion) || getProfileParents1997Answer(true, "माता-पिता और परिवार के बारे में बताइए"), topic: "parents" };
   if (dasha) {
@@ -44,7 +44,7 @@ function protectedProfileAnswer(question, history = []) {
     const careerAnswer = getProfileCareer1997Answer(true, archiveQuestion) || getProfileCareer1997Answer(true, "मेरे करियर और काम के बारे में बताइए");
     const workWithPartner = /partner|husband|pati|पति|पार्टनर|जीवनसाथी/i.test(routeText);
     const partnerWork = workWithPartner ? getProfileHusbandWorkAnswer(true, archiveQuestion) : "";
-    return { answer: [careerAnswer, partnerWork].filter(Boolean).join("\\n\\n"), topic: "career" };
+    return { answer: [careerAnswer, partnerWork].filter(Boolean).join("\n\n"), topic: "career" };
   }
   if (partner) {
     const divorce = /तलाक|divorc|talaq|separation|छोड़ना|छोडना|छोड़|छोड|अलगाव|leave/i.test(routeText);
