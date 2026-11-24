@@ -76,6 +76,9 @@ test("owner-written exact paragraph is returned for husband personality and work
 
 test("owner-written two-paragraph nature answer is returned for locked profile nature questions", () => {
   const answer = getProfileNatureAnswer(true, "मेरा नेचर कैसा है?");
+  for (const wording of ["Mujhe mere swabhav ke baare mein batao", "Mere swabhav ke bare mein batao", "Mera swabhav kaisa hai", "मुझे मेरे स्वभाव के बारे में बताओ", "मेरी पर्सनैलिटी कैसी है", "Tell me about my personality"]) {
+    assert.equal(getProfileNatureAnswer(true, wording), answer, `nature wording did not route: ${wording}`);
+  }
   assert.match(answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव/);
   assert.match(answer, /आपकी जन्म कुंडली में मन, भावनाओं और सोच के स्तर पर/);
   assert.equal(answer.split(/\n\n/).length, 8);
