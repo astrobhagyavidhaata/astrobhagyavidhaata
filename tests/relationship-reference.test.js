@@ -191,7 +191,7 @@ test("explicit partner personality question returns the owner-authored partner p
   assert.equal(statusCode, 200);
   assert.equal(payload.predictionLocked, true);
   assert.equal(payload.predictionSource, "owner-locked-husband-work-verbatim");
-  assert.match(payload.answer, /संतुलित, रचनात्मक और संवेदनशील/);
+  assert.match(payload.answer, /अत्यंत निडर, स्वाभिमानी, तेज बुद्धि वाला/);
 });
 
 test("strict profile lock routes all husband questions to the saved no-separation analysis", async () => {
