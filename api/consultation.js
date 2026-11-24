@@ -2,6 +2,7 @@
 
 const {askGemini}=require("../lib/gemini");
 const {getNextOwnerChunk}=require("../lib/profile-response-chunks");
+const {isLocked1997AmravatiProfile}=require("../lib/profile-birth-match");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer,getProfileDivorceAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileDreamsAnswer, getProfileExternalWomanAnswer, getProfileAngerHealthAnswer, getProfileHiddenMoneyAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
@@ -12,6 +13,46 @@ const {getProfileCareer1997Answer}=require("../lib/profile-career-1997");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 function chunkOwnerAnswer(answer, question, history) {
   return getNextOwnerChunk(answer, question, history, 3).answer;
+}
+
+function protectedProfileAnswer(question, history = []) {
+  const q = String(question || "").normalize("NFKC").toLowerCase().trim();
+  const continuation = /^(?:aur|aage|और|आगे|continue|more|next|थोड़ा और)/i.test(q);
+  let archiveQuestion = question;
+  if (continuation && Array.isArray(history)) {
+    const prior = [...history].reverse().find(item =>
+      (item?.role === "user" || item?.role === "human") &&
+      !/^(?:aur|aage|और|आगे|continue|more|next|थोड़ा और)/i.test(String(item.content || "").trim())
+    );
+    if (prior) archiveQuestion = prior.content;
+  }
+  const nature = /nature|नेचर|स्वभाव|व्यक्तित्व|personality|swabhav|swabhaav|vyaktitva|mere\\s+ba(?:re|are)|about\\s+me|myself/i.test(q);
+  const parents = /mata.?pita|maa|maata|pita|parents?|mother|father|family|माता|मां|माँ|पिता|मायका|कुटुंब|परिवार/i.test(q);
+  const career = /career|job|business|profession|work|काम|नौकरी|व्यवसाय|बिजनेस|करियर|आजीविका|पेशा|कार्यक्षेत्र/i.test(q);
+  const partner = /partner|husband|wife|spouse|pati|patidev|जीवनसाथी|पार्टनर|पति|पती|पत्नी|विवाह|शादी|वैवाहिक|marriage|relationship|रिश्ता|तलाक|divorc|talaq|separation|छोड़ना|छोडना/i.test(q);
+  const dasha = /dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|भविष्य|आने वाला समय|आनेवाला समय|future/i.test(q);
+  if (nature) return { answer: getProfileNatureAnswer(true, archiveQuestion), topic: "nature" };
+  if (parents) return { answer: getProfileParents1997Answer(true, archiveQuestion) || getProfileParents1997Answer(true, "माता-पिता और परिवार के बारे में बताइए"), topic: "parents" };
+  if (career) {
+    const careerAnswer = getProfileCareer1997Answer(true, archiveQuestion) || getProfileCareer1997Answer(true, "मेरे करियर और काम के बारे में बताइए");
+    const workWithPartner = /partner|husband|pati|पति|पार्टनर|जीवनसाथी/i.test(q);
+    const partnerWork = workWithPartner ? getProfileHusbandWorkAnswer(true, archiveQuestion) : "";
+    return { answer: [careerAnswer, partnerWork].filter(Boolean).join("\\n\\n"), topic: "career" };
+  }
+  if (partner) {
+    const divorce = /तलाक|divorc|talaq|separation|छोड़ना|छोडना|अलगाव|leave/i.test(q);
+    const answer = divorce
+      ? getProfileSpecificSeparationAnswer("क्या मैं अपने पति को छोड़ सकती हूं या तलाक ले सकती हूं?")
+      : (getProfileHusbandWorkAnswer(true, archiveQuestion) || getProfilePersonalityReference(true, archiveQuestion) ||
+         getProfileSpecificSeparationAnswer("मेरे वैवाहिक जीवन और पति के बारे में बताइए"));
+    return { answer, topic: "partner" };
+  }
+  if (dasha) {
+    const broadFuture = /भविष्य|आने वाला समय|आनेवाला समय|future|aane wala samay|aane wala waqt/i.test(q);
+    const answer = getProfileDashaPrediction(true, broadFuture ? "आने वाली दशा" : archiveQuestion, "");
+    return { answer, topic: "dasha" };
+  }
+  return { answer: "", topic: "other" };
 }
 
 const PRIVATE_FIELD_KEYS = new Set([
@@ -132,20 +173,36 @@ module.exports=async function(req,res,env={}){
     const question=body.question||body.content;
     if(typeof question!=="string"||!question.trim())return res.status(400).json({success:false,message:"कृपया अपना प्रश्न लिखें।"});
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
-    // Birth-profile lock is checked before reading Gemini configuration or doing
-    // any model work. For nature/self-description prompts, return the saved text
-    // immediately; the wording may be Hindi, Roman Hindi, or a single keyword.
+    // HARD PROFILE GATE: determine the protected birth chart before even
+    // reading the Gemini key. The Worker flag is trusted only because Worker
+    // recomputes it from submitted birth details; direct API callers are checked too.
+    const birthCandidates = [
+      body.birthData, body.birthDetails, body.chartContext,
+      body.chartContext?.birth, body.chartContext?.birthDetails,
+      body.chartContext?.chart?.birth
+    ].filter(value => value && typeof value === "object");
+    const matchedByBirth = birthCandidates.some(isLocked1997AmravatiProfile);
     const earlyProfileLock = body._wifeChartProfileMatched === true ||
-      body.lockedProfileRule === "TULA_1997_03_10_AMRAVATI";
-    const earlyNaturePrompt = /nature|स्वभाव|व्यक्तित्व|व्यक्तित्?व|personality|swabhav|swabhaav|vyaktitva|नेचर|mere\\s+ba(?:re|are)(?:\\s+me(?:in)?)?|about\\s+me|who\\s+am\\s+i/i.test(question.normalize("NFKC"));
-    if (earlyProfileLock && earlyNaturePrompt) {
-      const authoredNature = getProfileNatureAnswer(true, question) || getProfileNatureAnswer(true, "मेरा स्वभाव कैसा है?");
+      body.lockedProfileRule === "TULA_1997_03_10_AMRAVATI" || matchedByBirth;
+    if (earlyProfileLock) {
+      const routed = protectedProfileAnswer(question, body.conversationHistory);
+      if (routed.answer) {
+        return res.status(200).json({
+          success: true,
+          answer: chunkOwnerAnswer(routed.answer, question, body.conversationHistory),
+          identity: "Astro vidhata AI",
+          ownerAuthorized: false,
+          predictionSource: "owner-locked-" + routed.topic + "-verbatim",
+          predictionLocked: true,
+          sanitizedQuestion: question
+        });
+      }
       return res.status(200).json({
         success: true,
-        answer: chunkOwnerAnswer(authoredNature, question, body.conversationHistory),
+        answer: "इस विशेष जन्म-कुंडली के लिए इस विषय का मालिक द्वारा लिखा हुआ विश्लेषण संग्रह में उपलब्ध नहीं है। इसलिए Gemini से कोई नया या अनुमानित उत्तर नहीं बनाया जाएगा।",
         identity: "Astro vidhata AI",
         ownerAuthorized: false,
-        predictionSource: "owner-locked-nature-verbatim",
+        predictionSource: "owner-profile-no-gemini-fallback",
         predictionLocked: true,
         sanitizedQuestion: question
       });
