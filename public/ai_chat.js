@@ -104,6 +104,7 @@
       const payload = JSON.stringify({
         question,
         chartContext: chartContext(),
+        birthData: chartContext()?.birth && typeof chartContext().birth === "object" ? chartContext().birth : null,
         language: byId("preferredLanguage")?.value || "hi",
         lockedProfileRule: lockedProfileRule(),
         specialInstruction: relationshipProfileInstruction(lockedProfileRule()),
