@@ -280,6 +280,20 @@ module.exports=async function(req,res,env={}){
       // The same historical hard lock applies to marriage, husband/partner,
       // and explicit separation questions. Return the saved full D1/D9 analysis
       // before broad dasha/gochar matchers can execute or Gemini can be called.
+      // Exact archived Mahadasha/Antardasha readings must win before relationship
+      // intent matchers, so a dasha question cannot be hijacked by the divorce answer.
+      const ownerDashaDirectAnswer = getProfileDashaPrediction(specialProfileFocus, question, personName);
+      if (ownerDashaDirectAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: ownerDashaDirectAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-locked-dasha-verbatim",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
       // Give the exact saved husband/partner paragraph priority over the broad
       // marriage-intent handler, which otherwise returns the separation archive.
       const ownerHusbandDirectAnswer = getProfileHusbandWorkAnswer(true, question);
