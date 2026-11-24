@@ -238,7 +238,7 @@ module.exports=async function(req,res,env={}){
               specialRelationshipFocus,
               specialProfileFocus: true,
               chartContext,
-              conversationHistory: Array.isArray(body.conversationHistory) ? body.conversationHistory : [],
+              conversationHistory: [],
               language,
               apiKey: geminiApiKey,
               model: "gemini-3.8-flash",
