@@ -2,7 +2,7 @@
 
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
-const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileDreamsAnswer, getProfileExternalWomanAnswer, getProfileAngerHealthAnswer, getProfileHiddenMoneyAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
+const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer,getProfileDivorceAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileDreamsAnswer, getProfileExternalWomanAnswer, getProfileAngerHealthAnswer, getProfileHiddenMoneyAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const {getProfileGocharPrediction,getProfileParentsPrediction}=require("../lib/profile-gochar-predictions");
 const {getProfileParentsAnswer}=require("../lib/profile-parents-1987");
@@ -290,6 +290,19 @@ module.exports=async function(req,res,env={}){
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-locked-husband-verbatim",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
+      // Exact saved divorce conclusion takes priority for the protected Amravati birth profile.
+      const ownerDivorceDirectAnswer = getProfileDivorceAnswer(specialProfileFocus, question);
+      if (ownerDivorceDirectAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: ownerDivorceDirectAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-locked-divorce-verbatim",
           predictionLocked: true,
           sanitizedQuestion: privateSafeQuestion
         });
