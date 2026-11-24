@@ -166,6 +166,7 @@ module.exports=async function(req,res,env={}){
     })();
     const parents1987ProfileFocus = body._parents1987ProfileMatched === true;
     const specialProfileFocus = parents1987ProfileFocus || body._wifeChartProfileMatched === true ||
+      body.lockedProfileRule === "TULA_1997_03_10_AMRAVATI" ||
       (normalizedBirthDate === "1997-03-10" &&
       normalizedBirthTime === "21:15" &&
       (placeText.includes("amravati") || placeText.includes("अमरावती") || isAmravatiByCoordinates));
