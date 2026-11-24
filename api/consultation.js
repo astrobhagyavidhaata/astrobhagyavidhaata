@@ -134,7 +134,7 @@ module.exports=async function(req,res,env={}){
     const birthProfile=liveChartContext?.birth||{};
     // Resolve the protected profile from every supported request shape. The Worker
     // independently computes _wifeChartProfileMatched from the submitted birth data.
-    const fallbackBirth=body.birthData||body.birthDetails||body.chartContext?.birthDetails||body.chartContext||{};
+    const fallbackBirth=body.birthData||body.birthDetails||body.chartContext?.birth||body.chartContext?.birthDetails||body.chartContext||{};
     const birthDate=String(birthProfile.localDate||birthProfile.date||fallbackBirth.localDate||fallbackBirth.birthDate||fallbackBirth.date||body.chartContext?.birthDate||"").trim();
     const placeText=[
       birthProfile.place,birthProfile.name,birthProfile.label,
