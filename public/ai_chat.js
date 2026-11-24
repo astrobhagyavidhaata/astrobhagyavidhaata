@@ -144,10 +144,15 @@
         ...chartBirth,
         birthDate: chartBirth.birthDate || chartBirth.localDate || chartBirth.date || chartBirth.dateOfBirth || chartBirth.dob || "",
         birthTime: chartBirth.birthTime || chartBirth.localTime || chartBirth.time || chartBirth.timeOfBirth || "",
-        place: chartBirth.place || chartBirth.birthPlace || chartBirth.location?.name || chartBirth.location || activeChart?.birthPlace?.name || "",
+        place: chartBirth.place || chartBirth.birthPlace || chartBirth.location?.name || chartBirth.location || activeChart?.birthPlace?.name || byId("birthPlace")?.value?.trim() || "",
         latitude: chartBirth.latitude ?? chartBirth.lat ?? chartBirth.location?.latitude ?? activeChart?.birthPlace?.latitude,
         longitude: chartBirth.longitude ?? chartBirth.lon ?? chartBirth.lng ?? chartBirth.location?.longitude ?? activeChart?.birthPlace?.longitude
       };
+      // A rendered/saved chart can outlive its embedded birth metadata. In that
+      // case, use the visible birth form as the identity source so the protected
+      // owner archive is still selected instead of silently falling through to Gemini.
+      chartBirthData.birthDate = chartBirthData.birthDate || byId("dob")?.value?.trim() || "";
+      chartBirthData.birthTime = chartBirthData.birthTime || byId("birthTime")?.value?.trim() || "";
       const isLockedRequest = Boolean(lockedProfileRule()) || isLockedProfileBirth(chartBirthData);
       const payload = JSON.stringify({
         question,
