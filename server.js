@@ -44,7 +44,7 @@ function jsonBody(req,res,next){
 }
 
 // Razorpay signs the exact raw bytes. Keep this route before JSON parsing.
-app.post("/api/payments/webhook",readRequestBody,require("./api/payment-webhook"));
+app.post("/api/payments/webhook",readRequestBody,require("./lib/payment-webhook"));
 app.use(jsonBody);
 
 app.get("/healthz",(req,res)=>res.status(200).json({status:"ok"}));
