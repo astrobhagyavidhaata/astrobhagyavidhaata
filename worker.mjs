@@ -39,16 +39,10 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
     // Never trust a browser-supplied lock flag by itself. Validate the actual
     // birth data on the Worker so another chart cannot inherit this profile lock.
-    const birthCandidates = [
-      parsedBody.chartContext?.birth,
-      parsedBody.birthData,
-      parsedBody.birthDetails,
-      parsedBody.chartContext?.birthDetails,
-      parsedBody.chartContext?.chart?.birth,
-      parsedBody.birthData?.birth,
-      parsedBody.chartContext
-    ].filter(value => value && typeof value === "object");
-    const profileMatched = birthCandidates.some(isLockedWifeChart);
+    // Scan the complete submitted chart recursively. The form can store the
+    // birth inputs under chartContext.birth, birthDetails, saved chart objects,
+    // or location sub-objects; do not depend on one UI payload shape.
+    const profileMatched = isLockedWifeChart(parsedBody);
     safeBody._wifeChartProfileMatched = profileMatched;
     safeBody.lockedProfileRule = profileMatched ? "TULA_1997_03_10_AMRAVATI" : null;
     safeBody.specialInstruction = profileMatched ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।" : "";
@@ -78,7 +72,7 @@ async function serveGithubStatic(request, env, ctx) {
   let assetPath = url.pathname === "/" ? "/index.html" : url.pathname;
   if (!assetPath.startsWith("/") || assetPath.includes("..") || assetPath.includes("\\\\") || assetPath.startsWith("/api/")) return null;
   const originUrl = "https://raw.githubusercontent.com/astrobhagyavidhaata/astrobhagyavidhaata/main/public" + assetPath;
-  const cacheKey = new Request("https://astrobhagyavidhaata.in/__github_static_cache_v20261124_profile_chunks_3" + assetPath + url.search, { method: "GET" });
+  const cacheKey = new Request("https://astrobhagyavidhaata.in/__github_static_cache_v20261124_profile_gate_5" + assetPath + url.search, { method: "GET" });
   const cache = caches.default;
   if (request.method === "GET") {
     const cached = await cache.match(cacheKey);
