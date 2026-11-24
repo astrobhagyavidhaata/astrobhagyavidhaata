@@ -58,3 +58,42 @@ test("history from another topic does not advance the current topic archive", ()
   assert.equal(first.paragraphStart, 0);
   assert.equal(splitOwnerParagraphs(first.answer).length, 3);
 });
+
+
+test("long single-paragraph archives are reflowed into readable paragraph chunks", () => {
+  const longAnswer = Array.from({ length: 10 }, (_, index) => `यह एक लंबा वाक्य क्रमांक ${index + 1} है जो मूल मालिक-लिखित उत्तर का हिस्सा है।`).join(" ");
+  const first = getNextOwnerChunk(longAnswer, "मेरा पार्टनर कैसा होगा?", []);
+  assert.equal(splitOwnerParagraphs(first.answer).length, 3);
+  assert.equal(first.hasMore, true);
+  const history = [
+    { role: "user", content: "मेरा पार्टनर कैसा होगा?" },
+    { role: "assistant", content: first.answer }
+  ];
+  const second = getNextOwnerChunk(longAnswer, "aur batao", history);
+  assert.equal(splitOwnerParagraphs(second.answer).length, 1);
+  assert.equal(second.hasMore, false);
+});
+
+test("locked 1997 nature consultation returns authored chunks without a Gemini key", async () => {
+  const consultationHandler = require("../api/consultation");
+  let payload;
+  const response = {
+    statusCode: 200,
+    status(code) { this.statusCode = code; return this; },
+    json(value) { payload = value; return this; },
+    setHeader() {}
+  };
+  await consultationHandler({
+    method: "POST",
+    body: {
+      question: "Mujhe mere nature ke bare mein batao",
+      language: "hi",
+      lockedProfileRule: "TULA_1997_03_10_AMRAVATI",
+      conversationHistory: []
+    }
+  }, response, {});
+  assert.equal(response.statusCode, 200);
+  assert.equal(payload.predictionSource, "owner-locked-nature-verbatim");
+  assert.equal(splitOwnerParagraphs(payload.answer).length, 3);
+  assert.doesNotMatch(payload.answer, /दीक्षा जी, आपका स्वभाव मुख्य रूप से संतुलित/);
+});
