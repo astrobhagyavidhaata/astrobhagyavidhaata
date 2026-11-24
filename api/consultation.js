@@ -16,8 +16,8 @@ function chunkOwnerAnswer(answer, question, history) {
 }
 
 function protectedProfileAnswer(question, history = []) {
-  const q = String(question || "").normalize("NFKC").toLowerCase().trim();
-  const continuation = /^(?:aur|aage|और|आगे|continue|more|next|थोड़ा और)/i.test(q);
+  const rawQuestion = String(question || "").normalize("NFKC").trim();
+  const continuation = /^(?:aur|aage|और|आगे|continue|more|next|थोड़ा और)/i.test(rawQuestion);
   let archiveQuestion = question;
   if (continuation && Array.isArray(history)) {
     const prior = [...history].reverse().find(item =>
@@ -26,6 +26,8 @@ function protectedProfileAnswer(question, history = []) {
     );
     if (prior) archiveQuestion = prior.content;
   }
+  // Classify follow-ups using the original topic, not the literal words "aur batao".
+  const q = String(archiveQuestion || rawQuestion).normalize("NFKC").toLowerCase().trim();
   const nature = /nature|नेचर|स्वभाव|व्यक्तित्व|पर्सनैलिटी|personality|swabhav|swabhaav|vyaktitva|myself|about\s+me|mere\s+ba(?:re|are)/i.test(q);
   const parents = /mata.?pita|maa|maata|pita|parents?|mother|father|family|माता|मां|माँ|पिता|मायका|कुटुंब|परिवार/i.test(q);
   const career = /career|job|business|profession|work|काम|नौकरी|व्यवसाय|बिजनेस|करियर|आजीविका|पेशा|कार्यक्षेत्र/i.test(q);
