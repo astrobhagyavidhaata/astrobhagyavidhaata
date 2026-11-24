@@ -276,38 +276,32 @@ module.exports=async function(req,res,env={}){
         : "";
       const ownerAuthoredAnswer = ownerParentsAnswer || ownerDreamsAnswer || ownerExternalWomanAnswer || ownerAngerHealthAnswer || ownerHiddenMoneyAnswer || ownerGocharAnswer || ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
       console.info("[PROFILE_PRIORITY] source=owner_archive; owner_answer_found=" + Boolean(ownerAuthoredAnswer) + "; gemini_fallback=" + !ownerAuthoredAnswer + "; type=" + (ownerParentsAnswer ? "parents-family" : ownerDreamsAnswer ? "dreams" : ownerExternalWomanAnswer ? "external-woman" : ownerAngerHealthAnswer ? "anger-health" : ownerHiddenMoneyAnswer ? "hidden-money" : ownerGocharAnswer ? "gochar" : ownerDashaAnswer ? "dasha" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
-      // Always return the owner's exact saved text first. Gemini is only used
-      // when this profile has no authored answer matching the user's question.
+      // STRICT OWNER ARCHIVE LOCK:
+      // For this exact birth profile Gemini is never allowed to invent, replace,
+      // paraphrase, expand, or generate chart interpretations. Return only the
+      // exact owner-authored archive text. If no matching archive exists, say so.
       if (ownerAuthoredAnswer) {
-        // Keep the owner's saved text as the exclusive source, while Gemini
-        // rewrites it naturally for the exact question without adding facts.
-        // Return the complete owner-authored dasha and nature archives verbatim.
-        // Do not let Gemini replace these with a generic chart-based personality answer.
-        const answer = (ownerDashaAnswer || ownerNatureAnswer)
-          ? (ownerDashaAnswer || ownerNatureAnswer)
-          : await askGemini({
-              question: privateSafeQuestion,
-              personName,
-              ownerAuthoredSource: ownerAuthoredAnswer,
-              specialRelationshipFocus,
-              specialProfileFocus: true,
-              chartContext,
-              conversationHistory: [],
-              language,
-              apiKey: geminiApiKey,
-              model: "gemini-3.8-flash",
-              signal: req.signal
-            });
+        const answer = ownerAuthoredAnswer;
         return res.status(200).json({
           success: true,
           answer,
           identity: "Astro vidhata AI",
           ownerAuthorized,
-          predictionSource: ownerDashaAnswer ? "owner-locked-dasha" : ownerNatureAnswer ? "owner-locked-nature" : "owner-authored-rewrite",
+          predictionSource: ownerNatureAnswer ? "owner-locked-nature-verbatim" :
+            ownerDashaAnswer ? "owner-locked-dasha-verbatim" : "owner-authored-verbatim",
           predictionLocked: true,
           sanitizedQuestion: privateSafeQuestion
         });
       }
+      return res.status(200).json({
+        success: true,
+        answer: "इस विशेष जन्म-कुंडली के लिए आपके पूछे गए इस विषय का मालिक द्वारा लिखा हुआ विश्लेषण अभी संग्रह में उपलब्ध नहीं है। इसलिए इस कुंडली के लिए कोई नया या अनुमानित उत्तर नहीं दिया जाएगा।",
+        identity: "Astro vidhata AI",
+        ownerAuthorized,
+        predictionSource: "owner-profile-no-gemini-fallback",
+        predictionLocked: true,
+        sanitizedQuestion: privateSafeQuestion
+      });
     }
     if(ownerAuthorized && !privateSafeQuestion){
       return res.status(200).json({success:true,answer:"Owner Mode प्रमाणित है। अब अगली पंक्ति में अपना निर्देश और जिस प्रश्न की भविष्यवाणी बदलनी है, उसे लिखें।",identity:"Astro vidhata AI",ownerAuthorized:true,sanitizedQuestion:""});
