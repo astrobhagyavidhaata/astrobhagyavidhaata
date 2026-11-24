@@ -262,6 +262,25 @@ module.exports=async function(req,res,env={}){
           sanitizedQuestion: privateSafeQuestion
         });
       }
+      // The same historical hard lock applies to marriage, husband/partner,
+      // and explicit separation questions. Return the saved full D1/D9 analysis
+      // before broad dasha/gochar matchers can execute or Gemini can be called.
+      const lockedMarriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|\bpati\b|\bpatidev\b|\bhusband\b|\bwife\b|\bspouse\b|\bpartner\b|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|तलाक|डाइवोर्स|डिवोर्स|अलगाव|separation|divorc|break.?up/i.test(question) &&
+        !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
+      if (lockedMarriageIntent) {
+        const ownerMarriageDirectAnswer = getProfileSpecificSeparationAnswer(question);
+        if (ownerMarriageDirectAnswer) {
+          return res.status(200).json({
+            success: true,
+            answer: ownerMarriageDirectAnswer,
+            identity: "Astro vidhata AI",
+            ownerAuthorized,
+            predictionSource: "owner-locked-relationship-verbatim",
+            predictionLocked: true,
+            sanitizedQuestion: privateSafeQuestion
+          });
+        }
+      }
       // Direct husband/marriage and divorce questions must bypass broad transit/dasha
       // matchers. These exact owner-authored archives are returned without Gemini.
       const ownerSeparationDirectAnswer = divorceIntent
@@ -327,8 +346,7 @@ module.exports=async function(req,res,env={}){
       // Restore the original exact-profile marriage lock: all husband/partner/
       // marriage-life questions use the saved no-separation analysis verbatim.
       // Career/work questions retain their separate owner-authored husband-work answer.
-      const marriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|\bpati\b|\bpatidev\b|\bhusband\b|\bwife\b|\bspouse\b|\bpartner\b|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता/i.test(question) &&
-        !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
+      const marriageIntent = lockedMarriageIntent;
       const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && marriageIntent
         ? getProfileSpecificSeparationAnswer(question)
         : "";
