@@ -125,13 +125,31 @@ function compactChartContext(source){
 }
 
 module.exports=async function(req,res,env={}){
-  const geminiApiKey=runtimeApiKey(env);
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
   try{
     const body=req.body||{};
     const question=body.question||body.content;
     if(typeof question!=="string"||!question.trim())return res.status(400).json({success:false,message:"कृपया अपना प्रश्न लिखें।"});
     if(question.length>4000)return res.status(400).json({success:false,message:"प्रश्न 4000 अक्षरों से छोटा रखें।"});
+    // Birth-profile lock is checked before reading Gemini configuration or doing
+    // any model work. For nature/self-description prompts, return the saved text
+    // immediately; the wording may be Hindi, Roman Hindi, or a single keyword.
+    const earlyProfileLock = body._wifeChartProfileMatched === true ||
+      body.lockedProfileRule === "TULA_1997_03_10_AMRAVATI";
+    const earlyNaturePrompt = /nature|स्वभाव|व्यक्तित्व|व्यक्तित्?व|personality|swabhav|swabhaav|vyaktitva|नेचर|mere?\\s+bare|mere?\\s+baare|about\\s+me|who\\s+am\\s+i/i.test(question.normalize("NFKC"));
+    if (earlyProfileLock && earlyNaturePrompt) {
+      const authoredNature = getProfileNatureAnswer(true, question) || getProfileNatureAnswer(true, "मेरा स्वभाव कैसा है?");
+      return res.status(200).json({
+        success: true,
+        answer: chunkOwnerAnswer(authoredNature, question, body.conversationHistory),
+        identity: "Astro vidhata AI",
+        ownerAuthorized: false,
+        predictionSource: "owner-locked-nature-verbatim",
+        predictionLocked: true,
+        sanitizedQuestion: question
+      });
+    }
+    const geminiApiKey=runtimeApiKey(env);
     const priorUserQuestions = Array.isArray(body.conversationHistory)
       ? body.conversationHistory.filter(item => item?.role === "user" || item?.role === "human").map(item => String(item?.content || ""))
       : [];
