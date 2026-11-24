@@ -126,6 +126,7 @@ function compactChartContext(source){
 
 module.exports=async function(req,res,env={}){
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({success:false,message:"केवल POST अनुरोध स्वीकार है।"});}
+  let geminiApiKey="";
   try{
     const body=req.body||{};
     const question=body.question||body.content;
@@ -149,7 +150,7 @@ module.exports=async function(req,res,env={}){
         sanitizedQuestion: question
       });
     }
-    const geminiApiKey=runtimeApiKey(env);
+    geminiApiKey=runtimeApiKey(env);
     const priorUserQuestions = Array.isArray(body.conversationHistory)
       ? body.conversationHistory.filter(item => item?.role === "user" || item?.role === "human").map(item => String(item?.content || ""))
       : [];
