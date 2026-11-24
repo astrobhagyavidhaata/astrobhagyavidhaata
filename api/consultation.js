@@ -409,12 +409,6 @@ module.exports=async function(req,res,env={}){
       const ownerHiddenMoneyAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer ? getProfileHiddenMoneyAnswer(true, archiveQuestion) : "";
       const ownerGocharAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer ? getProfileGocharPrediction(true, archiveQuestion) : "";
       const ownerDashaAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, archiveQuestion, personName) : "";
-      const priorUserQuestions = Array.isArray(body.conversationHistory)
-        ? body.conversationHistory.filter(item => item?.role === "user" || item?.role === "human").map(item => String(item?.content || ""))
-        : [];
-      const lastPriorUserQuestion = priorUserQuestions.at(-1) || "";
-      const isNatureFollowUp = /^(?:और|aur|और भी|aur bhi|इसको|isko|इसे|ise|थोड़ा|thoda|ज्यादा|zyada|detail|विस्तार|aur detail|aur gahrai|और गहराई|और विस्तार|समझाओ|samjhao|बताओ|batao)/i.test(question.trim()) &&
-        /नेचर|स्वभाव|व्यक्तित्व|nature|personality|mera nature|meri nature|main kaisi|main kaisa|mera swabhav/i.test(lastPriorUserQuestion);
       const natureQuestion = archiveQuestion;
       const ownerOccultAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, archiveQuestion) : "";
       const ownerHabitsAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, archiveQuestion) : "";
