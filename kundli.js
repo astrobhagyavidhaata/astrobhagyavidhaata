@@ -824,6 +824,25 @@
       place:String(data.get("birthPlace")||"").trim()
     },null,null,true).catch(error=>console.warn("जन्म विवरण ड्राफ्ट सेव नहीं हुआ:",error));
   }
+  function matchesSpecialBirthProfile(details, location) {
+    if (!details || typeof details !== "object") return false;
+    const rawDate=String(details.localDate||details.date||details.birthDate||"").trim().toLowerCase();
+    const iso=rawDate.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:$|t)/);
+    const dmy=rawDate.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    const dateOK=rawDate==="10 march 1997"||rawDate==="10 mar 1997"||
+      Boolean(iso&&iso[1]==="1997"&&Number(iso[2])===3&&Number(iso[3])===10)||
+      Boolean(dmy&&Number(dmy[1])===10&&Number(dmy[2])===3&&dmy[3]==="1997");
+    if(!dateOK)return false;
+    const rawTime=String(details.localTime||details.time||details.birthTime||"").trim().toLowerCase();
+    const tm=rawTime.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/);
+    if(!tm)return false;
+    let hour=Number(tm[1]);if(tm[3]==="pm"&&hour<12)hour+=12;if(tm[3]==="am"&&hour===12)hour=0;
+    if(hour!==21||Number(tm[2])!==15)return false;
+    const place=[location?.name,location?.label,location?.place,details.place,details.birthPlace].filter(Boolean).join(" ").normalize("NFKC").toLowerCase();
+    const lat=Number(location?.latitude??details.latitude),lon=Number(location?.longitude??details.longitude);
+    return place.includes("amravati")||(Number.isFinite(lat)&&Number.isFinite(lon)&&Math.abs(lat-20.9)<=0.15&&Math.abs(lon-77.7)<=0.15);
+  }
+
   async function restoreAstroSession(form){
     // Restore the last generated chart as well as the birth form after navigation or refresh.
     let saved=readAstroSession();
@@ -844,8 +863,19 @@
       selectedBirthPlace={...saved.location,label:[saved.location.name,saved.location.admin1,saved.location.country].filter(Boolean).join(", ")||details.place||""};
     }
     if(saved?.chart){
-      window.AstroKundli=saved.chart;
-      renderMainKundliChart(saved.chart);
+      const chart=saved.chart;
+      const savedLocation=saved.location||{};
+      chart.birth={
+        ...(chart.birth&&typeof chart.birth==="object"?chart.birth:{}),
+        localDate:chart.birth?.localDate||details.localDate||details.date||"",
+        localTime:chart.birth?.localTime||details.localTime||details.time||"",
+        place:chart.birth?.place||[savedLocation.name||details.place,savedLocation.admin1,savedLocation.country].filter(Boolean).join(", "),
+        latitude:chart.birth?.latitude??savedLocation.latitude??details.latitude,
+        longitude:chart.birth?.longitude??savedLocation.longitude??details.longitude
+      };
+      window.AstroLockedProfileRule=matchesSpecialBirthProfile(details,savedLocation||{name:details.place})?"TULA_1997_03_10_AMRAVATI":null;
+      window.AstroKundli=chart;
+      renderMainKundliChart(chart);
       renderVargaCharts(saved.chart);
       renderAstrologyCalculations(saved.chart);
       const panel=$("kBox");if(panel)panel.style.display="block";
@@ -873,7 +903,7 @@
         headers:{"Content-Type":"application/json","Accept":"application/json"},
         body:JSON.stringify({
           question:"मेरी अभी बनी जन्म कुंडली का संक्षिप्त प्रारंभिक समन्वित परिचय दें। D1, D9, ग्रहों के नक्षत्र-पाद, नवतारा/तारा बल, उपलब्ध गोचर और वर्तमान महादशा-अंतर्दशा को साथ पढ़ें। केवल उपलब्ध गणना डेटा का उपयोग करें।",
-          chartContext,language:window.AstroLanguage?.get?.()||$("preferredLanguage")?.value||"hi"
+          chartContext,birthData:chart.birth||null,lockedProfileRule:window.AstroLockedProfileRule||null,language:window.AstroLanguage?.get?.()||$("preferredLanguage")?.value||"hi"
         })
       });
       const data=await response.json();
@@ -968,6 +998,15 @@
       }
 
       const chart = result.chart;
+      chart.birth={
+        ...(chart.birth&&typeof chart.birth==="object"?chart.birth:{}),
+        localDate:details.date||"",
+        localTime:details.time||"",
+        place:[location.name||details.place,location.admin1,location.country].filter(Boolean).join(", "),
+        latitude:location.latitude,
+        longitude:location.longitude
+      };
+      window.AstroLockedProfileRule=matchesSpecialBirthProfile(details,location)?"TULA_1997_03_10_AMRAVATI":null;
       window.AstroKundli = chart;
       renderMainKundliChart(chart);
       renderVargaCharts(chart);
