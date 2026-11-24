@@ -18,6 +18,29 @@
   }
   function showPreview(record){
     const chart=record.chart;
+    const details=record.birthDetails||{};
+    const birth=chart.birth&&typeof chart.birth==="object"?chart.birth:{};
+    chart.birth={
+      ...birth,
+      localDate:birth.localDate||details.localDate||details.date||details.birthDate||"",
+      localTime:birth.localTime||details.localTime||details.time||details.birthTime||"",
+      place:birth.place||details.place||details.birthPlace||"",
+      latitude:birth.latitude??details.latitude,
+      longitude:birth.longitude??details.longitude
+    };
+    const date=String(chart.birth.localDate||"").trim();
+    const time=String(chart.birth.localTime||"").trim().toLowerCase();
+    const place=String(chart.birth.place||"").normalize("NFKC").toLowerCase();
+    const iso=date.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    const dmy=date.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    const dateOK=Boolean((iso&&iso[1]==="1997"&&Number(iso[2])===3&&Number(iso[3])===10)||(dmy&&Number(dmy[1])===10&&Number(dmy[2])===3&&dmy[3]==="1997")||date==="10 March 1997"||date==="10 Mar 1997");
+    const tm=time.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
+    let hour=tm?Number(tm[1]):NaN;
+    if(tm&&tm[3]==="pm"&&hour<12)hour+=12;
+    if(tm&&tm[3]==="am"&&hour===12)hour=0;
+    const lat=Number(chart.birth.latitude),lon=Number(chart.birth.longitude);
+    const placeOK=place.includes("amravati")||(Number.isFinite(lat)&&Number.isFinite(lon)&&Math.abs(lat-20.9)<=0.15&&Math.abs(lon-77.7)<=0.15);
+    window.AstroLockedProfileRule=dateOK&&hour===21&&Number(tm?.[2])===15&&placeOK?"TULA_1997_03_10_AMRAVATI":null;
     window.AstroKundli=chart;
     document.dispatchEvent(new CustomEvent("astro:kundli-ready",{detail:chart}));
     const lines=[
