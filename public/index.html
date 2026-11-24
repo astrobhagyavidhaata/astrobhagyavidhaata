@@ -365,24 +365,26 @@
     <section class="panel app-page-panel" data-app-page="kundli">
       <h2>🌟 अपनी जन्म जानकारी भरें</h2>
       <form id="kundliForm">
-        <label>जन्म तारीख</label>
+        <label>जन्म तारीख (दिन / महीना / साल)</label>
         <div class="birth-input-grid birth-date-grid" role="group" aria-label="जन्म तारीख चुनें">
-          <select id="dobDay" aria-label="जन्म का दिन" required><option value="">दिन</option></select>
-          <select id="dobMonth" aria-label="जन्म का महीना" required><option value="">महीना</option></select>
-          <select id="dobYear" aria-label="जन्म का साल" required><option value="">साल</option></select>
+          <select id="dobDay" aria-label="जन्म का दिन चुनें" required><option value="">दिन चुनें</option></select>
+          <select id="dobMonth" aria-label="जन्म का महीना चुनें" required><option value="">महीना चुनें</option></select>
+          <select id="dobYear" aria-label="जन्म का साल चुनें" required><option value="">साल चुनें</option></select>
         </div>
+        <small class="field-hint">तीनों सूची से अपनी जन्म तारीख चुनें।</small>
         <input id="dob" name="dob" type="hidden">
         <label for="name">पूरा नाम</label><input id="name" name="name" type="text" placeholder="अपना पूरा नाम लिखें" maxlength="100" required>
         <label for="birthGender">लिंग</label>
         <select id="birthGender" name="gender" required><option value="">लिंग चुनें</option><option value="male">पुरुष</option><option value="female">महिला</option></select>
-        <label>जन्म समय</label>
+        <label>जन्म समय (घंटा / मिनट / सुबह या शाम)</label>
         <div class="birth-input-grid birth-time-grid" role="group" aria-label="जन्म समय चुनें">
-          <select id="birthHour" aria-label="जन्म का घंटा" required><option value="">घंटा</option></select>
-          <select id="birthMinute" aria-label="जन्म के मिनट" required><option value="">मिनट</option></select>
+          <select id="birthHour" aria-label="जन्म का घंटा चुनें" required><option value="">घंटा</option></select>
+          <select id="birthMinute" aria-label="जन्म के मिनट चुनें" required><option value="">मिनट</option></select>
           <select id="birthAmPm" aria-label="सुबह या शाम" required><option value="">सुबह / शाम</option><option value="AM">सुबह</option><option value="PM">शाम</option></select>
         </div>
+        <small class="field-hint">घंटा, मिनट और सुबह / शाम चुनें।</small>
         <input id="birthTime" name="birthTime" type="hidden">
-        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे: अमरावती, दिल्ली, शिमला)" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
+        <label for="birthPlace">जन्म स्थान</label><input id="birthPlace" name="birthPlace" type="text" placeholder="शहर या गाँव लिखें (जैसे: अमरावती, दिल्ली, शिमला)" inputmode="text" autocapitalize="words" maxlength="150" autocomplete="off" required><div id="birthPlaceSuggestions" role="listbox" aria-label="जन्मस्थान के सुझाव" style="display:none;margin-top:6px;background:#151020;border:1px solid #66547f;border-radius:8px;max-height:230px;overflow-y:auto"></div>
         <label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="saveToAccount" style="width:auto"> मेरी कुंडली इस ब्राउज़र में सुरक्षित करें</label>
         <button type="submit">मेरी कुंडली बनाएं</button>
       </form>
@@ -611,8 +613,8 @@
       activate(0);
     })();
   </script>
-  <script src="/birth-inputs.js"></script>
+  <script src="/birth-inputs.js?v=mobile-form-20261124-2"></script>
   <script src="/app.js"></script>
-  <script src="/kundli.js?v=7d997ec"></script><script src="/background_resume.js"></script><script src="kundli_matching.js?v=koota-meaning-1"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script><script src="/private-knowledge.js?v=1"></script>
+  <script src="/kundli.js?v=mobile-form-20261124-2"></script><script src="/background_resume.js"></script><script src="kundli_matching.js?v=koota-meaning-1"></script><script src="kundli-history.js"></script><script src="panchang.js"></script><script src="gochar.js"></script><script src="i18n.js"></script><script src="/ai_chat.js"></script><script src="/private-knowledge.js?v=1"></script>
 </body>
 </html>
