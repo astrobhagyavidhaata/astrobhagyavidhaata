@@ -6,6 +6,7 @@ const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProf
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const {getProfileGocharPrediction,getProfileParentsPrediction}=require("../lib/profile-gochar-predictions");
 const {getProfileParentsAnswer}=require("../lib/profile-parents-1987");
+const {getProfileParents1997Answer}=require("../lib/profile-parents-1997");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
 const PRIVATE_FIELD_KEYS = new Set([
@@ -214,6 +215,20 @@ module.exports=async function(req,res,env={}){
     if (specialProfileFocus) {
       // The 10-Mar-1987 profile has its own parent/maternal-family archive.
       // Do not route it through the separate 1997 relationship/dasha archive.
+      if (!parents1987ProfileFocus) {
+        const ownerParents1997Answer = getProfileParents1997Answer(true, question);
+        if (ownerParents1997Answer) {
+          return res.status(200).json({
+            success: true,
+            answer: ownerParents1997Answer,
+            identity: "Astro vidhata AI",
+            ownerAuthorized,
+            predictionSource: "owner-locked-parents-1997-verbatim",
+            predictionLocked: true,
+            sanitizedQuestion: privateSafeQuestion
+          });
+        }
+      }
       if (parents1987ProfileFocus) {
         const ownerParentsAnswer = getProfileParentsAnswer(true, question);
         if (!ownerParentsAnswer) {
