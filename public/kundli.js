@@ -924,18 +924,25 @@
   }
 
   function matchesSpecialBirthProfile(details, location) {
-    if (details?.date !== "1997-03-10") return false;
-    const time = String(details.time || "").trim().toLowerCase();
-    const match = time.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
+    if (!details || typeof details !== "object") return false;
+    const dateRaw = String(details.localDate || details.date || details.birthDate || details.birthdate || "").trim().toLowerCase();
+    const iso = dateRaw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:$|t)/);
+    const dmy = dateRaw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    const dateMatches = dateRaw === "10 march 1997" || dateRaw === "10 mar 1997" ||
+      Boolean(iso && iso[1] === "1997" && Number(iso[2]) === 3 && Number(iso[3]) === 10) ||
+      Boolean(dmy && Number(dmy[1]) === 10 && Number(dmy[2]) === 3 && dmy[3] === "1997");
+    if (!dateMatches) return false;
+    const time = String(details.localTime || details.time || details.birthTime || "").trim().toLowerCase();
+    const match = time.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/);
     if (!match) return false;
     let hour = Number(match[1]);
     const minute = Number(match[2]);
     if (match[3] === "pm" && hour < 12) hour += 12;
     if (match[3] === "am" && hour === 12) hour = 0;
     if (hour !== 21 || minute !== 15) return false;
-    const placeText = [location?.name, location?.label, details?.place].filter(Boolean).join(" ").normalize("NFKC").toLowerCase();
-    const latitude = Number(location?.latitude);
-    const longitude = Number(location?.longitude);
+    const placeText = [location?.name, location?.label, location?.place, details?.place, details?.birthPlace].filter(Boolean).join(" ").normalize("NFKC").toLowerCase();
+    const latitude = Number(location?.latitude ?? details?.latitude);
+    const longitude = Number(location?.longitude ?? details?.longitude);
     return placeText.includes("amravati") ||
       (Number.isFinite(latitude) && Number.isFinite(longitude) &&
        Math.abs(latitude - 20.9) <= 0.15 && Math.abs(longitude - 77.7) <= 0.15);
