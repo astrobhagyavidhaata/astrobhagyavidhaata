@@ -179,7 +179,7 @@ async function callConsultation(question, birthData) {
   return { statusCode: response.statusCode, payload };
 }
 
-test("strict profile lock returns the exact owner-authored husband answer for marriage questions", async () => {
+test("strict profile lock routes husband questions to the saved no-separation analysis", async () => {
   const { statusCode, payload } = await callConsultation("Mera pati kaisa hai?", {
     localDate: "1997-03-10",
     localTime: "21:15",
@@ -188,8 +188,8 @@ test("strict profile lock returns the exact owner-authored husband answer for ma
   assert.equal(statusCode, 200);
   assert.equal(payload.predictionLocked, true);
   assert.equal(payload.predictionSource, "owner-locked-relationship-verbatim");
-  assert.match(payload.answer, /^आपकी जन्म कुंडली के सप्तम भाव/);
-  assert.match(payload.answer, /रिश्ते को बचाने के लिए आपसे माफियां भी मांगेगा/);
+  assert.match(payload.answer, /कानूनी अलगाव या तलाक का योग नहीं बनता/);
+  assert.match(payload.answer, /ज्योतिषीय कारण और डेटा-समर्थित विश्लेषण/);
 });
 
 test("strict profile lock returns the saved no-separation analysis for explicit divorce questions", async () => {
