@@ -225,8 +225,15 @@ test("strict profile lock returns the saved no-separation analysis for explicit 
   assert.equal(payload.predictionLocked, true);
   assert.equal(payload.predictionSource, "owner-locked-relationship-verbatim");
   assert.match(payload.answer, /कानूनी अलगाव या तलाक का योग नहीं बनता/);
-  assert.match(payload.answer, /नवांश कुंडली में/);
   assert.match(payload.answer, /तारा बल/);
+  const nextRelationship = await callConsultation("aur batao", {
+    localDate: "1997-03-10", localTime: "21:15", place: "Amravati"
+  }, [
+    { role: "user", content: "Kya Main Apne Pati se Devorce le sakti hun?" },
+    { role: "assistant", content: payload.answer }
+  ]);
+  assert.equal(nextRelationship.statusCode, 200);
+  assert.match(nextRelationship.payload.answer, /नवांश कुंडली में/);
 });
 
 test("strict profile lock never falls back to Gemini when no owner-authored topic exists", async () => {
