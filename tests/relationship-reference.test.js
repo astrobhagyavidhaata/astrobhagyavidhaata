@@ -182,6 +182,18 @@ async function callConsultation(question, birthData) {
   return { statusCode: response.statusCode, payload };
 }
 
+test("explicit partner personality question returns the owner-authored partner profile", async () => {
+  const { statusCode, payload } = await callConsultation("मेरा पार्टनर कैसा होगा?", {
+    localDate: "1997-03-10",
+    localTime: "21:15",
+    place: "Amravati"
+  });
+  assert.equal(statusCode, 200);
+  assert.equal(payload.predictionLocked, true);
+  assert.equal(payload.predictionSource, "owner-locked-husband-work-verbatim");
+  assert.match(payload.answer, /संतुलित, रचनात्मक और संवेदनशील/);
+});
+
 test("strict profile lock routes all husband questions to the saved no-separation analysis", async () => {
   const { statusCode, payload } = await callConsultation("Mera pati kaisa hai?", {
     localDate: "1997-03-10",
