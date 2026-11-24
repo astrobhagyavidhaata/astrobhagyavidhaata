@@ -254,14 +254,14 @@ module.exports=async function(req,res,env={}){
       const ownerGocharAnswer = !ownerParentsAnswer ? getProfileGocharPrediction(true, question) : "";
       const ownerDashaAnswer = !ownerParentsAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, question, personName) : "";
       const ownerOccultAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, question) : "";
-      const ownerHabitsAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
-      const ownerNatureAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, question) : "";
-      const ownerHusbandWorkAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
+      const ownerHabitsAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
+      const ownerNatureAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, question) : "";
+      const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
       // Divorce/separation intent must win over the generic partner-topic matcher.
-      const ownerRelationshipAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && divorceIntent
+      const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer(question)
         : "";
-      const ownerPersonalityAnswer = !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && !ownerRelationshipAnswer
+      const ownerPersonalityAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && !ownerRelationshipAnswer
         ? getProfilePersonalityReference(true, question)
         : "";
       const ownerAuthoredAnswer = ownerParentsAnswer || ownerGocharAnswer || ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
