@@ -285,8 +285,8 @@ module.exports=async function(req,res,env={}){
       // Restore the original exact-profile marriage lock: all husband/partner/
       // marriage-life questions use the saved no-separation analysis verbatim.
       // Career/work questions retain their separate owner-authored husband-work answer.
-      const marriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|\\bpati\\b|\\bpatidev\\b|\\bhusband\\b|\\bwife\\b|\\bspouse\\b|\\bpartner\\b|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता/i.test(question) &&
-        !/काम|नौकरी|व्यवसाय|करियर|career|\\bjob\\b|\\bwork\\b|profession|business|पेशा/i.test(question);
+      const marriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|\bpati\b|\bpatidev\b|\bhusband\b|\bwife\b|\bspouse\b|\bpartner\b|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता/i.test(question) &&
+        !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
       const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && marriageIntent
         ? getProfileSpecificSeparationAnswer(question)
         : "";
