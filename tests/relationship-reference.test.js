@@ -141,6 +141,27 @@ test("consultation honors the explicit locked birth profile rule and returns the
   assert.doesNotMatch(payload.answer, /तुला लग्न.*न्यायप्रिय.*मीन राशि/);
 });
 
+test("consultation applies the restored no-separation archive to every marriage and husband question for the exact profile", async () => {
+  const consultationHandler = require("../api/consultation");
+  for (const question of ["Mera married life kaisa rahega", "Mera pati kaisa hai", "मेरे पति की आदतें कैसी होंगी", "क्या मेरा वैवाहिक जीवन बना रहेगा"]) {
+    let payload;
+    const response = {
+      statusCode: 200,
+      status(code) { this.statusCode = code; return this; },
+      json(value) { payload = value; return this; },
+      setHeader() {}
+    };
+    await consultationHandler({
+      method: "POST",
+      body: { question, language: "hi", lockedProfileRule: "TULA_1997_03_10_AMRAVATI" }
+    }, response, {});
+    assert.equal(response.statusCode, 200, question);
+    assert.equal(payload.predictionSource, "owner-locked-relationship-verbatim", question);
+    assert.match(payload.answer, /कानूनी अलगाव या तलाक का योग नहीं बनता/, question);
+    assert.doesNotMatch(payload.answer, /generic Gemini|संतुलित, रचनात्मक और संवेदनशील का एक सुंदर मिश्रण/, question);
+  }
+});
+
 
 async function callConsultation(question, birthData) {
   const consultationHandler = require("../api/consultation");
