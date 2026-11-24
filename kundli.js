@@ -1152,6 +1152,21 @@
       return;
     }
 
+    const dobField = $("dob");
+    if (dobField) {
+      dobField.addEventListener("input", () => {
+        const digits = dobField.value.replace(/[^0-9]/g, "").slice(0, 8);
+        const formatted = digits.length > 4
+          ? digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4)
+          : digits.length > 2
+            ? digits.slice(0, 2) + "/" + digits.slice(2)
+            : digits;
+        if (dobField.value !== formatted) {
+          dobField.value = formatted;
+          dobField.setSelectionRange(formatted.length, formatted.length);
+        }
+      });
+    }
     form.addEventListener("submit", handleSubmit);
     form.addEventListener("input",()=>saveFormDraft(form));
     form.addEventListener("change",()=>saveFormDraft(form));
