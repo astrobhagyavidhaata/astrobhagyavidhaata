@@ -57,8 +57,11 @@ function protectedProfileAnswer(question, history = []) {
       topic: "relationship"
     };
   }
+  if (/शनि.*ढैया|ढैया|shani.*dhaiya|saturn.*dhaiya|dhaiyya|साढ़ेसाती|sade.?sati/i.test(routeText)) {
+    return { answer: getProfileGocharPrediction(true, "अष्टम ढैया"), topic: "dasha" };
+  }
   if (dasha) {
-    const broadFuture = /भविष्य|आने वाला समय|आनेवाला समय|future|aane wala samay|aane wala waqt|upcoming|ढैया|dhaiya|साढ़ेसाती|sade.?sati/i.test(routeText);
+    const broadFuture = /भविष्य|आने वाला समय|आनेवाला समय|future|aane wala samay|aane wala waqt|upcoming/i.test(routeText);
     const hasSpecificPlanet = /शुक्र|शुक्?र|venus|राहु|rahu|गुरु|बृहस्पति|jupiter|शनि|shani|saturn|बुध|budh|mercury|केतु|ketu|सूर्य|surya|sun|चंद्र|चन्द्र|moon/i.test(routeText);
     const genericDasha = /^(?:dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|future|भविष्य)$/i.test(routeText) || (!hasSpecificPlanet && /dasha|दशा|भविष्य|future/i.test(routeText));
     const answer = getProfileDashaPrediction(true, (broadFuture || genericDasha) ? "आने वाली दशा" : archiveQuestion, "");
