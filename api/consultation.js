@@ -26,13 +26,14 @@ function protectedProfileAnswer(question, history = []) {
     );
     if (prior) archiveQuestion = prior.content;
   }
+  const routeText = String(archiveQuestion || question || "").normalize("NFKC").toLowerCase().trim();
   // Classify follow-ups using the original topic, not the literal words "aur batao".
   const q = String(archiveQuestion || rawQuestion).normalize("NFKC").toLowerCase().trim();
-  const nature = /nature|नेचर|स्वभाव|व्यक्तित्व|पर्सनैलिटी|personality|swabhav|swabhaav|vyaktitva|myself|about\s+me|mere\s+ba(?:re|are)/i.test(q);
-  const parents = /mata.?pita|maa|maata|pita|parents?|mother|father|family|माता|मां|माँ|पिता|मायका|कुटुंब|परिवार/i.test(q);
-  const career = /career|job|business|profession|work|काम|नौकरी|व्यवसाय|बिजनेस|करियर|आजीविका|पेशा|कार्यक्षेत्र/i.test(q);
-  const partner = /partner|husband|wife|spouse|pati|patidev|जीवनसाथी|पार्टनर|पति|पती|पत्नी|विवाह|शादी|वैवाहिक|marriage|married\s+life|marital|relationship|रिश्ता|तलाक|divorc|talaq|separation|छोड़ना|छोडना|अलगाव|leave/i.test(q);
-  const dasha = /dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|भविष्य|आने वाला समय|आनेवाला समय|future/i.test(q);
+  const nature = /nature|नेचर|स्वभाव|व्यक्तित्व|पर्सनैलिटी|personality|swabhav|swabhaav|vyaktitva|myself|about\s+me|mere\s+ba(?:re|are)/i.test(routeText);
+  const parents = /mata.?pita|maa|maata|pita|parents?|mother|father|family|माता|मां|माँ|पिता|मायका|कुटुंब|परिवार/i.test(routeText);
+  const career = /career|job|business|profession|work|kaam|काम|नौकरी|व्यवसाय|बिजनेस|करियर|आजीविका|पेशा|कार्यक्षेत्र/i.test(routeText);
+  const partner = /partner|husband|wife|spouse|pati|patidev|जीवनसाथी|पार्टनर|पति|पती|पत्नी|विवाह|शादी|वैवाहिक|marriage|married\s+life|marital|relationship|रिश्ता|तलाक|divorc|talaq|separation|छोड़ना|छोडना|अलगाव|leave/i.test(routeText);
+  const dasha = /dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|भविष्य|आने वाला समय|आनेवाला समय|future|ढैया|dhaiya|साढ़ेसाती|sade.?sati/i.test(routeText);
   if (nature) return { answer: getProfileNatureAnswer(true, archiveQuestion) || getProfileNatureAnswer(true, "मेरा नेचर कैसा है?"), topic: "nature" };
   if (parents) return { answer: getProfileParents1997Answer(true, archiveQuestion) || getProfileParents1997Answer(true, "माता-पिता और परिवार के बारे में बताइए"), topic: "parents" };
   if (career) {
@@ -57,8 +58,10 @@ function protectedProfileAnswer(question, history = []) {
     };
   }
   if (dasha) {
-    const broadFuture = /भविष्य|आने वाला समय|आनेवाला समय|future|aane wala samay|aane wala waqt|upcoming/i.test(q);
-    const answer = getProfileDashaPrediction(true, broadFuture ? "आने वाली दशा" : archiveQuestion, "");
+    const broadFuture = /भविष्य|आने वाला समय|आनेवाला समय|future|aane wala samay|aane wala waqt|upcoming|ढैया|dhaiya|साढ़ेसाती|sade.?sati/i.test(routeText);
+    const hasSpecificPlanet = /शुक्र|शुक्?र|venus|राहु|rahu|गुरु|बृहस्पति|jupiter|शनि|shani|saturn|बुध|budh|mercury|केतु|ketu|सूर्य|surya|sun|चंद्र|चन्द्र|moon/i.test(routeText);
+    const genericDasha = /^(?:dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|future|भविष्य)$/i.test(routeText) || (!hasSpecificPlanet && /dasha|दशा|भविष्य|future/i.test(routeText));
+    const answer = getProfileDashaPrediction(true, (broadFuture || genericDasha) ? "आने वाली दशा" : archiveQuestion, "");
     return { answer, topic: "dasha" };
   }
   return { answer: "", topic: "other" };
@@ -205,7 +208,7 @@ module.exports=async function(req,res,env={}){
       }
       return res.status(200).json({
         success: true,
-        answer: "इस विशेष जन्म-कुंडली के लिए इस विषय का मालिक द्वारा लिखा हुआ विश्लेषण संग्रह में उपलब्ध नहीं है। इसलिए Gemini से कोई नया या अनुमानित उत्तर नहीं बनाया जाएगा।",
+        answer: "इस विशेष जन्म-कुंडली के लिए इस विषय का मालिक द्वारा लिखा हुआ विश्लेषण अभी संग्रह में उपलब्ध नहीं है। इसलिए Gemini से कोई नया या अनुमानित उत्तर नहीं बनाया जाएगा।",
         identity: "Astro vidhata AI",
         ownerAuthorized: false,
         predictionSource: "owner-profile-no-gemini-fallback",
