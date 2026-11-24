@@ -294,20 +294,6 @@ module.exports=async function(req,res,env={}){
           sanitizedQuestion: privateSafeQuestion
         });
       }
-      // Give the exact saved husband/partner paragraph priority over the broad
-      // marriage-intent handler, which otherwise returns the separation archive.
-      const ownerHusbandDirectAnswer = getProfileHusbandWorkAnswer(true, question);
-      if (ownerHusbandDirectAnswer) {
-        return res.status(200).json({
-          success: true,
-          answer: ownerHusbandDirectAnswer,
-          identity: "Astro vidhata AI",
-          ownerAuthorized,
-          predictionSource: "owner-locked-husband-verbatim",
-          predictionLocked: true,
-          sanitizedQuestion: privateSafeQuestion
-        });
-      }
       // Exact saved divorce conclusion takes priority for the protected Amravati birth profile.
       const ownerDivorceDirectAnswer = getProfileDivorceAnswer(specialProfileFocus, question);
       if (ownerDivorceDirectAnswer) {
