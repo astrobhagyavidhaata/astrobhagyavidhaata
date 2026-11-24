@@ -322,6 +322,20 @@ module.exports=async function(req,res,env={}){
           sanitizedQuestion: privateSafeQuestion
         });
       }
+      // A direct "what is my partner like?" question must receive the dedicated
+      // owner-authored husband/partner profile, not the unrelated separation conclusion.
+      const earlyHusbandWorkAnswer = getProfileHusbandWorkAnswer(true, question);
+      if (earlyHusbandWorkAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: earlyHusbandWorkAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-locked-husband-work-verbatim",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
       const lockedMarriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|(?:^|[^a-z])(?:pati|patidev|husband|wife|spouse|partner)(?:$|[^a-z])|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|तलाक|डाइवोर्स|डिवोर्स|अलगाव|separation|divorc|break.?up/i.test(question) &&
         !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
       if (lockedMarriageIntent) {
