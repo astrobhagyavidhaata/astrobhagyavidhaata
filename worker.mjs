@@ -91,7 +91,7 @@ async function serveGithubStatic(request, env, ctx) {
   let assetPath = url.pathname === "/" ? "/index.html" : url.pathname;
   if (!assetPath.startsWith("/") || assetPath.includes("..") || assetPath.includes("\\\\") || assetPath.startsWith("/api/")) return null;
   const originUrl = "https://raw.githubusercontent.com/astrobhagyavidhaata/astrobhagyavidhaata/main/public" + assetPath;
-  const cacheKey = new Request("https://astrobhagyavidhaata.in/__github_static_cache" + assetPath + url.search, { method: "GET" });
+  const cacheKey = new Request("https://astrobhagyavidhaata.in/__github_static_cache_v20261124_mobile_form_2" + assetPath + url.search, { method: "GET" });
   const cache = caches.default;
   if (request.method === "GET") {
     const cached = await cache.match(cacheKey);
