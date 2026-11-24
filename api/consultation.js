@@ -31,7 +31,7 @@ function protectedProfileAnswer(question, history = []) {
   const career = /career|job|business|profession|work|काम|नौकरी|व्यवसाय|बिजनेस|करियर|आजीविका|पेशा|कार्यक्षेत्र/i.test(q);
   const partner = /partner|husband|wife|spouse|pati|patidev|जीवनसाथी|पार्टनर|पति|पती|पत्नी|विवाह|शादी|वैवाहिक|marriage|married\s+life|marital|relationship|रिश्ता|तलाक|divorc|talaq|separation|छोड़ना|छोडना|अलगाव|leave/i.test(q);
   const dasha = /dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|भविष्य|आने वाला समय|आनेवाला समय|future/i.test(q);
-  if (nature) return { answer: getProfileNatureAnswer(true, archiveQuestion) || getProfileNatureAnswer(true, "nature"), topic: "nature" };
+  if (nature) return { answer: getProfileNatureAnswer(true, archiveQuestion) || getProfileNatureAnswer(true, "मेरा नेचर कैसा है?"), topic: "nature" };
   if (parents) return { answer: getProfileParents1997Answer(true, archiveQuestion) || getProfileParents1997Answer(true, "माता-पिता और परिवार के बारे में बताइए"), topic: "parents" };
   if (career) {
     const careerAnswer = getProfileCareer1997Answer(true, archiveQuestion) || getProfileCareer1997Answer(true, "मेरे करियर और काम के बारे में बताइए");
@@ -44,7 +44,10 @@ function protectedProfileAnswer(question, history = []) {
       answer: getProfileSpecificSeparationAnswer("क्या मैं अपने पति को छोड़ सकती हूं या तलाक ले सकती हूं?"),
       topic: "relationship"
     };
-    const partnerAnswer = getProfileHusbandWorkAnswer(true, archiveQuestion) || getProfilePersonalityReference(true, archiveQuestion);
+    const explicitPartnerProfile = /पार्टनर|partner|spouse/i.test(q);
+    const partnerAnswer = explicitPartnerProfile
+      ? (getProfileHusbandWorkAnswer(true, archiveQuestion) || getProfilePersonalityReference(true, archiveQuestion))
+      : "";
     if (partnerAnswer) return { answer: partnerAnswer, topic: "husband-work" };
     return {
       answer: getProfileSpecificSeparationAnswer("मेरे वैवाहिक जीवन और पति के बारे में बताइए"),
@@ -180,12 +183,9 @@ module.exports=async function(req,res,env={}){
     // HARD PROFILE GATE: determine the protected birth chart before even
     // reading the Gemini key. The Worker flag is trusted only because Worker
     // recomputes it from submitted birth details; direct API callers are checked too.
-    const birthCandidates = [
-      body.birthData, body.birthDetails, body.chartContext,
-      body.chartContext?.birth, body.chartContext?.birthDetails,
-      body.chartContext?.chart?.birth
-    ].filter(value => value && typeof value === "object");
-    const matchedByBirth = birthCandidates.some(isLocked1997AmravatiProfile);
+    // Re-check the entire body independently of the Worker hint. This handles
+    // nested birthDetails/location/chart payloads and prevents model fallback.
+    const matchedByBirth = isLocked1997AmravatiProfile(body);
     const earlyProfileLock = body._wifeChartProfileMatched === true ||
       body.lockedProfileRule === "TULA_1997_03_10_AMRAVATI" || matchedByBirth;
     if (earlyProfileLock) {
