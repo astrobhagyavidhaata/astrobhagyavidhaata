@@ -74,6 +74,7 @@ test("Protected profile topics always return the matching owner-authored archive
     ["Mera pati kaisa hoga", "owner-locked-relationship-verbatim", /कानूनी अलगाव या तलाक/],
     ["future", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
     ["rahu ki mhadsha kaisi rahegi", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
+    ["Meri राहु ki antrdsha kaisi jayegi", "owner-locked-dasha-verbatim", /02 अक्टूबर 2025 से शुक्र की महादशा में राहु की अंतर्दशा/],
     ["rahu", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
     ["shukra rahu", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
     ["mhadsha", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
