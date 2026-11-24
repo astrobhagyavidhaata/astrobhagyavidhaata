@@ -227,12 +227,29 @@ module.exports=async function(req,res,env={}){
       // Always return the owner's exact saved text first. Gemini is only used
       // when this profile has no authored answer matching the user's question.
       if (ownerAuthoredAnswer) {
+        // Keep the owner's saved text as the exclusive source, while Gemini
+        // rewrites it naturally for the exact question without adding facts.
+        const answer = ownerDashaAnswer
+          ? ownerDashaAnswer
+          : await askGemini({
+              question: privateSafeQuestion,
+              personName,
+              ownerAuthoredSource: ownerAuthoredAnswer,
+              specialRelationshipFocus,
+              specialProfileFocus: true,
+              chartContext,
+              conversationHistory: Array.isArray(body.conversationHistory) ? body.conversationHistory : [],
+              language,
+              apiKey: geminiApiKey,
+              model: "gemini-3.8-flash",
+              signal: req.signal
+            });
         return res.status(200).json({
           success: true,
-          answer: ownerAuthoredAnswer,
+          answer,
           identity: "Astro vidhata AI",
           ownerAuthorized,
-          predictionSource: "owner-locked-archive",
+          predictionSource: ownerDashaAnswer ? "owner-locked-dasha" : "owner-authored-rewrite",
           predictionLocked: true,
           sanitizedQuestion: privateSafeQuestion
         });
