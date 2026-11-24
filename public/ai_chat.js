@@ -108,7 +108,7 @@
         language: byId("preferredLanguage")?.value || "hi",
         lockedProfileRule: lockedProfileRule(),
         specialInstruction: relationshipProfileInstruction(lockedProfileRule()),
-        conversationHistory: history.slice(-10)
+        conversationHistory: history.slice(-30)
       });
       let data = null;
       let attempt = 0;
@@ -155,7 +155,7 @@
       if(lastUserMessage && safeQuestion!==question) lastUserMessage.textContent=safeQuestion||"Owner authentication";
       addMessage(data.answer, "assistant");
       history.push({ role: "user", content: safeQuestion }, { role: "assistant", content: data.answer });
-      if (history.length > 20) history.splice(0, history.length - 20);
+      if (history.length > 60) history.splice(0, history.length - 60);
       if (status) status.textContent = "";
     } catch (error) {
       if (requestId !== requestSequence) return;
