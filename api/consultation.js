@@ -257,9 +257,16 @@ module.exports=async function(req,res,env={}){
       const ownerHiddenMoneyAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer ? getProfileHiddenMoneyAnswer(true, question) : "";
       const ownerGocharAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer ? getProfileGocharPrediction(true, question) : "";
       const ownerDashaAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, question, personName) : "";
+      const priorUserQuestions = Array.isArray(body.conversationHistory)
+        ? body.conversationHistory.filter(item => item?.role === "user" || item?.role === "human").map(item => String(item?.content || ""))
+        : [];
+      const lastPriorUserQuestion = priorUserQuestions.at(-1) || "";
+      const isNatureFollowUp = /^(?:और|aur|और भी|aur bhi|इसको|isko|इसे|ise|थोड़ा|thoda|ज्यादा|zyada|detail|विस्तार|aur detail|aur gahrai|और गहराई|और विस्तार|समझाओ|samjhao|बताओ|batao)/i.test(question.trim()) &&
+        /नेचर|स्वभाव|व्यक्तित्व|nature|personality|mera nature|meri nature|main kaisi|main kaisa|mera swabhav/i.test(lastPriorUserQuestion);
+      const natureQuestion = isNatureFollowUp ? lastPriorUserQuestion : question;
       const ownerOccultAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, question) : "";
       const ownerHabitsAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
-      const ownerNatureAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, question) : "";
+      const ownerNatureAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, natureQuestion) : "";
       const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
       const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer(question)
@@ -296,7 +303,7 @@ module.exports=async function(req,res,env={}){
           answer,
           identity: "Astro vidhata AI",
           ownerAuthorized,
-          predictionSource: ownerDashaAnswer ? "owner-locked-dasha" : "owner-authored-rewrite",
+          predictionSource: ownerDashaAnswer ? "owner-locked-dasha" : ownerNatureAnswer ? "owner-locked-nature" : "owner-authored-rewrite",
           predictionLocked: true,
           sanitizedQuestion: privateSafeQuestion
         });
