@@ -324,7 +324,10 @@ module.exports=async function(req,res,env={}){
       }
       // A direct "what is my partner like?" question must receive the dedicated
       // owner-authored husband/partner profile, not the unrelated separation conclusion.
-      const earlyHusbandWorkAnswer = getProfileHusbandWorkAnswer(true, question);
+      const isExplicitPartnerProfileQuestion = /पार्टनर|partner|spouse|जीवनसाथी/i.test(question);
+      const earlyHusbandWorkAnswer = isExplicitPartnerProfileQuestion
+        ? getProfileHusbandWorkAnswer(true, question)
+        : "";
       if (earlyHusbandWorkAnswer) {
         return res.status(200).json({
           success: true,
