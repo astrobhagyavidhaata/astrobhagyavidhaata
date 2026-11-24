@@ -140,7 +140,15 @@ test("consultation honors the explicit locked birth profile rule and returns the
   assert.equal(response.statusCode, 200);
   assert.equal(payload.predictionSource, "owner-locked-nature-verbatim");
   assert.match(payload.answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव बाहर से देखने में बेहद शांत/);
-  assert.match(payload.answer, /पल-पल बदलने वाला अस्थिर स्वभाव/);
+  assert.doesNotMatch(payload.answer, /पल-पल बदलने वाला अस्थिर स्वभाव/);
+  const nextNature = await callConsultation("aur batao", {
+    localDate: "1997-03-10", localTime: "21:15", place: "Amravati"
+  }, [
+    { role: "user", content: "Mujhe mere nature ke bare mein batao" },
+    { role: "assistant", content: payload.answer }
+  ]);
+  assert.equal(nextNature.statusCode, 200);
+  assert.match(nextNature.payload.answer, /पल-पल बदलने वाला अस्थिर स्वभाव/);
   assert.doesNotMatch(payload.answer, /तुला लग्न.*न्यायप्रिय.*मीन राशि/);
 });
 
@@ -166,7 +174,7 @@ test("consultation applies the restored no-separation archive to every marriage 
 });
 
 
-async function callConsultation(question, birthData) {
+async function callConsultation(question, birthData, conversationHistory = []) {
   const consultationHandler = require("../api/consultation");
   let payload;
   const response = {
@@ -177,7 +185,7 @@ async function callConsultation(question, birthData) {
   };
   await consultationHandler({
     method: "POST",
-    body: { question, language: "hi", birthData }
+    body: { question, language: "hi", birthData, conversationHistory }
   }, response, {});
   return { statusCode: response.statusCode, payload };
 }
