@@ -265,7 +265,7 @@ module.exports=async function(req,res,env={}){
       // The same historical hard lock applies to marriage, husband/partner,
       // and explicit separation questions. Return the saved full D1/D9 analysis
       // before broad dasha/gochar matchers can execute or Gemini can be called.
-      const lockedMarriageIntent = /विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|तलाक|डाइवोर्स|डिवोर्स|अलगाव|separation|divorc|break.?up|पति.{0,20}(?:आदत|व्यवहार|कैसा व्यवहार)|(?:आदत|व्यवहार).{0,20}पति|husband.{0,20}(?:habit|behavio)|(?:habit|behavio).{0,20}husband|partner.{0,20}(?:habit|behavio)|(?:habit|behavio).{0,20}partner/i.test(question) &&
+      const lockedMarriageIntent = /विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|पति.{0,20}(?:आदत|व्यवहार|कैसा व्यवहार)|(?:आदत|व्यवहार).{0,20}पति|husband.{0,20}(?:habit|behavio)|(?:habit|behavio).{0,20}husband|partner.{0,20}(?:habit|behavio)|(?:habit|behavio).{0,20}partner/i.test(question) &&
         !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
       if (lockedMarriageIntent) {
         // Use the canonical explicit separation wording to retrieve the full
