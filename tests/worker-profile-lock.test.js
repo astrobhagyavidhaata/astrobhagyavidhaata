@@ -69,6 +69,10 @@ test("Protected profile topics always return the matching owner-authored archive
     ["career", "owner-locked-career-verbatim", /आपकी तुला लग्न और मीन राशि/],
     ["Mera pati kaisa hoga", "owner-locked-relationship-verbatim", /कानूनी अलगाव या तलाक/],
     ["future", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
+    ["rahu ki mhadsha kaisi rahegi", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
+    ["rahu", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
+    ["shukra rahu", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
+    ["mhadsha", "owner-locked-dasha-verbatim", /शुक्र की महादशा में राहु की अंतर्दशा/],
     ["Shani dhaiya", "owner-locked-dasha-verbatim", /अष्टम ढैया/]
   ];
   for (const [question, source, answerPattern] of cases) {

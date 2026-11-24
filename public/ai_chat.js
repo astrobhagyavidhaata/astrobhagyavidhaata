@@ -101,10 +101,21 @@
     // Close Android keyboard after sending so the answer gets the full reading area.
     input.blur();
     try {
+      const activeChart = chartContext();
+      const chartBirth = activeChart?.birth && typeof activeChart.birth === "object" ? activeChart.birth
+        : activeChart?.birthDetails && typeof activeChart.birthDetails === "object" ? activeChart.birthDetails : {};
+      const chartBirthData = {
+        ...chartBirth,
+        birthDate: chartBirth.birthDate || chartBirth.localDate || chartBirth.date || chartBirth.dateOfBirth || chartBirth.dob || "",
+        birthTime: chartBirth.birthTime || chartBirth.localTime || chartBirth.time || chartBirth.timeOfBirth || "",
+        place: chartBirth.place || chartBirth.birthPlace || chartBirth.location?.name || chartBirth.location || activeChart?.birthPlace?.name || "",
+        latitude: chartBirth.latitude ?? chartBirth.lat ?? chartBirth.location?.latitude ?? activeChart?.birthPlace?.latitude,
+        longitude: chartBirth.longitude ?? chartBirth.lon ?? chartBirth.lng ?? chartBirth.location?.longitude ?? activeChart?.birthPlace?.longitude
+      };
       const payload = JSON.stringify({
         question,
-        chartContext: chartContext(),
-        birthData: chartContext()?.birth && typeof chartContext().birth === "object" ? chartContext().birth : null,
+        chartContext: activeChart,
+        birthData: chartBirthData,
         language: byId("preferredLanguage")?.value || "hi",
         lockedProfileRule: lockedProfileRule(),
         specialInstruction: relationshipProfileInstruction(lockedProfileRule()),

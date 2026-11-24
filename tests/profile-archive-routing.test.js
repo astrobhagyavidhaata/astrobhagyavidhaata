@@ -46,6 +46,10 @@ test("parents, partner, marriage, career and dasha prompts select their own auth
     ["dasha", "owner-locked-dasha-verbatim"],
     ["mahadasha", "owner-locked-dasha-verbatim"],
     ["antardasha", "owner-locked-dasha-verbatim"],
+    ["rahu ki mhadsha kaisi rahegi", "owner-locked-dasha-verbatim"],
+    ["rahu", "owner-locked-dasha-verbatim"],
+    ["shukra rahu", "owner-locked-dasha-verbatim"],
+    ["mhadsha", "owner-locked-dasha-verbatim"],
     ["भविष्य", "owner-locked-dasha-verbatim"],
     ["आने वाला समय", "owner-locked-dasha-verbatim"]
   ];
@@ -87,4 +91,17 @@ test("generic dasha and future requests return the full saved sequence in chunks
   const next = await ask("aage batao", history);
   assert.equal(next.payload.predictionSource, "owner-locked-dasha-verbatim");
   assert.notEqual(next.payload.answer, payload.answer);
+});
+
+
+test("Rahu typo and planet-only prompts return the saved Venus-Rahu period and continue by chunks", async () => {
+  for (const q of ["rahu ki mhadsha kaisi rahegi", "rahu", "shukra rahu"]) {
+    const first = await ask(q);
+    assert.equal(first.payload.predictionSource, "owner-locked-dasha-verbatim", q);
+    assert.match(first.payload.answer, /02 अक्टूबर 2025 से शुक्र की महादशा में राहु की अंतर्दशा/, q);
+    assert.ok(splitOwnerParagraphs(first.payload.answer).length <= 3, q);
+    const next = await ask("aur batao", [{ role: "user", content: q }, { role: "assistant", content: first.payload.answer }]);
+    assert.equal(next.payload.predictionSource, "owner-locked-dasha-verbatim", q);
+    assert.notEqual(next.payload.answer, first.payload.answer, q);
+  }
 });

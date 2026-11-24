@@ -33,7 +33,7 @@ function protectedProfileAnswer(question, history = []) {
   const parents = /mata.?pita|maa|maata|pita|parents?|mother|father|family|माता|मां|माँ|पिता|मायका|कुटुंब|परिवार/i.test(routeText);
   const career = /career|job|business|profession|work|kaam|काम|नौकरी|व्यवसाय|बिजनेस|करियर|आजीविका|पेशा|कार्यक्षेत्र/i.test(routeText);
   const partner = /partner|husband|wife|spouse|pati|patidev|जीवनसाथी|पार्टनर|पति|पती|पत्नी|विवाह|शादी|वैवाहिक|marriage|married\s+life|marital|relationship|रिश्ता|तलाक|divorc|talaq|separation|छोड़ना|छोडना|अलगाव|leave/i.test(routeText);
-  const dasha = /dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|भविष्य|आने वाला समय|आनेवाला समय|future|ढैया|dhaiya|साढ़ेसाती|sade.?sati/i.test(routeText);
+  const dasha = /dasha|mahadasha|mhadasha|mhadsha|maha.?dsh|antar.?dasha|antr.?dsh|दशा|महादशा|अंतर्दशा|अन्तर्दशा|भविष्य|आने वाला समय|आनेवाला समय|future|ढैया|dhaiya|साढ़ेसाती|sade.?sati/i.test(routeText) || /(?:^|[^a-z])(?:rahu|shukra|shukr|venus|guru|brihaspati|jupiter|shani|saturn|budh|mercury|ketu|surya|sun|chandra|chandrama|moon)(?:$|[^a-z])/i.test(routeText);
   if (nature) return { answer: getProfileNatureAnswer(true, archiveQuestion) || getProfileNatureAnswer(true, "मेरा नेचर कैसा है?"), topic: "nature" };
   if (parents) return { answer: getProfileParents1997Answer(true, archiveQuestion) || getProfileParents1997Answer(true, "माता-पिता और परिवार के बारे में बताइए"), topic: "parents" };
   if (career) {
@@ -63,7 +63,7 @@ function protectedProfileAnswer(question, history = []) {
   if (dasha) {
     const broadFuture = /भविष्य|आने वाला समय|आनेवाला समय|future|aane wala samay|aane wala waqt|upcoming/i.test(routeText);
     const hasSpecificPlanet = /शुक्र|शुक्?र|venus|राहु|rahu|गुरु|बृहस्पति|jupiter|शनि|shani|saturn|बुध|budh|mercury|केतु|ketu|सूर्य|surya|sun|चंद्र|चन्द्र|moon/i.test(routeText);
-    const genericDasha = /^(?:dasha|mahadasha|antar.?dasha|दशा|महादशा|अंतर्दशा|अन्तर्दशा|future|भविष्य)$/i.test(routeText) || (!hasSpecificPlanet && /dasha|दशा|भविष्य|future/i.test(routeText));
+    const genericDasha = /^(?:dasha|mahadasha|mhadasha|mhadsha|maha.?dsh|antar.?dasha|antr.?dsh|दशा|महादशा|अंतर्दशा|अन्तर्दशा|future|भविष्य)$/i.test(routeText) || (!hasSpecificPlanet && /dasha|दशा|भविष्य|future/i.test(routeText));
     const answer = getProfileDashaPrediction(true, (broadFuture || genericDasha) ? "आने वाली दशा" : archiveQuestion, "");
     return { answer, topic: "dasha" };
   }
