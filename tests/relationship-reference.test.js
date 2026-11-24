@@ -227,3 +227,52 @@ test("strict profile archive does not affect another person's birth chart", asyn
   assert.equal(statusCode, 503);
   assert.equal(payload.predictionLocked, undefined);
 });
+
+
+test("Cloudflare Worker validates birth date, time and place before enabling the exact-profile lock", async () => {
+  const worker = (await import("../worker.mjs")).default;
+  const request = new Request("https://astrobhagyavidhaata.in/api/consultation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      question: "Mujhe yah batao Mera nature kaisa hai",
+      chartContext: { birth: {
+        localDate: "1997-03-10",
+        localTime: "21:15",
+        place: "Amravati",
+        latitude: 20.93,
+        longitude: 77.75
+      } },
+      language: "hi"
+    })
+  });
+  const response = await worker.fetch(request, {}, { waitUntil() {} });
+  const payload = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(payload.predictionSource, "owner-locked-nature-verbatim");
+  assert.match(payload.answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव बाहर से देखने में बेहद शांत/);
+});
+
+test("Cloudflare Worker ignores a forged profile flag for a different birth chart", async () => {
+  const worker = (await import("../worker.mjs")).default;
+  const request = new Request("https://astrobhagyavidhaata.in/api/consultation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      question: "Mera nature kaisa hai",
+      lockedProfileRule: "TULA_1997_03_10_AMRAVATI",
+      chartContext: { birth: {
+        localDate: "1988-05-12",
+        localTime: "10:30",
+        place: "Nagpur",
+        latitude: 21.15,
+        longitude: 79.09
+      } },
+      language: "hi"
+    })
+  });
+  const response = await worker.fetch(request, {}, { waitUntil() {} });
+  const payload = await response.json();
+  assert.equal(response.status, 503);
+  assert.notEqual(payload.predictionLocked, true);
+});
