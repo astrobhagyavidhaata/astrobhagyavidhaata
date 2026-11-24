@@ -56,6 +56,7 @@
         body: JSON.stringify({
           question,
           chartContext: chartContext(),
+          birthData: window.AstroKundli?.birth && typeof window.AstroKundli.birth === "object" ? window.AstroKundli.birth : null,
           language: byId("preferredLanguage")?.value || "hi",
           lockedProfileRule: lockedProfileRule(),
           specialInstruction: relationshipProfileInstruction(lockedProfileRule()),
