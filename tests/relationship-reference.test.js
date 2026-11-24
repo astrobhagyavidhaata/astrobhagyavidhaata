@@ -78,7 +78,10 @@ test("owner-written two-paragraph nature answer is returned for locked profile n
   const answer = getProfileNatureAnswer(true, "मेरा नेचर कैसा है?");
   assert.match(answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव/);
   assert.match(answer, /आपकी जन्म कुंडली में मन, भावनाओं और सोच के स्तर पर/);
-  assert.equal(answer.split("\n\n").length, 2);
+  assert.equal(answer.split(/\n\n/).length, 8);
+  for (const heading of ["पल-पल बदलने वाला अस्थिर स्वभाव", "बातों को लंबे समय तक छिपाना", "अत्यधिक ओवरथिंकिंग", "जिद्दी, अड़ियल", "वाद-विवाद में आनंद लेना", "अचानक मूड बदलना"]) {
+    assert.ok(answer.includes(heading), `missing owner-authored nature section: ${heading}`);
+  }
   assert.equal(getProfileNatureAnswer(false, "मेरा नेचर कैसा है?"), "");
 });
 
@@ -107,5 +110,8 @@ test("locked birth profile serves its saved owner answers instead of globally bl
   assert.equal(areProfilePredictionsLocked(), false);
   const answer = getProfileNatureAnswer(true, "Mera nature kaisa hai?");
   assert.match(answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव/);
-  assert.equal(answer.split(/\n\n/).length, 2);
+  assert.equal(answer.split(/\n\n/).length, 8);
+  for (const heading of ["पल-पल बदलने वाला अस्थिर स्वभाव", "बातों को लंबे समय तक छिपाना", "अत्यधिक ओवरथिंकिंग", "जिद्दी, अड़ियल", "वाद-विवाद में आनंद लेना", "अचानक मूड बदलना"]) {
+    assert.ok(answer.includes(heading), `missing owner-authored nature section: ${heading}`);
+  }
 });
