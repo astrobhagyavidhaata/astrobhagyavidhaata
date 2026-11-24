@@ -33,6 +33,33 @@ function isLockedWifeChart(birthData = {}) {
   return dateMatches && timeMatches && placeMatches;
 }
 
+// Recognize the separate parent/family reference profile for 10-Mar-1987, 21:15, Amravati.
+function isLockedParents1987Chart(birthData = {}) {
+  if (!birthData || typeof birthData !== "object") return false;
+  const rawDate = String(birthData.localDate || birthData.birthDate || birthData.dateOfBirth || birthData.dob || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const iso = rawDate.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|t)/);
+  const dateMatches = ["1987-03-10", "10/03/1987", "10-03-1987", "10 march 1987", "10 mar 1987"].includes(rawDate) ||
+    Boolean(iso && iso[1] === "1987" && Number(iso[2]) === 3 && Number(iso[3]) === 10);
+  const rawTime = String(birthData.localTime || birthData.birthTime || birthData.timeOfBirth || birthData.time || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const hm = rawTime.match(/^(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:\s*(am|pm))?$/);
+  let minutes = null;
+  if (hm) {
+    let hour = Number(hm[1]);
+    const minute = Number(hm[2]);
+    if (hm[3] === "pm" && hour < 12) hour += 12;
+    if (hm[3] === "am" && hour === 12) hour = 0;
+    if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) minutes = hour * 60 + minute;
+  }
+  const timeMatches = minutes !== null && Math.abs(minutes - 1275) <= 1;
+  const location = birthData.location && typeof birthData.location === "object" ? birthData.location : {};
+  const place = String(birthData.place || birthData.birthPlace || location.name || location.label || birthData.location || "").normalize("NFKC").toLowerCase();
+  const lat = Number(birthData.latitude ?? birthData.lat ?? location.latitude);
+  const lon = Number(birthData.longitude ?? birthData.lon ?? birthData.lng ?? location.longitude);
+  const placeMatches = place.includes("amravati") || place.includes("अमरावती") ||
+    (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat - 20.9) <= 0.15 && Math.abs(lon - 77.7) <= 0.15);
+  return dateMatches && timeMatches && placeMatches;
+}
+
 function limitAnswerLines(value) {
   const clean = String(value || "").replace(/\r/g, "").trim();
   if (!clean) return clean;
@@ -67,8 +94,12 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
   const safeBody = Array.isArray(allowedBodyKeys)
     ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(parsedBody, key)).map(key => [key, parsedBody[key]]))
     : parsedBody;
+  const incomingBirthData = parsedBody.birthData || parsedBody.chartContext?.birth || parsedBody.birthDetails || parsedBody.chartContext || {};
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
-    safeBody._wifeChartProfileMatched = isLockedWifeChart(parsedBody.birthData || parsedBody.chartContext?.birth || parsedBody.birthDetails || parsedBody.chartContext || {});
+    safeBody._wifeChartProfileMatched = isLockedWifeChart(incomingBirthData);
+  }
+  if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_parents1987ProfileMatched")) {
+    safeBody._parents1987ProfileMatched = isLockedParents1987Chart(incomingBirthData);
   }
   const headers = Object.fromEntries(request.headers.entries());
   const req = {
@@ -207,7 +238,7 @@ export default {
         } catch (_) {
           consultationProtectedProfile = false;
         }
-        let response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "birthData", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched"]);
+        let response = await runApi(consultationHandler, request, bindings, ["question", "content", "chartContext", "birthData", "language", "conversationHistory", "lockedProfileRule", "specialInstruction", "_wifeChartProfileMatched", "_parents1987ProfileMatched"]);
         if (!consultationProtectedProfile) {
           const payload = await response.clone().json().catch(() => null);
           if (payload && typeof payload.answer === "string") {
