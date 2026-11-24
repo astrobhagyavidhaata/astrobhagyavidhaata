@@ -280,6 +280,20 @@ module.exports=async function(req,res,env={}){
       // The same historical hard lock applies to marriage, husband/partner,
       // and explicit separation questions. Return the saved full D1/D9 analysis
       // before broad dasha/gochar matchers can execute or Gemini can be called.
+      // Give the exact saved husband/partner paragraph priority over the broad
+      // marriage-intent handler, which otherwise returns the separation archive.
+      const ownerHusbandDirectAnswer = getProfileHusbandWorkAnswer(true, question);
+      if (ownerHusbandDirectAnswer) {
+        return res.status(200).json({
+          success: true,
+          answer: ownerHusbandDirectAnswer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-locked-husband-verbatim",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
       const lockedMarriageIntent = /पति|पती|पत्नी|जीवनसाथी|पार्टनर|(?:^|[^a-z])(?:pati|patidev|husband|wife|spouse|partner)(?:$|[^a-z])|विवाह|शादी|वैवाहिक|marriage|marital|married life|relationship|रिश्ता|तलाक|डाइवोर्स|डिवोर्स|अलगाव|separation|divorc|break.?up/i.test(question) &&
         !/काम|नौकरी|व्यवसाय|करियर|career|\bjob\b|\bwork\b|profession|business|पेशा/i.test(question);
       if (lockedMarriageIntent) {
