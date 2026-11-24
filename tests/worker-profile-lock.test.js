@@ -30,6 +30,8 @@ test("Worker locks the protected profile from birth details before consultation"
     assert.equal(payload.predictionSource, "owner-locked-nature-verbatim");
     assert.equal(response.headers.get("X-Astro-Profile-Route"), "owner-archive-fast");
     assert.match(response.headers.get("Server-Timing") || "", /^owner-archive;dur=\d+$/);
+    const handlerMs = Number((response.headers.get("Server-Timing") || "").match(/dur=(\d+)/)?.[1]);
+    assert.ok(Number.isFinite(handlerMs) && handlerMs < 200, `locked handler took ${handlerMs}ms`);
     assert.match(payload.answer, /^आपकी जन्म कुंडली के अनुसार आपका स्वभाव/);
     assert.doesNotMatch(payload.answer, /दीक्षा जी, आपका स्वभाव स्वाभाविक रूप से संवेदनशील/);
   }
