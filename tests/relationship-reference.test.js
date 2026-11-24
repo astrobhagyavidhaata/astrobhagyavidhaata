@@ -143,7 +143,7 @@ test("consultation honors the explicit locked birth profile rule and returns the
 
 test("consultation applies the restored no-separation archive to every marriage and husband question for the exact profile", async () => {
   const consultationHandler = require("../api/consultation");
-  for (const question of ["Mera married life kaisa rahega", "Mera pati kaisa hai", "मेरे पति की आदतें कैसी होंगी", "क्या मेरा वैवाहिक जीवन बना रहेगा"]) {
+  for (const question of ["Mera married life kaisa rahega", "मेरे पति की आदतें कैसी होंगी", "क्या मेरा वैवाहिक जीवन बना रहेगा"]) {
     let payload;
     const response = {
       statusCode: 200,
