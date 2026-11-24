@@ -140,3 +140,69 @@ test("consultation honors the explicit locked birth profile rule and returns the
   assert.match(payload.answer, /पल-पल बदलने वाला अस्थिर स्वभाव/);
   assert.doesNotMatch(payload.answer, /तुला लग्न.*न्यायप्रिय.*मीन राशि/);
 });
+
+
+async function callConsultation(question, birthData) {
+  const consultationHandler = require("../api/consultation");
+  let payload;
+  const response = {
+    statusCode: 200,
+    status(code) { this.statusCode = code; return this; },
+    json(value) { payload = value; return this; },
+    setHeader() {}
+  };
+  await consultationHandler({
+    method: "POST",
+    body: { question, language: "hi", birthData }
+  }, response, {});
+  return { statusCode: response.statusCode, payload };
+}
+
+test("strict profile lock returns the exact owner-authored husband answer for marriage questions", async () => {
+  const { statusCode, payload } = await callConsultation("Mera pati kaisa hai?", {
+    localDate: "1997-03-10",
+    localTime: "21:15",
+    place: "Amravati"
+  });
+  assert.equal(statusCode, 200);
+  assert.equal(payload.predictionLocked, true);
+  assert.equal(payload.predictionSource, "owner-authored-verbatim");
+  assert.match(payload.answer, /^आपकी जन्म कुंडली के सप्तम भाव/);
+  assert.match(payload.answer, /रिश्ते को बचाने के लिए आपसे माफियां भी मांगेगा/);
+});
+
+test("strict profile lock returns the saved no-separation analysis for explicit divorce questions", async () => {
+  const { statusCode, payload } = await callConsultation("Kya Main Apne Pati se Devorce le sakti hun?", {
+    localDate: "1997-03-10",
+    localTime: "21:15",
+    place: "Amravati"
+  });
+  assert.equal(statusCode, 200);
+  assert.equal(payload.predictionLocked, true);
+  assert.equal(payload.predictionSource, "owner-authored-verbatim");
+  assert.match(payload.answer, /कानूनी अलगाव या तलाक का योग नहीं बनता/);
+  assert.match(payload.answer, /नवांश कुंडली में/);
+  assert.match(payload.answer, /तारा बल/);
+});
+
+test("strict profile lock never falls back to Gemini when no owner-authored topic exists", async () => {
+  const { statusCode, payload } = await callConsultation("मेरा पसंदीदा रंग कौन सा है?", {
+    localDate: "1997-03-10",
+    localTime: "21:15",
+    place: "Amravati"
+  });
+  assert.equal(statusCode, 200);
+  assert.equal(payload.predictionLocked, true);
+  assert.equal(payload.predictionSource, "owner-profile-no-gemini-fallback");
+  assert.match(payload.answer, /मालिक द्वारा लिखा हुआ विश्लेषण अभी संग्रह में उपलब्ध नहीं है/);
+});
+
+test("strict profile archive does not affect another person's birth chart", async () => {
+  const { statusCode, payload } = await callConsultation("Mera nature kaisa hai?", {
+    localDate: "1997-03-11",
+    localTime: "21:15",
+    place: "Amravati"
+  });
+  assert.equal(statusCode, 503);
+  assert.equal(payload.predictionLocked, undefined);
+});
