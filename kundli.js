@@ -651,8 +651,8 @@
 
   function validateBirthDetails(data) {
     const rawDate = String(data.get("dob") || "").trim();
-    const dmy = rawDate.match(/^(\\d{1,2})[/. -](\\d{1,2})[/. -](\\d{4})$/);
-    const iso = rawDate.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+    const dmy = rawDate.match(/^([0-9]{1,2})[/. -]([0-9]{1,2})[/. -]([0-9]{4})$/);
+    const iso = rawDate.match(/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/);
     const year = Number(dmy ? dmy[3] : iso?.[1]);
     const month = Number(dmy ? dmy[2] : iso?.[2]);
     const day = Number(dmy ? dmy[1] : iso?.[3]);
@@ -663,12 +663,11 @@
       place: String(data.get("birthPlace") || "").trim(),
       saveToAccount: data.get("saveToAccount") === "on"
     };
-
     if (!details.name || !rawDate || !details.time || !details.place) {
       throw new Error("कृपया नाम, जन्म तारीख, जन्म समय और जन्म स्थान भरें।");
     }
     if (!dmy && !iso) {
-      throw new Error("जन्म तारीख DD/MM/YYYY के प्रारूप में लिखें, जैसे 10/03/1997।");
+      throw new Error("जन्म तारीख DD/MM/YYYY में लिखें, जैसे 10/03/1997।");
     }
     const birthDate = new Date(Date.UTC(year, month - 1, day));
     if (!year || month < 1 || month > 12 || day < 1 ||
