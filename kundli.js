@@ -650,37 +650,38 @@
   }
 
   function validateBirthDetails(data) {
+    const rawDate = String(data.get("dob") || "").trim();
+    const dmy = rawDate.match(/^(\\d{1,2})[/. -](\\d{1,2})[/. -](\\d{4})$/);
+    const iso = rawDate.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+    const year = Number(dmy ? dmy[3] : iso?.[1]);
+    const month = Number(dmy ? dmy[2] : iso?.[2]);
+    const day = Number(dmy ? dmy[1] : iso?.[3]);
     const details = {
       name: String(data.get("name") || "").trim(),
-      date: String(data.get("dob") || ""),
+      date: year && month && day ? `${String(year).padStart(4,"0")}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}` : "",
       time: String(data.get("birthTime") || ""),
       place: String(data.get("birthPlace") || "").trim(),
       saveToAccount: data.get("saveToAccount") === "on"
     };
 
-    if (
-      !details.name ||
-      !details.date ||
-      !details.time ||
-      !details.place
-    ) {
-      throw new Error("Please enter all birth details.");
+    if (!details.name || !rawDate || !details.time || !details.place) {
+      throw new Error("कृपया नाम, जन्म तारीख, जन्म समय और जन्म स्थान भरें।");
     }
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(details.date)) {
-      throw new Error("Please select a valid birth date.");
+    if (!dmy && !iso) {
+      throw new Error("जन्म तारीख DD/MM/YYYY के प्रारूप में लिखें, जैसे 10/03/1997।");
     }
-    const [year, month, day] = details.date.split("-").map(Number);
     const birthDate = new Date(Date.UTC(year, month - 1, day));
-    if (birthDate.getUTCFullYear() !== year || birthDate.getUTCMonth() !== month - 1 || birthDate.getUTCDate() !== day) {
-      throw new Error("Please enter a valid birth date.");
+    if (!year || month < 1 || month > 12 || day < 1 ||
+        birthDate.getUTCFullYear() !== year ||
+        birthDate.getUTCMonth() !== month - 1 ||
+        birthDate.getUTCDate() !== day) {
+      throw new Error("कृपया सही जन्म तारीख भरें।");
     }
     const today = new Date();
     const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
     if (birthDate.getTime() > todayUtc) {
-      throw new Error("Birth date cannot be in the future.");
+      throw new Error("जन्म तारीख भविष्य की नहीं हो सकती।");
     }
-
     return details;
   }
 
@@ -856,7 +857,10 @@
     }
     const details=saved?.birthDetails||{};
     if(form){
-      const values={name:details.name||"",dob:details.date||"",birthTime:details.time||"",birthPlace:details.place||""};
+      const savedDate=String(details.date||"");
+      const isoDate=savedDate.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+      const displayDate=isoDate?`${isoDate[3]}/${isoDate[2]}/${isoDate[1]}`:savedDate;
+      const values={name:details.name||"",dob:displayDate,birthTime:details.time||"",birthPlace:details.place||""};
       for(const [id,value] of Object.entries(values)){const field=$(id);if(field&&value)field.value=value;}
     }
     if(saved?.location?.latitude!=null&&saved?.location?.longitude!=null){
