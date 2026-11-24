@@ -857,7 +857,7 @@
     const details=saved?.birthDetails||{};
     if(form){
       const savedDate=String(details.date||"");
-      const isoDate=savedDate.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+      const isoDate=savedDate.match(/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/);
       const displayDate=isoDate?`${isoDate[3]}/${isoDate[2]}/${isoDate[1]}`:savedDate;
       const values={name:details.name||"",dob:displayDate,birthTime:details.time||"",birthPlace:details.place||""};
       for(const [id,value] of Object.entries(values)){const field=$(id);if(field&&value)field.value=value;}
