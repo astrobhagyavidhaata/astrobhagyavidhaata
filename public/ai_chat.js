@@ -79,6 +79,42 @@
       : "";
   }
 
+  function isLockedProfileBirth(birth = {}) {
+    const date = String(birth.birthDate || birth.localDate || birth.date || birth.dateOfBirth || birth.dob || "").normalize("NFKC").trim().toLowerCase();
+    const dateOk = /^(?:1997-03-10|10[-/.]03[-/.]1997|10\s+march\s+1997|10\s+mar\s+1997)$/.test(date);
+    const rawTime = String(birth.birthTime || birth.localTime || birth.time || birth.timeOfBirth || "").normalize("NFKC").trim().toLowerCase().replace(/\./g, "");
+    const tm = rawTime.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/);
+    let timeOk = false;
+    if (tm) {
+      let hour = Number(tm[1]);
+      if (tm[3] === "pm" && hour < 12) hour += 12;
+      if (tm[3] === "am" && hour === 12) hour = 0;
+      timeOk = hour === 21 && Number(tm[2]) === 15;
+    }
+    const place = String(birth.place || birth.birthPlace || birth.location?.name || birth.location || "").toLowerCase();
+    const lat = Number(birth.latitude ?? birth.lat ?? birth.location?.latitude);
+    const lon = Number(birth.longitude ?? birth.lon ?? birth.lng ?? birth.location?.longitude);
+    const locationOk = /amravati|अमरावती/.test(place) ||
+      (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat - 20.93) <= 0.12 && Math.abs(lon - 77.75) <= 0.12);
+    return dateOk && timeOk && locationOk;
+  }
+
+  function compactLockedHistory(items) {
+    return items.slice(-30).map(item => {
+      const role = item?.role;
+      const content = String(item?.content || "");
+      if (role !== "assistant" && role !== "model") return { role, content };
+      let parts = content.trim().split(/\n\s*\n/).filter(Boolean);
+      if (parts.length === 1 && content.includes("\n")) parts = content.split(/\n+/).filter(Boolean);
+      parts = parts.flatMap(part => {
+        if (part.length < 500) return [part];
+        const sentences = part.split(/(?<=[।!?])\s+/u).filter(Boolean);
+        return sentences.length < 4 ? [part] : Array.from({ length: Math.ceil(sentences.length / 3) }, () => "…");
+      });
+      return { role, content: parts.map(() => "…").join("\n\n") };
+    });
+  }
+
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   async function sendQuestion() {
@@ -112,18 +148,21 @@
         latitude: chartBirth.latitude ?? chartBirth.lat ?? chartBirth.location?.latitude ?? activeChart?.birthPlace?.latitude,
         longitude: chartBirth.longitude ?? chartBirth.lon ?? chartBirth.lng ?? chartBirth.location?.longitude ?? activeChart?.birthPlace?.longitude
       };
+      const isLockedRequest = Boolean(lockedProfileRule()) || isLockedProfileBirth(chartBirthData);
       const payload = JSON.stringify({
         question,
-        chartContext: activeChart,
+        // The protected archive does not calculate a live chart. Send only the
+        // birth identity and compact continuation index instead of the full D1/D9 payload.
+        chartContext: isLockedRequest ? null : activeChart,
         birthData: chartBirthData,
         language: byId("preferredLanguage")?.value || "hi",
-        lockedProfileRule: lockedProfileRule(),
-        specialInstruction: relationshipProfileInstruction(lockedProfileRule()),
-        conversationHistory: history.slice(-30)
+        lockedProfileRule: isLockedRequest ? "TULA_1997_03_10_AMRAVATI" : lockedProfileRule(),
+        specialInstruction: isLockedRequest ? "" : relationshipProfileInstruction(lockedProfileRule()),
+        conversationHistory: isLockedRequest ? compactLockedHistory(history) : history.slice(-30)
       });
       let data = null;
       let attempt = 0;
-      const maxRetries = 4;
+      const maxRetries = isLockedRequest ? 1 : 4;
       while (true) {
         try {
           const response = await fetch(endpoint, {
@@ -143,7 +182,7 @@
             busyError.permanent = true;
             throw busyError;
           }
-          const delay = Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
+          const delay = isLockedRequest ? 0 : Math.min(15000, 1200 * Math.pow(1.6, Math.min(attempt, 6))) + Math.floor(Math.random() * 1200);
           if (status) status.textContent = "अभी सर्वर व्यस्त है। आपका सवाल सुरक्षित है—कुछ देर में फिर कोशिश होगी (" + attempt + "/" + maxRetries + ")...";
           await wait(delay);
         } catch (error) {

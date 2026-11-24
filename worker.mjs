@@ -57,8 +57,13 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
     socket: { remoteAddress: headers["cf-connecting-ip"] || "anonymous" }
   };
   const res = createResponse();
+  const handlerStartedAt = Date.now();
   try {
     await handler(req, res, env || {});
+    if (safeBody._wifeChartProfileMatched === true) {
+      res.setHeader("X-Astro-Profile-Route", "owner-archive-fast");
+      res.setHeader("Server-Timing", `owner-archive;dur=${Date.now() - handlerStartedAt}`);
+    }
     return res.result();
   } catch (error) {
     console.error("Worker API error:", error?.message || error);
