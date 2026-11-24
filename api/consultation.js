@@ -2,7 +2,7 @@
 
 const {askGemini}=require("../lib/gemini");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
-const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
+const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileDreamsAnswer, getProfileExternalWomanAnswer, getProfileAngerHealthAnswer, getProfileHiddenMoneyAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const {getProfileGocharPrediction,getProfileParentsPrediction}=require("../lib/profile-gochar-predictions");
 const {getProfileParentsAnswer}=require("../lib/profile-parents-1987");
@@ -251,22 +251,24 @@ module.exports=async function(req,res,env={}){
       // be checked before topic/personality matching.
       // Gochar/sibling/father transit text must be matched before dasha's broad planet-name matcher.
       const ownerParentsAnswer = getProfileParentsPrediction(true, question);
-      const ownerGocharAnswer = !ownerParentsAnswer ? getProfileGocharPrediction(true, question) : "";
-      const ownerDashaAnswer = !ownerParentsAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, question, personName) : "";
-      const ownerDreamsAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileDreamsAnswer(true, question) : "";
-      const ownerOccultAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerDreamsAnswer ? getProfileOccultAnswer(true, question) : "";
-      const ownerHabitsAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerDreamsAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
-      const ownerNatureAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerDreamsAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, question) : "";
-      const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerDreamsAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
-      // Divorce/separation intent must win over the generic partner-topic matcher.
-      const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerDreamsAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && divorceIntent
+      const ownerDreamsAnswer = !ownerParentsAnswer ? getProfileDreamsAnswer(true, question) : "";
+      const ownerExternalWomanAnswer = !ownerParentsAnswer && !ownerDreamsAnswer ? getProfileExternalWomanAnswer(true, question) : "";
+      const ownerAngerHealthAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer ? getProfileAngerHealthAnswer(true, question) : "";
+      const ownerHiddenMoneyAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer ? getProfileHiddenMoneyAnswer(true, question) : "";
+      const ownerGocharAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer ? getProfileGocharPrediction(true, question) : "";
+      const ownerDashaAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer ? getProfileDashaPrediction(true, question, personName) : "";
+      const ownerOccultAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer ? getProfileOccultAnswer(true, question) : "";
+      const ownerHabitsAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer ? getProfileHabitsAnswer(true, question) : "";
+      const ownerNatureAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer ? getProfileNatureAnswer(true, question) : "";
+      const ownerHusbandWorkAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer ? getProfileHusbandWorkAnswer(true, question) : "";
+      const ownerRelationshipAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && divorceIntent
         ? getProfileSpecificSeparationAnswer(question)
         : "";
-      const ownerPersonalityAnswer = !ownerParentsAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerDreamsAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && !ownerRelationshipAnswer
+      const ownerPersonalityAnswer = !ownerParentsAnswer && !ownerDreamsAnswer && !ownerExternalWomanAnswer && !ownerAngerHealthAnswer && !ownerHiddenMoneyAnswer && !ownerGocharAnswer && !ownerDashaAnswer && !ownerOccultAnswer && !ownerHabitsAnswer && !ownerNatureAnswer && !ownerHusbandWorkAnswer && !ownerRelationshipAnswer
         ? getProfilePersonalityReference(true, question)
         : "";
-      const ownerAuthoredAnswer = ownerParentsAnswer || ownerGocharAnswer || ownerDashaAnswer || ownerDreamsAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
-      console.info("[PROFILE_PRIORITY] source=owner_archive; owner_answer_found=" + Boolean(ownerAuthoredAnswer) + "; gemini_fallback=" + !ownerAuthoredAnswer + "; type=" + (ownerParentsAnswer ? "parents-family" : ownerGocharAnswer ? "gochar" : ownerDashaAnswer ? "dasha" : ownerDreamsAnswer ? "dreams" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
+      const ownerAuthoredAnswer = ownerParentsAnswer || ownerDreamsAnswer || ownerExternalWomanAnswer || ownerAngerHealthAnswer || ownerHiddenMoneyAnswer || ownerGocharAnswer || ownerDashaAnswer || ownerOccultAnswer || ownerHabitsAnswer || ownerNatureAnswer || ownerHusbandWorkAnswer || ownerRelationshipAnswer || ownerPersonalityAnswer;
+      console.info("[PROFILE_PRIORITY] source=owner_archive; owner_answer_found=" + Boolean(ownerAuthoredAnswer) + "; gemini_fallback=" + !ownerAuthoredAnswer + "; type=" + (ownerParentsAnswer ? "parents-family" : ownerDreamsAnswer ? "dreams" : ownerExternalWomanAnswer ? "external-woman" : ownerAngerHealthAnswer ? "anger-health" : ownerHiddenMoneyAnswer ? "hidden-money" : ownerGocharAnswer ? "gochar" : ownerDashaAnswer ? "dasha" : ownerOccultAnswer ? "occult" : ownerHabitsAnswer ? "habits" : ownerNatureAnswer ? "nature" : ownerHusbandWorkAnswer ? "husband-work" : ownerRelationshipAnswer ? "relationship" : ownerPersonalityAnswer ? "topic" : "unmapped"));
       // Always return the owner's exact saved text first. Gemini is only used
       // when this profile has no authored answer matching the user's question.
       if (ownerAuthoredAnswer) {
