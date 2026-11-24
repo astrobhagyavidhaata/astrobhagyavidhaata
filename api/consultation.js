@@ -1,6 +1,7 @@
 "use strict";
 
 const {askGemini}=require("../lib/gemini");
+const {getNextOwnerChunk}=require("../lib/profile-response-chunks");
 const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer,getProfileDivorceAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, getProfileDreamsAnswer, getProfileExternalWomanAnswer, getProfileAngerHealthAnswer, getProfileHiddenMoneyAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
@@ -9,6 +10,9 @@ const {getProfileParentsAnswer}=require("../lib/profile-parents-1987");
 const {getProfileParents1997Answer}=require("../lib/profile-parents-1997");
 const {getProfileCareer1997Answer}=require("../lib/profile-career-1997");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
+function chunkOwnerAnswer(answer, question, history) {
+  return getNextOwnerChunk(answer, question, history, 3).answer;
+}
 
 const PRIVATE_FIELD_KEYS = new Set([
   "name", "fullname", "email", "phone", "mobile", "birthplace", "place",
@@ -221,7 +225,7 @@ module.exports=async function(req,res,env={}){
         if (ownerParents1997Answer) {
           return res.status(200).json({
             success: true,
-            answer: ownerParents1997Answer,
+            answer: chunkOwnerAnswer(ownerParents1997Answer, question, body.conversationHistory),
             identity: "Astro vidhata AI",
             ownerAuthorized,
             predictionSource: "owner-locked-parents-1997-verbatim",
@@ -270,7 +274,7 @@ module.exports=async function(req,res,env={}){
       if (ownerCareerDirectAnswer) {
         return res.status(200).json({
           success: true,
-          answer: ownerCareerDirectAnswer,
+          answer: chunkOwnerAnswer(ownerCareerDirectAnswer, question, body.conversationHistory),
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-locked-career-verbatim",
@@ -284,7 +288,7 @@ module.exports=async function(req,res,env={}){
       if (ownerNatureDirectAnswer) {
         return res.status(200).json({
           success: true,
-          answer: ownerNatureDirectAnswer,
+          answer: chunkOwnerAnswer(ownerNatureDirectAnswer, question, body.conversationHistory),
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-locked-nature-verbatim",
@@ -301,7 +305,7 @@ module.exports=async function(req,res,env={}){
       if (ownerDashaDirectAnswer) {
         return res.status(200).json({
           success: true,
-          answer: ownerDashaDirectAnswer,
+          answer: chunkOwnerAnswer(ownerDashaDirectAnswer, question, body.conversationHistory),
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-locked-dasha-verbatim",
@@ -314,7 +318,7 @@ module.exports=async function(req,res,env={}){
       if (ownerDivorceDirectAnswer) {
         return res.status(200).json({
           success: true,
-          answer: ownerDivorceDirectAnswer,
+          answer: chunkOwnerAnswer(ownerDivorceDirectAnswer, question, body.conversationHistory),
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-locked-divorce-verbatim",
@@ -331,7 +335,7 @@ module.exports=async function(req,res,env={}){
       if (earlyHusbandWorkAnswer) {
         return res.status(200).json({
           success: true,
-          answer: earlyHusbandWorkAnswer,
+          answer: chunkOwnerAnswer(earlyHusbandWorkAnswer, question, body.conversationHistory),
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-locked-husband-work-verbatim",
@@ -349,7 +353,7 @@ module.exports=async function(req,res,env={}){
         if (ownerMarriageDirectAnswer) {
           return res.status(200).json({
             success: true,
-            answer: ownerMarriageDirectAnswer,
+            answer: chunkOwnerAnswer(ownerMarriageDirectAnswer, question, body.conversationHistory),
             identity: "Astro vidhata AI",
             ownerAuthorized,
             predictionSource: "owner-locked-relationship-verbatim",
@@ -366,7 +370,7 @@ module.exports=async function(req,res,env={}){
       if (ownerSeparationDirectAnswer) {
         return res.status(200).json({
           success: true,
-          answer: ownerSeparationDirectAnswer,
+          answer: chunkOwnerAnswer(ownerSeparationDirectAnswer, question, body.conversationHistory),
           identity: "Astro vidhata AI",
           ownerAuthorized,
           predictionSource: "owner-locked-separation-verbatim",
@@ -426,7 +430,7 @@ module.exports=async function(req,res,env={}){
       // paraphrase, expand, or generate chart interpretations. Return only the
       // exact owner-authored archive text. If no matching archive exists, say so.
       if (ownerAuthoredAnswer) {
-        const answer = ownerAuthoredAnswer;
+        const answer = chunkOwnerAnswer(ownerAuthoredAnswer, question, body.conversationHistory);
         return res.status(200).json({
           success: true,
           answer,
@@ -453,7 +457,7 @@ module.exports=async function(req,res,env={}){
       return res.status(200).json({success:true,answer:"Owner Mode प्रमाणित है। अब अगली पंक्ति में अपना निर्देश और जिस प्रश्न की भविष्यवाणी बदलनी है, उसे लिखें।",identity:"Astro vidhata AI",ownerAuthorized:true,sanitizedQuestion:""});
     }
     const conversationHistory=Array.isArray(body.conversationHistory)
-      ? body.conversationHistory.slice(-12).map(item=>({
+      ? body.conversationHistory.slice(-30).map(item=>({
           role:item?.role==="assistant"||item?.role==="model"?"assistant":"user",
           content:redactQuestion(String(item?.content||"").slice(0,2500),body.chartContext)
         })).filter(item=>item.content.trim())
