@@ -59,9 +59,16 @@ async function runApi(handler, request, env = {}, allowedBodyKeys = null) {
     ? Object.fromEntries(allowedBodyKeys.filter(key => Object.prototype.hasOwnProperty.call(parsedBody, key)).map(key => [key, parsedBody[key]]))
     : parsedBody;
   if (Array.isArray(allowedBodyKeys) && allowedBodyKeys.includes("_wifeChartProfileMatched")) {
-    const profileHint = parsedBody.lockedProfileRule === "TULA_1997_03_10_AMRAVATI";
-    const chartBirth = parsedBody.chartContext?.birth || parsedBody.birthData || parsedBody.birthDetails || parsedBody.chartContext || {};
-    const profileMatched = profileHint || isLockedWifeChart(chartBirth);
+    // Never trust a browser-supplied lock flag by itself. Validate the actual
+    // birth data on the Worker so another chart cannot inherit this profile lock.
+    const birthCandidates = [
+      parsedBody.chartContext?.birth,
+      parsedBody.birthData,
+      parsedBody.birthDetails,
+      parsedBody.chartContext?.birthDetails,
+      parsedBody.chartContext
+    ].filter(value => value && typeof value === "object");
+    const profileMatched = birthCandidates.some(isLockedWifeChart);
     safeBody._wifeChartProfileMatched = profileMatched;
     safeBody.lockedProfileRule = profileMatched ? "TULA_1997_03_10_AMRAVATI" : null;
     safeBody.specialInstruction = profileMatched ? "इस जन्म-कुंडली के संबंध-विषयक प्रश्नों में D1, D9, सप्तम भाव/सप्तमेश, शुक्र/गुरु, दशा-अंतर्दशा और उपलब्ध गोचर के वास्तविक संकेतों का संतुलित विश्लेषण करें। किसी परिणाम की गारंटी न दें और विरोधी संकेतों को न छिपाएँ।" : "";
