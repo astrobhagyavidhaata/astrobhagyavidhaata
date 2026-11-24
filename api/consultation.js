@@ -5,6 +5,7 @@ const {buildLiveAstrologyContext}=require("../lib/consultation-context");
 const {getProfileSpecificSeparationAnswer,getProfilePersonalityReference,getProfileHusbandWorkAnswer, getProfileNatureAnswer, getProfileHabitsAnswer, getProfileOccultAnswer, areProfilePredictionsLocked}=require("../lib/relationship-reference");
 const {getProfileDashaPrediction}=require("../lib/profile-dasha-predictions");
 const {getProfileGocharPrediction}=require("../lib/profile-gochar-predictions");
+const {getProfileParentsAnswer}=require("../lib/profile-parents-1987");
 const runtimeApiKey=env=>env?.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : "") || "";
 
 const PRIVATE_FIELD_KEYS = new Set([
@@ -163,7 +164,8 @@ module.exports=async function(req,res,env={}){
       if (match) return match[3] + "-" + String(Number(match[2])).padStart(2,"0") + "-" + String(Number(match[1])).padStart(2,"0");
       return "";
     })();
-    const specialProfileFocus = body._wifeChartProfileMatched === true ||
+    const parents1987ProfileFocus = body._parents1987ProfileMatched === true;
+    const specialProfileFocus = parents1987ProfileFocus || body._wifeChartProfileMatched === true ||
       (normalizedBirthDate === "1997-03-10" &&
       normalizedBirthTime === "21:15" &&
       (placeText.includes("amravati") || placeText.includes("अमरावती") || isAmravatiByCoordinates));
@@ -209,6 +211,42 @@ module.exports=async function(req,res,env={}){
     // Dasha records are returned verbatim from the dedicated archive; relationship
     // separation questions use the owner's saved answer. Never fall through to Gemini.
     if (specialProfileFocus) {
+      // The 10-Mar-1987 profile has its own parent/maternal-family archive.
+      // Do not route it through the separate 1997 relationship/dasha archive.
+      if (parents1987ProfileFocus) {
+        const ownerParentsAnswer = getProfileParentsAnswer(true, question);
+        if (!ownerParentsAnswer) {
+          return res.status(200).json({
+            success: true,
+            answer: "इस जन्म-कुंडली के लिए अभी माता-पिता और मायके के परिवार से संबंधित मालिक द्वारा दिया गया विश्लेषण उपलब्ध है।",
+            identity: "Astro vidhata AI",
+            predictionLocked: true,
+            predictionSource: "owner-profile-topic-not-archived",
+            sanitizedQuestion: privateSafeQuestion
+          });
+        }
+        const answer = await askGemini({
+          question: privateSafeQuestion,
+          personName,
+          ownerAuthoredSource: ownerParentsAnswer,
+          specialProfileFocus: true,
+          chartContext,
+          conversationHistory: [],
+          language,
+          apiKey: geminiApiKey,
+          model: "gemini-3.8-flash",
+          signal: req.signal
+        });
+        return res.status(200).json({
+          success: true,
+          answer,
+          identity: "Astro vidhata AI",
+          ownerAuthorized,
+          predictionSource: "owner-authored-parents-1987",
+          predictionLocked: true,
+          sanitizedQuestion: privateSafeQuestion
+        });
+      }
       // Dasha questions have their own single-paragraph authored answer and must
       // be checked before topic/personality matching.
       // Gochar/sibling/father transit text must be matched before dasha's broad planet-name matcher.
