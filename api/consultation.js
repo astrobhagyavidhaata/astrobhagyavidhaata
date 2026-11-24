@@ -342,18 +342,6 @@ module.exports=async function(req,res,env={}){
           sanitizedQuestion: privateSafeQuestion
         });
       }
-      const ownerHusbandDirectAnswer = getProfileHusbandWorkAnswer(true, question);
-      if (ownerHusbandDirectAnswer) {
-        return res.status(200).json({
-          success: true,
-          answer: ownerHusbandDirectAnswer,
-          identity: "Astro vidhata AI",
-          ownerAuthorized,
-          predictionSource: "owner-locked-husband-verbatim",
-          predictionLocked: true,
-          sanitizedQuestion: privateSafeQuestion
-        });
-      }
       // An unrelated question must not be sent to Gemini for this profile.
       // It may proceed only if it belongs to one of the explicitly archived topics.
       const hasArchivedTopicIntent = /नेचर|स्वभाव|व्यक्तित्व|nature|personality|आदत|habits?|तंत्र|मंत्र|occult|dream|सपना|स्वप्न|माँ|मां|माता|पिता|परिवार|भाई|बहन|parents|family|health|स्वास्थ्य|बीमारी|गुस्सा|क्रोध|anger|hidden.?money|छुपे? पैसे|गहने|धन|गोचर|transit|शनि|राहु|केतु|दशा|महादशा|अंतर्दशा|antar.?dasha|dasha|पति|पती|pati|husband|पत्नी|जीवनसाथी|partner|विवाह|शादी|marriage|relationship|तलाक|divorce|separation/i.test(question);
