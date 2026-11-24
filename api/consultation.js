@@ -274,8 +274,10 @@ module.exports=async function(req,res,env={}){
       if (ownerAuthoredAnswer) {
         // Keep the owner's saved text as the exclusive source, while Gemini
         // rewrites it naturally for the exact question without adding facts.
-        const answer = ownerDashaAnswer
-          ? ownerDashaAnswer
+        // Return the complete owner-authored dasha and nature archives verbatim.
+        // Do not let Gemini replace these with a generic chart-based personality answer.
+        const answer = (ownerDashaAnswer || ownerNatureAnswer)
+          ? (ownerDashaAnswer || ownerNatureAnswer)
           : await askGemini({
               question: privateSafeQuestion,
               personName,
